@@ -56,6 +56,7 @@
 - Honest phase report: `docs/PHASE_REPORTS/analytics.md`. Not measured: p95<400 ms at 5,000×5 years, full axe audit. Not implemented: real upstream fact source, XLSX/PDF/object-storage downloads, per-export salt, per-user insight prefs, UI consumption of saved-view API, AI narratives (no pinned model).
 
 ### Resume here
-- All Part 8 changes are **uncommitted**. Do not commit/push without an explicit request.
+- Part 8 landed in commit `72f22d4` (`promt8`) on branch `EC2`; the working tree is clean. Do not commit/push without an explicit request.
+- Re-verified 2026-11-17: `pnpm typecheck && pnpm lint && pnpm test && pnpm build` pass (89 tests); Gradle `test` BUILD SUCCESSFUL; Playwright analytics 7 passed / 1 intentional skip.
 - If resuming: first re-read `docs/PHASE_REPORTS/analytics.md` and `docs/GAP_REPORT.md` §“Part 8 analytics addendum”; then re-run `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, `cd services/api && JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew test --console=plain` and `cd apps/web && pnpm exec playwright test e2e/analytics.spec.ts --reporter=line`.
 - Highest-value next work: close A1 by wiring a real `AnalyticsFactSource`; close A3 by consuming `/api/analytics/views` in the UI; add a registered `verify/runner.py` check before promoting any P8 feature from `stubbed`; measure p95 and run a full axe audit.

@@ -1,10 +1,12 @@
-import { Suspense, lazy, useEffect, type ReactNode } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Suspense, lazy, useEffect } from 'react'
+import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 import { SHOW_UI_KIT } from '@schoolos/api-client'
+import { can, landingRouteFor } from '@schoolos/shared'
 import { useSession } from './app/session'
-import { AppShell, ShellFallback } from './components/AppShell'
-import { ForbiddenCard } from './components/Screen'
+import { AppShell } from './components/AppShell'
+import { PublicOnly, RequireAuth, RequireTenant, RouteGuard, useCacheHygiene } from './access'
+import { AccessDenied, NotFoundState, ComingSoon } from './access/states'
 
 /**
  * Static FR fallback labels used for `document.title` before a screen applies
@@ -105,26 +107,44 @@ function FullPageLoader() {
   return <div className="flex min-h-screen items-center justify-center bg-app"><div className="flex flex-col items-center gap-3 text-content-subtle"><GraduationCap className="h-8 w-8 animate-pulse text-brand-500" /><span className="text-sm">SchoolOS</span></div></div>
 }
 
-function RequireAuth({ children }: { children: ReactNode }) {
-  const { session, loading } = useSession()
-  if (loading) return <FullPageLoader />
-  if (!session.authenticated) return <Navigate to="/login" replace />
-  return <>{children}</>
+function activeRoles(roles: string[], role?: string): string[] {
+  return roles.length ? roles : (role ? [role] : [])
 }
 
-function PublicOnly({ children }: { children: ReactNode }) {
-  const { session, loading } = useSession()
-  if (loading) return <FullPageLoader />
-  if (session.authenticated) return <Navigate to="/app/dashboard" replace />
-  return <>{children}</>
+/** `/` and legacy roots always resolve through the canonical role landing. */
+function RootRedirect() {
+  const { roles, role } = useSession()
+  return <Navigate to={landingRouteFor(activeRoles(roles, role))} replace />
+}
+
+/** Legacy paths are documented in ROLE_UI_MAP.md and resolve to the current landing. */
+function LegacyRedirect() {
+  const { roles, role } = useSession()
+  return <Navigate to={landingRouteFor(activeRoles(roles, role))} replace />
+}
+
+function LegacyStudentsRedirect() {
+  const { roles, role } = useSession()
+  const active = activeRoles(roles, role)
+  return <Navigate to={active.some(item => can(item, 'students.read')) ? '/app/people/students' : landingRouteFor(active)} replace />
+}
+
+function SoonPage() {
+  const { module } = useParams()
+  return <ComingSoon module={module} />
 }
 
 export default function App() {
+  useCacheHygiene()
   return (
     <Suspense fallback={<FullPageLoader />}>
       <DocumentTitle />
       <Routes>
-        <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="/home" element={<LegacyRedirect />} />
+        <Route path="/dashboard" element={<LegacyRedirect />} />
+        <Route path="/app/home" element={<LegacyRedirect />} />
+        <Route path="/students" element={<LegacyStudentsRedirect />} />
         <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
         <Route path="/forgot-password" element={<PublicOnly><ForgotPasswordPage /></PublicOnly>} />
         <Route path="/reset-password" element={<PublicOnly><ResetPasswordPage /></PublicOnly>} />
@@ -139,6 +159,33 @@ export default function App() {
           <Route path="/app/dashboard/teacher" element={<TeacherDashboard />} />
           <Route path="/app/dashboard/parent" element={<ParentDashboard />} />
           <Route path="/app/dashboard/student" element={<StudentDashboard />} />
+
+          {/* Canonical role landings — all render the shared dashboard, configured by role. */}
+          <Route path="/principal" element={<DashboardSwitch />} />
+          <Route path="/admin" element={<DashboardSwitch />} />
+          <Route path="/vie-scolaire" element={<DashboardSwitch />} />
+          <Route path="/teacher" element={<DashboardSwitch />} />
+          <Route path="/parent" element={<DashboardSwitch />} />
+          <Route path="/student" element={<DashboardSwitch />} />
+          <Route path="/finance" element={<DashboardSwitch />} />
+          <Route path="/hr" element={<DashboardSwitch />} />
+          <Route path="/safeguarding" element={<DashboardSwitch />} />
+          <Route path="/health" element={<DashboardSwitch />} />
+          <Route path="/it" element={<DashboardSwitch />} />
+          <Route path="/library" element={<DashboardSwitch />} />
+          <Route path="/front-office" element={<DashboardSwitch />} />
+          <Route path="/audit" element={<DashboardSwitch />} />
+          <Route path="/group" element={<DashboardSwitch />} />
+          <Route path="/platform" element={<DashboardSwitch />} />
+          <Route path="/analyst" element={<DashboardSwitch />} />
+
+          {/* Feature-flagged placeholders for epics not built yet; never blank screens. */}
+          <Route path="/app/soon/:module" element={<SoonPage />} />
+          <Route path="/app/health" element={<SoonPage />} />
+          <Route path="/app/finance" element={<SoonPage />} />
+          <Route path="/app/library" element={<SoonPage />} />
+          <Route path="/app/front-office" element={<SoonPage />} />
+          <Route path="/app/group/schools" element={<SoonPage />} />
 
           <Route path="/app/attendance" element={<AttendancePage />} />
           <Route path="/app/timetable" element={<TimetablePage />} />
@@ -193,9 +240,11 @@ export default function App() {
           {SHOW_UI_KIT && <Route path="/ui-kit/colors" element={<UiKitColorsPage />} />}
           {SHOW_UI_KIT && <Route path="/ui-kit/buttons" element={<UiKitButtonsPage />} />}
           {SHOW_UI_KIT && <Route path="/ui-kit/analytics" element={<AnalyticsUiKitPage />} />}
+          {/* Unknown paths stay inside the shell for authenticated users. */}
+          <Route path="*" element={<NotFoundState />} />
         </Route>
 
-        <Route path="/403" element={<ForbiddenCard />} />
+        <Route path="/403" element={<AccessDenied />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>

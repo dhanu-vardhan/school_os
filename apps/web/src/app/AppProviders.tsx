@@ -6,6 +6,7 @@ import {
 } from '@schoolos/ui'
 import { PreferencesProvider } from './preferences'
 import { SessionProvider } from './session'
+import { UiContextProvider } from './context'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [client] = useState(() => new QueryClient({
@@ -61,12 +62,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <QueryClientProvider client={client}>
       <PreferencesProvider>
         <SessionProvider>
-          <ActionLabelsProvider labels={actionLabels}>
-            <TooltipProvider delayDuration={250}>
-              {children}
-              <ToastHost />
-            </TooltipProvider>
-          </ActionLabelsProvider>
+          <UiContextProvider>
+            <ActionLabelsProvider labels={actionLabels}>
+              <TooltipProvider delayDuration={250}>
+                {children}
+                <ToastHost />
+              </TooltipProvider>
+            </ActionLabelsProvider>
+          </UiContextProvider>
         </SessionProvider>
       </PreferencesProvider>
     </QueryClientProvider>

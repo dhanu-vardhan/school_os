@@ -13,7 +13,7 @@ import {
   acceptInvitation, authSignIn, currentDemoTotp, demoSignIn, forgotPassword, resetPassword,
   sessionStore, useDemoAccounts, verifyMfa,
 } from '@schoolos/api-client'
-import { ROLE_ACCENT, ROLE_FAMILY, toDisplayRole } from '@schoolos/shared'
+import { ROLE_ACCENT, ROLE_FAMILY, landingRouteFor, postLoginRoute, toDisplayRole } from '@schoolos/shared'
 import type { DemoAccount, MfaChallenge } from '@schoolos/shared'
 import { useSession } from '../app/session'
 import { PageHeader } from '../components/Screen'
@@ -43,6 +43,7 @@ export function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const [params] = useSearchParams()
   const { config, refresh } = useSession()
   const [schoolId, setSchoolId] = useState<string | undefined>()
   const [identifier, setIdentifier] = useState('')
@@ -66,8 +67,11 @@ export function LoginPage() {
     await qc.invalidateQueries()
     await refresh()
     const stored = sessionStore.get()
-    const target = (stored.user?.memberships?.length ?? 0) > 1 && !schoolId ? '/schools/select' : '/app/dashboard'
-    navigate(target, { replace: true })
+    if ((stored.user?.memberships?.length ?? 0) > 1 && !schoolId) {
+      navigate('/schools/select', { replace: true })
+      return
+    }
+    navigate(postLoginRoute(params.get('returnTo'), stored.user?.roles), { replace: true })
   }
 
   async function handleResult(result: Awaited<ReturnType<typeof authSignIn>>['data'] | Awaited<ReturnType<typeof demoSignIn>>['data']) {
@@ -343,7 +347,7 @@ export function SchoolSelectPage() {
     try {
       await switchSchool(id)
       toast.success(t('common.school'))
-      navigate('/app/dashboard', { replace: true })
+      navigate(landingRouteFor(sessionStore.get().user?.roles), { replace: true })
     } catch {
       toast.error(t('state.error'))
     } finally { setBusy(false) }
@@ -528,7 +532,7 @@ export function ForbiddenPage() {
         <h1 className="mt-4 font-display text-2xl font-bold text-content">{t('auth.forbidden')}</h1>
         <p className="mt-2 text-sm text-content-muted">{t('auth.forbiddenBody')}</p>
         <div className="mt-6 flex flex-col gap-2">
-          <Button asChild><Link to="/app/dashboard">Go to my dashboard</Link></Button>
+          <Button asChild><Link to="/">Go to my dashboard</Link></Button>
           <Button asChild variant="outline"><Link to="/app/platform/support">Request access</Link></Button>
         </div>
       </Card>
@@ -544,7 +548,7 @@ export function NotFoundPage() {
       <p className="mt-4 font-display text-6xl font-bold text-brand-500">404</p>
       <h1 className="mt-2 font-display text-2xl font-bold text-content">{t('auth.notFound')}</h1>
       <p className="mt-2 text-sm text-content-muted">{t('auth.notFoundBody')}</p>
-      <Button asChild className="mt-6"><Link to="/app/dashboard">{t('auth.goHome')}</Link></Button>
+      <Button asChild className="mt-6"><Link to="/">{t('auth.goHome')}</Link></Button>
     </div>
   )
 }

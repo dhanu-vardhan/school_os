@@ -1,13 +1,19 @@
-import { Navigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { can } from '@schoolos/shared'
+import { canAccess, type AccessResource, type PermissionInput } from '@schoolos/shared'
 import { useSession } from '../app/session'
+import { AccessDenied } from './states'
 
-export function RequirePermission({ permission, children }: { permission?: string; children: ReactNode }) {
-  const { role, loading } = useSession()
+/**
+ * Action-level gate (route-level access is handled by RouteGuard). Accepts dotted or colon-shaped
+ * permissions and an optional resource for object-scoped checks; denies by default.
+ */
+export function RequirePermission({ permission, resource, children }: {
+  permission: PermissionInput
+  resource?: AccessResource
+  children: ReactNode
+}) {
+  const { role, roles, schoolId, loading } = useSession()
   if (loading) return null
-  if (permission && !can(role, permission as any)) {
-    return <Navigate to="/forbidden" replace />
-  }
+  if (!canAccess({ role, roles, schoolId }, permission, resource)) return <AccessDenied />
   return <>{children}</>
 }
