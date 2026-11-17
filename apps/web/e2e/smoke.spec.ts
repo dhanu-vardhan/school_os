@@ -74,6 +74,23 @@ test('colour kit renders token contrast in light, dark and high contrast', async
   await expect(page.getByText('FAIL', { exact: true })).toHaveCount(0)
 })
 
+test('buttons kit exposes the action matrix and roving keyboard focus', async ({ page }) => {
+  await signIn(page)
+  await goTo(page, '/ui-kit/buttons')
+  await expect(page.getByRole('heading', { name: 'Boutons', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Matrice des états', level: 2 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Actions composées', level: 2 })).toBeVisible()
+
+  const toolbar = page.getByRole('toolbar', { name: 'Vue' })
+  await toolbar.getByRole('button', { name: 'Jour' }).focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(toolbar.getByRole('button', { name: 'Semaine' })).toBeFocused()
+  await expect(page.locator('button[aria-keyshortcuts]:visible').first()).toBeVisible()
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2)
+  expect(overflow).toBe(false)
+})
+
 test('safeguarding lists expose no restricted content', async ({ page }) => {
   await signIn(page)
   await goTo(page, '/app/safeguarding')

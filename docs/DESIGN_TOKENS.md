@@ -81,13 +81,13 @@ Rules:
 
 ### Source lint
 
-`scripts/lint-actions.mjs` (run by `pnpm lint` in `apps/web`) fails when:
+`pnpm lint` runs three gates:
 
-- more than one `variant="primary"` (or bare `<Button>` default-primary) is found in the same JSX section without a `data-section` boundary,
-- an action label matches `^(OK|Submit|Yes|Cancel|Confirm)$` in either locale,
-- a raw hex/rgb/hsl/oklch or named `white`/`black`/`transparent` colour appears outside `styles.css` or a token file.
+- `scripts/lint-actions.mjs` fails on the generic labels `OK`, `Submit` and `Yes` in feature screens (the UI kit and tests are exempt).
+- `scripts/lint-colors.mjs` fails on raw hex/rgb/hsl/oklch values and named `white`/`black`/`transparent` outside token files.
+- `scripts/check-contrast.mjs` checks 14 token pairs in light, dark, high contrast and dark high contrast.
 
-The lint is intentionally simple (regex + JSX section scan); complex cases are documented in review rather than suppressed.
+The one-primary rule and verb+object labels are enforced by review and the shared action primitives; complex cases are documented rather than suppressed by overly clever regex.
 
 ---
 
@@ -95,10 +95,15 @@ The lint is intentionally simple (regex + JSX section scan); complex cases are d
 
 | Component | Semantic tokens used |
 |---|---|
-| Button (all variants) | `--action-*`, `--state-layer-*`, `--focus-ring`, `--btn-radius`, `--ripple-color` |
+| Button / IconButton | `--action-*`, `--state-layer-*`, `--focus-ring`, `--btn-radius`, `--ripple-color` |
+| ButtonGroup / SegmentedControl | Button tokens plus `--control-border` between joined controls |
+| DropdownMenu / RowActions | `--surface`, `--border`, `--control-border` (shortcut key), `--status-danger-*` |
+| BulkActionBar / StickyActionBar | `--surface`, `--control-border`, `--shadow-md` |
+| Fab / SpeedDial | `--action-primary-*`, `--radius-full`, `--shadow-lg` |
+| CopyButton / ShareMenu / QuickAddMenu | Button tokens plus `--status-success-*` / `--status-danger-*` |
 | Badge / StatusPill | `--status-{brand,success,warning,danger,info}-{fg,bg,border}` |
 | Card / surfaces | `--surface`, `--border`, `--shadow-*` |
 | Inputs | `--surface`, `--control-border` (≥3:1), `--text`, `--focus-ring` |
 | Charts | `--chart-{fill,line,grid,point,label,bar-start,bar-end}` |
 
-Colour-blind safety: every status is encoded by **text + shape/icon + colour**, never colour alone. `/ui-kit/colors` renders the full matrix in light, dark and high-contrast modes with computed contrast ratios.
+Colour-blind safety: every status is encoded by **text + shape/icon + colour**, never colour alone. `/ui-kit/colors` renders the full matrix in light, dark and high-contrast modes with computed contrast ratios; `/ui-kit/buttons` renders every action state and composite primitive, including roving-tabindex keyboard behaviour.

@@ -84,6 +84,7 @@ const SettingsPage = lazy(() => import('./pages/Settings').then(m => ({ default:
 const DemoPage = lazy(() => import('./pages/Demo').then(m => ({ default: m.DemoPage })))
 const UiKitPage = lazy(() => import('./pages/UiKit').then(m => ({ default: m.UiKitPage })))
 const UiKitColorsPage = lazy(() => import('./pages/UiKitColors').then(m => ({ default: m.UiKitColorsPage })))
+const UiKitButtonsPage = lazy(() => import('./pages/UiKitButtons').then(m => ({ default: m.UiKitButtonsPage })))
 
 function FullPageLoader() {
   return <div className="flex min-h-screen items-center justify-center bg-app"><div className="flex flex-col items-center gap-3 text-content-subtle"><GraduationCap className="h-8 w-8 animate-pulse text-brand-500" /><span className="text-sm">SchoolOS</span></div></div>
@@ -164,6 +165,7 @@ export default function App() {
           <Route path="/demo" element={<DemoPage />} />
           {SHOW_UI_KIT && <Route path="/ui-kit" element={<UiKitPage />} />}
           {SHOW_UI_KIT && <Route path="/ui-kit/colors" element={<UiKitColorsPage />} />}
+          {SHOW_UI_KIT && <Route path="/ui-kit/buttons" element={<UiKitButtonsPage />} />}
         </Route>
 
         <Route path="/403" element={<ForbiddenCard />} />

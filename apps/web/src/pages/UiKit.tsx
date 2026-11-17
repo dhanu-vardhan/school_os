@@ -42,6 +42,7 @@ export function UiKitPage() {
         actions={
           <>
             <Button asChild variant="outline" size="sm"><Link to="/ui-kit/colors">{t('uikit.colors')}</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link to="/ui-kit/buttons">{t('uikit.buttons')}</Link></Button>
             <Badge tone="brand">v1</Badge>
           </>
         }

@@ -1,24 +1,18 @@
 import { forwardRef } from 'react'
 import { cn } from '../lib/cn'
-import { buttonVariants } from '../lib/variants'
-import type { VariantProps } from 'class-variance-authority'
+import { Button, type ButtonProps } from './Button'
 
-export interface IconButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+export interface IconButtonProps extends ButtonProps {
+  /** Accessible name and native tooltip for the icon-only action. */
   label: string
 }
 
+/** Icon-only variant of the single Button system (never a separate button implementation). */
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
   { label, className, variant = 'ghost', size = 'icon', ...props }, ref,
 ) {
   return (
-    <button
-      ref={ref}
-      type="button"
-      aria-label={label}
-      title={label}
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...props}
-    />
+    <Button ref={ref} type="button" aria-label={label} title={label} variant={variant} size={size}
+      className={cn('shrink-0', className)} {...props} />
   )
 })

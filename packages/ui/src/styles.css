@@ -451,6 +451,79 @@ html.ui-large-text { font-size: 17px; }
   animation: ui-ripple var(--duration-ripple) var(--ease-out) forwards;
 }
 
+/* Composite actions — layout and elevation only; all colour comes from tokens */
+.ui-kbd {
+  align-items: center;
+  border: 1px solid rgb(var(--control-border));
+  border-radius: var(--radius-xs);
+  background: rgb(var(--surface-2));
+  color: rgb(var(--text-subtle));
+  padding: 0 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1.25rem;
+}
+.ui-action-group, .ui-split, .ui-row-actions { display: inline-flex; align-items: center; }
+.ui-action-group > *, .ui-split > * { margin-left: -1px; }
+.ui-action-group > :first-child, .ui-split > :first-child { margin-left: 0; }
+.ui-action-group > :focus-visible, .ui-split > :focus-visible { z-index: 1; }
+.ui-row-actions > * + * { margin-left: 0.125rem; }
+.ui-chip { border-radius: var(--radius-full); }
+.ui-toggle[aria-pressed='true'] { border-color: rgb(var(--action-primary-bg)); }
+
+.ui-bulk-bar, .ui-sticky-bar {
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgb(var(--control-border));
+  border-radius: var(--radius-md);
+  background: rgb(var(--surface) / 0.96);
+  box-shadow: var(--shadow-md);
+  padding: 0.75rem 1rem;
+}
+.ui-bulk-bar { position: sticky; bottom: 5.25rem; margin-top: 1rem; }
+.ui-sticky-bar { position: sticky; bottom: 5.25rem; margin-top: 1.5rem; }
+@media (min-width: 768px) {
+  .ui-bulk-bar { bottom: 1rem; }
+  .ui-sticky-bar { bottom: 1rem; }
+}
+
+.ui-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.5rem;
+  z-index: 30;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+}
+.ui-fab-inline, .ui-speed-dial-inline { position: relative; inset: auto; z-index: auto; }
+.ui-speed-dial {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.5rem;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+.ui-speed-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  transform-origin: bottom right;
+  animation: ui-scale-in var(--duration-fast) var(--ease-out) both;
+}
+.ui-speed-item { justify-content: flex-end; box-shadow: var(--shadow-sm); }
+@media (min-width: 768px) {
+  .ui-fab, .ui-speed-dial { right: 1.5rem; bottom: 1.5rem; }
+}
+
 /* Route transition — transform/opacity only, disabled under reduced motion */
 @keyframes ui-route-in {
   from { opacity: 0; transform: translateY(6px); }

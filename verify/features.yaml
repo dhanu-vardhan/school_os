@@ -1136,3 +1136,30 @@ features:
     status: stubbed
     prompt_ref: P2-tokens
     reason: "Status and chart colour layers added; no raw colour outside token file"
+  - id: UI-P4-BUTTON-SYSTEM
+    module: ui
+    name: "Part 2 unified Button with loading, disabled reason, shortcut and ripple"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-actions
+    reason: "Shared primitive upgraded; covered by Vitest and Playwright"
+  - id: UI-P4-COMPOSITE-ACTIONS
+    module: ui
+    name: "Part 2 composite action primitives with roving tabindex"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-actions
+    reason: "ButtonGroup, SplitButton, bulk/sticky bars, FAB, copy and menus implemented"
+  - id: UI-P4-BUTTON-KIT
+    module: ui
+    name: "Part 2 /ui-kit/buttons action state matrix"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-actions
+    reason: "Dev-only route; responsive state matrix and keyboard smoke coverage"

@@ -92,3 +92,13 @@
 | P3-2 | Add `--chart-*` component tokens and migrate both charts to them. | Charts were token-based but referenced primitives directly; the component layer keeps future palette changes in one place. |
 | P3-3 | Add `--status-*-{bg,border}` tokens and use them in `Badge`/`StatusPill`; dark mode overrides the component layer rather than sprinkling `dark:` colour classes in each variant. | Colour remains the secondary signal (text/icon still carries meaning), and status chips stay consistent across modules. |
 | P3-4 | Use `--control-border` for outlined controls and stepper markers, leaving decorative dividers on `--border`. | Satisfies WCAG 1.4.11 without making the UI visually loud. |
+
+## 2026-11-17: Part 2 Phase 4 — action system
+
+| # | Decision | Reason |
+|---|---|---|
+| P4-1 | `Button` is the only action primitive: `asChild` uses Radix `Slottable`, `disabledReason` adds an sr-only description plus native tooltip, `shortcut` mirrors to `aria-keyshortcuts`, and a touch-only ripple is removed on `animationend`. `IconButton` now delegates to `Button`. | One focus/state/motion implementation; no duplicate raw `<button>` code, and no timers or reduced-motion violations. |
+| P4-2 | `ActionLabelsProvider` supplies translated verb+object labels from the web app; `packages/ui` never imports i18n. `undoToast` carries only caller-provided, non-case messages. | Keeps the UI package reusable while every screen remains FR/EN and safeguarding data never reaches toasts. |
+| P4-3 | Composite primitives use local roving tabindex for groups, Radix menus for focus trap/return, and force destructive items to the end with an `Irreversible actions` group label. | Meets WCAG 2.1 keyboard expectations without adding dependencies or risking an accidental destructive click. |
+| P4-4 | `BulkActionBar` renders exactly one primary action and pushes danger last; `StickyActionBar` keeps one primary committed action. | Encodes the one-primary-per-section rule in the component rather than relying on each screen. |
+| P4-5 | `/ui-kit/buttons` is dev-only, uses a mobile card layout instead of a 760 px table, and is gated by `SHOW_UI_KIT` like the colour kit. | The action reference must be reviewable at 360 px without introducing document-level horizontal overflow. |
