@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { CalendarDays } from 'lucide-react'
 import { cn } from '../lib/cn'
 import { Input } from './Field'
+import { Button } from './Button'
 
 const iso = (d: Date) => d.toISOString().slice(0, 10)
 
@@ -36,13 +37,13 @@ export function DateRange({ from, to, onChange, className }: {
       <DatePicker label="To" value={to} onChange={v => onChange(from, v)} className="w-40" />
       <div className="flex gap-1 pb-0.5">
         {presets.map(p => (
-          <button key={p.label} type="button" onClick={() => {
+          <Button key={p.label} variant="outline" size="sm" onClick={() => {
             const end = new Date()
             const start = new Date(end.getTime() - p.days * 86400000)
             onChange(iso(start), iso(end))
-          }} className="focus-ring rounded-md border border-line bg-surface px-2.5 py-2 text-xs font-medium text-content-muted hover:bg-surface-2 hover:text-content">
+          }} className="px-2.5 text-content-muted hover:text-content">
             {p.label}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

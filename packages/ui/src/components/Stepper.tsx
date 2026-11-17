@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react'
 import { cn } from '../lib/cn'
+import { Button } from './Button'
 
 export function Stepper({ steps, current, onStepClick }: {
   steps: { title: string; description?: string }[]; current: number; onStepClick?: (i: number) => void
@@ -11,12 +12,13 @@ export function Stepper({ steps, current, onStepClick }: {
         const active = i === current
         return (
           <li key={step.title} className="flex flex-1 items-start gap-3">
-            <button type="button" disabled={!onStepClick} onClick={() => onStepClick?.(i)}
+            <Button variant="bare" disabled={!onStepClick} onClick={() => onStepClick?.(i)}
+              aria-label={step.title}
               aria-current={active ? 'step' : undefined}
-              className={cn('focus-ring flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+              className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
                 done ? 'border-action-success bg-action-success text-action-success-fg' : active ? 'border-action-primary bg-action-primary text-action-primary-fg' : 'border-line-control bg-surface text-content-subtle')}>
               {done ? <Check className="h-4 w-4" /> : i + 1}
-            </button>
+            </Button>
             <div className="min-w-0 pt-1">
               <p className={cn('text-sm font-medium', active ? 'text-content' : 'text-content-muted')}>{step.title}</p>
               {step.description && <p className="text-xs text-content-subtle">{step.description}</p>}

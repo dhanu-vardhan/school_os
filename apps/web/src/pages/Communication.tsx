@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Bell, CheckCheck, Mail, Megaphone, Send } from 'lucide-react'
 import {
   Badge, Banner, Button, Card, CardBody, CardHeader, FormField, Input, Modal, Select,
-  Tabs, Textarea, Timeline, toast,
+  Tabs, Textarea, Timeline, cn, toast,
 } from '@schoolos/ui'
 import {
   useAnnouncements, useCreateAnnouncement, useMarkAllNotificationsRead, useMarkNotificationRead,
@@ -26,12 +26,14 @@ export function NotificationsPage() {
       <QueryState isLoading={notifications.isLoading} error={notifications.error} onRetry={() => void notifications.refetch()} isEmpty={notifications.data?.data?.length === 0} empty={<ScreenEmpty title={t('comm.empty')} />}>{() => (<>
         <Card><CardBody className="space-y-2">
           {notifications.data!.data.map(n => (
-            <button key={n.id} type="button" onClick={() => void markOne.mutateAsync(n.id)}
-              className={`flex w-full items-start gap-3 rounded-lg border p-4 text-left transition-colors ${n.read ? 'border-line bg-surface' : 'border-brand-200 bg-brand-50/60 dark:border-brand-500/30 dark:bg-brand-500/10'}`}>
+            <Button key={n.id} variant="bare" onClick={() => void markOne.mutateAsync(n.id)}
+              aria-label={`${n.title} — ${n.category}`}
+              className={cn('flex w-full items-start gap-3 rounded-lg border p-4 text-left transition-colors',
+                n.read ? 'border-line bg-surface' : 'border-brand-200 bg-brand-50/60 dark:border-brand-500/30 dark:bg-brand-500/10')}>
               <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${n.tone === 'danger' ? 'bg-danger-100 text-danger-600' : n.tone === 'warning' ? 'bg-warning-100 text-warning-600' : 'bg-brand-100 text-brand-600'} dark:bg-surface-3`}><Bell className="h-4 w-4" /></span>
               <div className="min-w-0 flex-1"><p className="font-medium text-content">{n.title}</p><p className="text-sm text-content-muted">{n.body}</p><p className="mt-1 text-xs text-content-subtle">{formatDate(n.at)} · {n.category}</p></div>
               {!n.read && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-500" aria-label="unread" />}
-            </button>
+            </Button>
           ))}
         </CardBody></Card>
       </>)}</QueryState>
@@ -105,12 +107,15 @@ export function MessagesPage() {
             <CardHeader title={t('comm.messages')} action={<Badge tone="neutral">{messages.data!.data.length}</Badge>} />
             <CardBody className="space-y-2 p-2">
               {messages.data!.data.map(m => (
-                <button key={m.id} type="button" onClick={() => setSelected(m)}
-                  className={`w-full rounded-lg border p-3 text-left transition-colors ${selected?.id === m.id ? 'border-brand-300 bg-brand-50 dark:bg-brand-500/10' : 'border-line/0 hover:bg-surface-2'} ${!m.read ? 'font-medium' : ''}`}>
+                <Button key={m.id} variant="bare" onClick={() => setSelected(m)}
+                  aria-label={`${m.subject} — ${m.from}`}
+                  className={cn('block w-full rounded-lg border p-3 text-left transition-colors',
+                    selected?.id === m.id ? 'border-brand-300 bg-brand-50 dark:bg-brand-500/10' : 'border-line/0 hover:bg-surface-2',
+                    !m.read && 'font-medium')}>
                   <div className="flex items-center justify-between gap-2"><p className="truncate text-sm text-content">{m.subject}</p>{!m.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />}</div>
                   <p className="truncate text-xs text-content-muted">{m.from}</p>
                   <p className="mt-1 text-[11px] text-content-subtle">{formatDate(m.at)}</p>
-                </button>
+                </Button>
               ))}
             </CardBody>
           </Card>

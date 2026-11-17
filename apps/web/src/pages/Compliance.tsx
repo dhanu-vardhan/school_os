@@ -104,7 +104,15 @@ export function CompliancePackPage() {
       <PageHeader title={t('compliance.pack')} breadcrumbs={[{ label: t('nav.group.safety') }, { label: t('compliance.pack') }]} />
       <div className="mb-5"><Banner tone="info" title={t('compliance.legal')} /></div>
       <div className="grid gap-3 sm:grid-cols-2">
-        {links.map(l => <a key={l.label} href={l.to} className="ui-card flex items-center gap-3 p-5 hover:border-brand-300"><l.icon className="h-5 w-5 text-brand-500" /><span className="font-medium text-content">{l.label}</span><Badge tone="neutral" className="ml-auto">TODO(legal-review)</Badge></a>)}
+        {links.map(l => (
+          <Button key={l.label} asChild variant="bare" className="ui-card flex items-center gap-3 p-5 hover:border-brand-300">
+            <a href={l.to}>
+              <l.icon className="h-5 w-5 text-brand-500" />
+              <span className="font-medium text-content">{l.label}</span>
+              <Badge tone="neutral" className="ml-auto">TODO(legal-review)</Badge>
+            </a>
+          </Button>
+        ))}
       </div>
     </div>
   )

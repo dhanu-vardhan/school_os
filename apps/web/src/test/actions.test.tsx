@@ -22,6 +22,22 @@ describe('Button action system', () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  it('keeps card-like actions keyboard accessible without preset button styling', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+    renderApp(
+      <Button variant="bare" onClick={onClick} aria-label="Open activity">
+        <span>Chess club</span>
+      </Button>,
+    )
+    const card = screen.getByRole('button', { name: 'Open activity' })
+    expect(card).not.toHaveClass('bg-action-primary')
+    expect(card).toHaveClass('focus-ring', 'ui-state')
+    card.focus()
+    await user.keyboard('{Enter}')
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+
   it('exposes shortcut hints to assistive technology', () => {
     renderApp(<Button shortcut="⌘S">Enregistrer l’emploi du temps</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('aria-keyshortcuts', '⌘S')

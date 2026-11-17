@@ -27,6 +27,14 @@ export interface ActionLabels {
   destructive: string
   selected: (count: number) => string
   clearSelection: string
+  previousPage: string
+  nextPage: string
+  clearSearch: string
+  search: string
+  selectAll: string
+  clear: string
+  columns: string
+  toggleDensity: string
 }
 
 export const defaultActionLabels: ActionLabels = {
@@ -54,6 +62,14 @@ export const defaultActionLabels: ActionLabels = {
   destructive: 'Irreversible actions',
   selected: count => `${count} selected`,
   clearSelection: 'Clear selection',
+  previousPage: 'Previous page',
+  nextPage: 'Next page',
+  clearSearch: 'Clear search',
+  search: 'Search',
+  selectAll: 'Select all',
+  clear: 'Clear',
+  columns: 'Columns',
+  toggleDensity: 'Toggle density',
 }
 
 const ActionLabelsContext = createContext<ActionLabels>(defaultActionLabels)

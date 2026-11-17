@@ -40,6 +40,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
     destructive: t('action.destructive'),
     selected: count => t('action.selected', { count }),
     clearSelection: t('action.clearSelection'),
+    previousPage: t('action.previousPage'),
+    nextPage: t('action.nextPage'),
+    clearSearch: t('action.clearSearch'),
+    search: t('action.search'),
+    selectAll: t('action.selectAll'),
+    clear: t('action.clear'),
+    columns: t('action.columns'),
+    toggleDensity: t('action.toggleDensity'),
   }), [t])
 
   return (

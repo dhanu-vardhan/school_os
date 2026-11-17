@@ -1,4 +1,5 @@
 import { cn } from '../lib/cn'
+import { Button } from './Button'
 
 export interface CalendarEvent {
   id: string
@@ -49,12 +50,13 @@ export function CalendarGrid({ days, startHour = 8, endHour = 18, events, onEven
                   const top = (e.start - startHour) * 64
                   const height = Math.max(28, (e.end - e.start) * 64 - 4)
                   return (
-                    <button key={e.id} type="button" onClick={() => onEventClick?.(e)}
-                      className={cn('pointer-events-auto absolute inset-x-1 overflow-hidden rounded border-l-[3px] px-2 py-1 text-left shadow-xs transition-shadow hover:shadow-md', tones[e.tone ?? 'brand'])}
+                    <Button key={e.id} variant="bare" onClick={() => onEventClick?.(e)}
+                      aria-label={e.subtitle ? `${e.title} — ${e.subtitle}` : e.title}
+                      className={cn('pointer-events-auto absolute inset-x-1 block overflow-hidden rounded border-l-[3px] px-2 py-1 text-left shadow-xs transition-shadow hover:shadow-md', tones[e.tone ?? 'brand'])}
                       style={{ top, height }}>
                       <p className="truncate text-xs font-semibold">{e.title}</p>
                       {height > 42 && e.subtitle && <p className="truncate text-[11px] opacity-80">{e.subtitle}</p>}
-                    </button>
+                    </Button>
                   )
                 })}
               </div>

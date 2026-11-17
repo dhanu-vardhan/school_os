@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import {
-  Badge, Button, Card, CardBody, CardHeader, EmptyState, Progress, Select, Stepper, Tabs, toast,
+  Badge, Button, Card, CardBody, CardHeader, EmptyState, Progress, Select, Stepper, Tabs, cn, toast,
 } from '@schoolos/ui'
 import { useActivity, useActivities, useEnrolInActivity, useOfferings, useStudents } from '@schoolos/api-client'
 import { formatDate, formatMoney } from '@schoolos/i18n'
@@ -21,7 +21,8 @@ function ActivityCard({ activity, offeringId, onOpen }: { activity: Activity; of
   const { t } = useTranslation()
   const Icon = iconMap[activity.icon ?? 'art'] ?? Palette
   return (
-    <button type="button" onClick={onOpen} className="ui-card ui-card-hover overflow-hidden text-left">
+    <Button variant="bare" onClick={onOpen} aria-label={activity.name}
+      className="ui-card ui-card-hover block w-full overflow-hidden text-left">
       <div className={`flex h-28 items-center justify-center bg-gradient-to-br ${toneMap[activity.imageTone ?? 'brand']}`}>
         <Icon className="h-10 w-10 text-neutral-0/90" />
       </div>
@@ -31,7 +32,7 @@ function ActivityCard({ activity, offeringId, onOpen }: { activity: Activity; of
         <div className="mt-3 flex items-center gap-3 text-xs text-content-subtle"><span className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" />{activity.day}</span><span className="flex items-center gap-1"><UsersRound className="h-3.5 w-3.5" />{activity.minAge}–{activity.maxAge} {t('common.yes').toLowerCase()}</span></div>
         {offeringId && <span className="mt-3 inline-flex text-xs font-medium text-brand-600 dark:text-brand-300">{t('common.details')} →</span>}
       </div>
-    </button>
+    </Button>
   )
 }
 
@@ -67,12 +68,14 @@ export function ActivitiesPage() {
             {activities.data!.data.map(a => {
               const o = offeringByActivity.get(a.id)
               return (
-                <button key={a.id} type="button" onClick={() => navigate(`/app/activities/${a.id}`)} className="ui-card flex w-full flex-wrap items-center gap-4 p-4 text-left hover:border-brand-300">
+                <Button key={a.id} variant="bare" onClick={() => navigate(`/app/activities/${a.id}`)}
+                  aria-label={a.name}
+                  className="ui-card flex w-full flex-wrap items-center gap-4 p-4 text-left hover:border-brand-300">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${toneMap[a.imageTone ?? 'brand']}`}>{(() => { const Icon = iconMap[a.icon ?? 'art'] ?? Palette; return <Icon className="h-5 w-5 text-neutral-0" /> })()}</div>
                   <div className="min-w-0 flex-1"><p className="font-medium text-content">{a.name}</p><p className="truncate text-xs text-content-subtle">{a.description}</p></div>
                   <span className="text-xs text-content-muted">{a.day}</span>
                   {o && <Badge tone={o.booked >= o.capacity ? 'warning' : 'success'}>{o.booked}/{o.capacity}</Badge>}
-                </button>
+                </Button>
               )
             })}
           </div>

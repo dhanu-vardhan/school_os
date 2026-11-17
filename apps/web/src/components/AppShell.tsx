@@ -115,9 +115,15 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-app text-content">
-      <a href="#main-content" className="ui-skip focus-ring">{t('common.skipToContent')}</a>
+      <Button asChild variant="bare" className="ui-skip focus-ring">
+        <a href="#main-content" data-skip-link>{t('common.skipToContent')}</a>
+      </Button>
 
-      {sidebarOpen && <button className="fixed inset-0 z-30 bg-overlay lg:hidden" aria-label={t('common.close')} onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && (
+        <IconButton label={t('common.close')} variant="bare"
+          className="fixed inset-0 z-30 h-auto w-auto rounded-none bg-overlay p-0 lg:hidden"
+          onClick={() => setSidebarOpen(false)} />
+      )}
 
       <aside className={`ui-scroll fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-line bg-surface transition-transform duration-base lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex h-16 items-center gap-3 border-b border-line px-5">

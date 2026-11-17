@@ -1163,3 +1163,30 @@ features:
     status: stubbed
     prompt_ref: P2-actions
     reason: "Dev-only route; responsive state matrix and keyboard smoke coverage"
+  - id: UI-P5-SINGLE-BUTTON-SYSTEM
+    module: ui
+    name: "Part 2 all feature and shared actions use the Button system"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-actions
+    reason: "Raw buttons removed; lint enforces Button/IconButton or Button asChild anchors"
+  - id: UI-P5-BARE-CARD-ACTIONS
+    module: ui
+    name: "Part 2 card, row and marker actions use the bare Button variant"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-actions
+    reason: "Bare variant keeps focus/disabled behaviour with className-driven layout"
+  - id: UI-P5-ACTION-LINT
+    module: ui
+    name: "Part 2 action lint fails ad-hoc buttons, styled anchors and generic labels"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-actions
+    reason: "scripts/lint-actions.mjs extended and wired into pnpm lint"

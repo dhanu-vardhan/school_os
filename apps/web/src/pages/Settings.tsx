@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Monitor, Moon, Sun } from 'lucide-react'
-import { Badge, Card, CardBody, CardHeader, Select, Switch, Tabs, toast } from '@schoolos/ui'
+import { Badge, Button, Card, CardBody, CardHeader, Select, Switch, Tabs, cn, toast } from '@schoolos/ui'
 import { usePreferences, type Theme } from '../app/preferences'
 import { useSession } from '../app/session'
 import { PageHeader } from '../components/Screen'
@@ -29,10 +29,12 @@ export function SettingsPage() {
                   <p className="mb-2 text-sm font-medium text-content">{t('common.theme')}</p>
                   <div className="grid grid-cols-3 gap-2">
                     {([['light', Sun], ['dark', Moon], ['system', Monitor]] as [Theme, typeof Sun][]).map(([value, Icon]) => (
-                      <button key={value} type="button" onClick={() => setTheme(value)}
-                        className={`focus-ring flex flex-col items-center gap-2 rounded-lg border p-4 text-sm ${theme === value ? 'border-brand-400 bg-brand-50 dark:bg-brand-500/10' : 'border-line'}`}>
+                      <Button key={value} variant="bare" onClick={() => setTheme(value)}
+                        aria-pressed={theme === value}
+                        className={cn('flex flex-col items-center gap-2 rounded-lg border p-4 text-sm',
+                          theme === value ? 'border-brand-400 bg-brand-50 dark:bg-brand-500/10' : 'border-line')}>
                         <Icon className="h-5 w-5 text-brand-500" />{t(`settings.theme${value[0].toUpperCase()}${value.slice(1)}`)}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -62,7 +64,7 @@ export function SettingsPage() {
               <div className="max-w-xl space-y-4">
                 <p className="text-sm text-content-muted">{t('auth.sessionExpiredBody')}</p>
                 <Badge tone="brand">{config.authMode}</Badge>
-                <div><button type="button" className="focus-ring rounded-md bg-danger-600 px-4 py-2 text-sm font-medium text-neutral-0" onClick={() => void logout().then(() => window.location.assign('/login'))}>{t('common.logout')}</button></div>
+                <div><Button variant="danger" onClick={() => void logout().then(() => window.location.assign('/login'))}>{t('common.logout')}</Button></div>
               </div>
             ) },
           ]} />

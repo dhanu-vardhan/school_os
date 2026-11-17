@@ -102,3 +102,13 @@
 | P4-3 | Composite primitives use local roving tabindex for groups, Radix menus for focus trap/return, and force destructive items to the end with an `Irreversible actions` group label. | Meets WCAG 2.1 keyboard expectations without adding dependencies or risking an accidental destructive click. |
 | P4-4 | `BulkActionBar` renders exactly one primary action and pushes danger last; `StickyActionBar` keeps one primary committed action. | Encodes the one-primary-per-section rule in the component rather than relying on each screen. |
 | P4-5 | `/ui-kit/buttons` is dev-only, uses a mobile card layout instead of a 760 px table, and is gated by `SHOW_UI_KIT` like the colour kit. | The action reference must be reviewable at 360 px without introducing document-level horizontal overflow. |
+
+## 2026-11-17: Part 2 Phase 5 — single action system across all screens
+
+| # | Decision | Reason |
+|---|---|---|
+| P5-1 | Add a `bare` variant/size that keeps only the universal `focus-ring ui-state transition disabled` behaviour and leaves layout to `className`; `Button` forces the bare size whenever `variant="bare"`. | Cards, rows, calendar events, stepper markers and combobox triggers need the Button behaviour without the filled/padded pill shape; this avoids fragile tailwind-merge overrides. |
+| P5-2 | Migrate every raw `<button>` in `apps/web/src` and `packages/ui/src` to `Button` or `IconButton`, and every styled `<a>` to `<Button asChild>` with the anchor as an unstyled child. | One focus/state/motion implementation; the skip link and static doc links stay real anchors without bypassing the system. |
+| P5-3 | Add translated control labels (`previousPage`, `nextPage`, `clearSearch`, `search`, `selectAll`, `clear`, `columns`, `toggleDensity`) to `ActionLabels` so shared widgets no longer hard-code English aria-labels. | Keeps `packages/ui` i18n-free while every screen is FR/EN and screen-reader labels stay localised. |
+| P5-4 | Extend `scripts/lint-actions.mjs` to fail any raw `<button>` and any `<a>` carrying `className` (except UI kit and tests), while allowing unstyled anchors used as `Button asChild` children. | Prevents regression to ad-hoc actions without forbidding the legitimate anchor child pattern. |
+| P5-5 | Preserve each migrated control's accessible name from its visible content; only add explicit `aria-label` where the content is ambiguous (calendar events, messages, notifications). | Keeps existing E2E/profile-picker matching intact and avoids redundant or conflicting labels. |

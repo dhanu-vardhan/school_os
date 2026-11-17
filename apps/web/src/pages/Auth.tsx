@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Building2, CheckCircle2, GraduationCap, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
-import { Avatar, Badge, Banner, Button, Card, CardBody, Skeleton, toast } from '@schoolos/ui'
+import { Avatar, Badge, Banner, Button, Card, CardBody, Skeleton, cn, toast } from '@schoolos/ui'
 import { demoUsers, useApiQuery, useSchools } from '@schoolos/api-client'
 import { ROLE_ACCENT, ROLE_FAMILY } from '@schoolos/shared'
 import { useSession } from '../app/session'
@@ -71,9 +71,9 @@ export function LoginPage() {
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {usersQuery.data?.data?.map(user => (
-                  <button key={`${user.role}-${user.schoolId}`} type="button" onClick={() => void pick(user.role)}
+                  <Button key={`${user.role}-${user.schoolId}`} variant="bare" onClick={() => void pick(user.role)}
                     disabled={busyRole !== undefined}
-                    className="focus-ring group flex items-center gap-3 rounded-xl border border-line bg-surface p-4 text-left transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md disabled:opacity-60">
+                    className="group flex w-full items-center gap-3 rounded-xl border border-line bg-surface p-4 text-left transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md disabled:opacity-60">
                     <Avatar name={user.name} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-content">{user.name}</p>
@@ -83,7 +83,7 @@ export function LoginPage() {
                       </div>
                     </div>
                     {busyRole === user.role ? <CheckCircle2 className="h-4 w-4 animate-pulse text-brand-500" /> : <ArrowRight className="h-4 w-4 text-content-subtle transition-transform group-hover:translate-x-1" />}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -115,15 +115,17 @@ export function SchoolSelectPage() {
       <div className="space-y-3">
         {schoolsQuery.isLoading && <Skeleton className="h-24 rounded-lg" />}
         {schoolsQuery.data?.data?.map(school => (
-          <button key={school.id} type="button" disabled={busy} onClick={() => void choose(school.id)}
-            className={`focus-ring ui-card flex w-full items-center gap-4 p-5 text-left transition-all hover:border-brand-300 hover:shadow-md disabled:opacity-60 ${school.id === schoolId ? 'border-brand-400 bg-brand-50/40 dark:bg-brand-500/10' : ''}`}>
+          <Button key={school.id} variant="bare" disabled={busy} onClick={() => void choose(school.id)}
+            aria-label={school.name}
+            className={cn('ui-card flex w-full items-center gap-4 p-5 text-left transition-all hover:border-brand-300 hover:shadow-md disabled:opacity-60',
+              school.id === schoolId && 'border-brand-400 bg-brand-50/40 dark:bg-brand-500/10')}>
             <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-100 font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-200">{school.logoText ?? school.name.slice(0, 2)}</span>
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-content">{school.name}</p>
               <p className="text-xs text-content-muted">{school.address} · {school.academicYear}</p>
             </div>
             {school.id === schoolId && <Badge tone="success" dot>{t('common.yes')}</Badge>}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

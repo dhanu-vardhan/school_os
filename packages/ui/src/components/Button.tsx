@@ -73,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const button = (
     <Comp
       ref={ref}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={cn(buttonVariants({ variant, size: variant === 'bare' ? 'bare' : size }), className)}
       disabled={asChild ? undefined : unavailable}
       aria-disabled={asChild && unavailable ? true : undefined}
       aria-busy={loading || undefined}
