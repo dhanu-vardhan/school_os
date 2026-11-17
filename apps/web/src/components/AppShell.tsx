@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   Bell, ChevronDown, GraduationCap, Keyboard, Languages, LogOut, Menu, Moon,
@@ -13,7 +14,9 @@ import { useSession } from '../app/session'
 import { usePreferences, type Theme } from '../app/preferences'
 import { ALL_NAV_ITEMS, visibleNavGroups } from '../app/nav'
 import { useOnline } from '../app/hooks'
+import { prefetchNavigation } from '../app/prefetch'
 import { useGlobalShortcuts } from '../app/shortcuts'
+import { navigateWithTransition } from '../app/view-transitions'
 import { QuickAddDialog, ShortcutsHelpDialog } from './ShortcutDialogs'
 import { MockNotice } from './Screen'
 
@@ -96,6 +99,7 @@ export function AppShell() {
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { session, role, logout } = useSession()
   const online = useOnline()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -109,7 +113,8 @@ export function AppShell() {
   const togglePalette = useCallback(() => setPaletteOpen(open => !open), [])
   const openHelp = useCallback(() => setHelpOpen(true), [])
   const openQuickAdd = useCallback(() => setQuickAddOpen(true), [])
-  const goTo = useCallback((path: string) => navigate(path), [navigate])
+  const goTo = useCallback((path: string) => navigateWithTransition(navigate, path), [navigate])
+  const warm = useCallback((path: string) => prefetchNavigation(queryClient, path), [queryClient])
   const closeSidebar = useCallback(() => setSidebarOpen(false), [])
 
   useGlobalShortcuts({
@@ -153,6 +158,8 @@ export function AppShell() {
               <div className="space-y-0.5">
                 {group.items.map(item => (
                   <NavLink key={item.to} to={item.to}
+                    onMouseEnter={() => warm(item.to)}
+                    onFocus={() => warm(item.to)}
                     className={({ isActive }) => `focus-ring flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${isActive ? 'bg-brand-50 font-semibold text-brand-700 dark:bg-brand-500/15 dark:text-brand-200' : 'text-content-muted hover:bg-surface-2 hover:text-content'}`}>
                     <item.icon className="h-4 w-4 shrink-0" aria-hidden />
                     <span className="truncate">{t(item.labelKey)}</span>
@@ -197,14 +204,17 @@ export function AppShell() {
           </div>
         </header>
 
-        <main id="main-content" className="ui-page mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main key={location.pathname} id="main-content" className="ui-route-in mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <Outlet />
         </main>
       </div>
 
       <nav aria-label={t('nav.more')} className="ui-safe-bottom ui-glass fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-line px-2 py-1.5 lg:hidden">
         {groups.flatMap(g => g.items).slice(0, 5).map(item => (
-          <NavLink key={item.to} to={item.to} className={({ isActive }) => `focus-ring flex min-w-14 flex-col items-center gap-0.5 rounded-md px-2 py-1 text-[10px] ${isActive ? 'text-brand-600 dark:text-brand-300' : 'text-content-subtle'}`}>
+          <NavLink key={item.to} to={item.to}
+          onMouseEnter={() => warm(item.to)}
+          onFocus={() => warm(item.to)}
+          className={({ isActive }) => `focus-ring flex min-w-14 flex-col items-center gap-0.5 rounded-md px-2 py-1 text-[10px] ${isActive ? 'text-brand-600 dark:text-brand-300' : 'text-content-subtle'}`}>
             <item.icon className="h-5 w-5" /><span className="max-w-16 truncate">{t(item.labelKey)}</span>
           </NavLink>
         ))}

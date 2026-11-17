@@ -8,7 +8,7 @@ import {
 import { useConcern, useConcerns, useCreateConcern, useUpdateConcern } from '@schoolos/api-client'
 import { formatDate } from '@schoolos/i18n'
 import type { SafeguardingConcern } from '@schoolos/shared'
-import { ForbiddenCard, MockNotice, OfflineNotice, PageHeader, QueryState, ScreenError } from '../components/Screen'
+import { ForbiddenCard, MockNotice, OfflineNotice, PageHeader, QueryState, ScreenError, ScreenLoading } from '../components/Screen'
 import { useCan } from '../app/permissions'
 
 function ConfidentialBanner() {
@@ -30,7 +30,7 @@ export function SafeguardingPage() {
       <PageHeader title={t('safeguarding.title')} subtitle={t('safeguarding.noLeak')}
         actions={<><MockNotice mock={concerns.data?.mock} compact /><Button asChild><Link to="/app/safeguarding/new">{t('safeguarding.new')}</Link></Button></>}
         breadcrumbs={[{ label: t('nav.group.safety') }, { label: t('nav.safeguarding') }]} />
-      <QueryState isLoading={concerns.isLoading} error={concerns.error} onRetry={() => void concerns.refetch()} isEmpty={concerns.data?.data?.length === 0}>{() => (<>
+      <QueryState isLoading={concerns.isLoading} error={concerns.error} onRetry={() => void concerns.refetch()} isEmpty={concerns.data?.data?.length === 0} loading={<ScreenLoading variant="table" />}>{() => (<>
         <div className="ui-card overflow-hidden">
           <table className="w-full border-collapse text-sm">
             <thead className="bg-surface-2 text-left text-xs uppercase text-content-subtle"><tr><th className="p-3">{t('safeguarding.reference')}</th><th className="p-3">{t('safeguarding.category')}</th><th className="p-3">{t('safeguarding.status')}</th><th className="p-3">{t('common.updatedAt')}</th><th className="p-3" /></tr></thead>

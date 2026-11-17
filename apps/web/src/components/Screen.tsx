@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle, WifiOff, LockKeyhole, Construction } from 'lucide-react'
-import { Badge, Banner, Breadcrumbs, Button, EmptyState, ErrorState, SkeletonList, toast } from '@schoolos/ui'
+import { Badge, Banner, Breadcrumbs, Button, EmptyState, ErrorState, Skeleton, toast } from '@schoolos/ui'
 import type { ApiError } from '@schoolos/api-client'
 import { useOnline } from '../app/hooks'
 
@@ -50,9 +50,56 @@ export function PartialNotice({ show = false }: { show?: boolean }) {
   return <div className="mb-4"><Banner tone="info" title={t('state.partial')} /></div>
 }
 
-export function ScreenLoading({ label }: { label?: string }) {
+export type SkeletonVariant = 'list' | 'table' | 'cards' | 'detail' | 'dashboard'
+
+/** Shape-matched skeletons keep the page height stable while a query loads. */
+export function ScreenLoading({ label, variant = 'list' }: { label?: string; variant?: SkeletonVariant }) {
   const { t } = useTranslation()
-  return <div className="space-y-4"><SkeletonList rows={5} /><span className="ui-sr-only" role="status">{label ?? t('state.loading')}</span></div>
+  return (
+    <div className="space-y-4" aria-busy="true">
+      {variant === 'dashboard' && <>
+        <div className="flex items-center justify-between gap-4"><Skeleton className="h-9 w-56" /><Skeleton className="h-9 w-32" /></div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="ui-card space-y-3 p-5"><Skeleton className="h-3 w-24" /><Skeleton className="h-8 w-16" /><Skeleton className="h-3 w-28" /></div>
+          ))}
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {[0, 1].map(i => (
+            <div key={i} className="ui-card space-y-3 p-5"><Skeleton className="h-4 w-40" />{Array.from({ length: 4 }).map((_, j) => <Skeleton key={j} className="h-9 w-full" />)}</div>
+          ))}
+        </div>
+      </>}
+      {variant === 'table' && <>
+        <div className="flex items-center justify-between gap-4"><Skeleton className="h-9 w-48" /><Skeleton className="h-9 w-32" /></div>
+        <div className="ui-card divide-y divide-line/60">
+          <div className="flex gap-4 px-4 py-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-3 flex-1" />)}</div>
+          {Array.from({ length: 6 }).map((_, row) => (
+            <div key={row} className="flex gap-4 px-4 py-4">{Array.from({ length: 5 }).map((_, cell) => <Skeleton key={cell} className="h-4 flex-1" />)}</div>
+          ))}
+        </div>
+      </>}
+      {variant === 'cards' && (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="ui-card space-y-3 p-5"><Skeleton className="h-28 w-full" /><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-full" /><Skeleton className="h-3 w-2/3" /></div>
+          ))}
+        </div>
+      )}
+      {variant === 'detail' && (
+        <div className="grid gap-5 lg:grid-cols-3">
+          <div className="ui-card space-y-4 p-5 lg:col-span-2"><Skeleton className="h-5 w-48" />{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+          <div className="ui-card space-y-4 p-5"><Skeleton className="h-5 w-32" />{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+        </div>
+      )}
+      {variant === 'list' && (
+        <div className="ui-card space-y-3 p-4">
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+        </div>
+      )}
+      <span className="ui-sr-only" role="status">{label ?? t('state.loading')}</span>
+    </div>
+  )
 }
 
 export function ScreenError({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
@@ -105,7 +152,7 @@ export function NotImplementedCard({ feature }: { feature?: string }) {
   )
 }
 
-export function QueryState({ isLoading, error, children, onRetry, empty, isEmpty }: {
+export function QueryState({ isLoading, error, children, onRetry, empty, isEmpty, loading }: {
   isLoading: boolean
   error?: unknown
   /** Pass a function so data-dependent JSX is not evaluated while the query is still loading. */
@@ -113,8 +160,10 @@ export function QueryState({ isLoading, error, children, onRetry, empty, isEmpty
   onRetry?: () => void
   empty?: ReactNode
   isEmpty?: boolean
+  /** Shape-matched loading UI; defaults to the generic list skeleton. */
+  loading?: ReactNode
 }) {
-  if (isLoading) return <ScreenLoading />
+  if (isLoading) return <>{loading ?? <ScreenLoading />}</>
   if (error) return <ScreenError error={error} onRetry={onRetry} />
   if (isEmpty) return <>{empty ?? <ScreenEmpty />}</>
   return <>{typeof children === 'function' ? children() : children}</>

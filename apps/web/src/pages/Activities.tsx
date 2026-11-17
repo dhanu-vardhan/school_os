@@ -12,7 +12,7 @@ import {
 import { useActivity, useActivities, useEnrolInActivity, useOfferings, useStudents } from '@schoolos/api-client'
 import { formatDate, formatMoney } from '@schoolos/i18n'
 import type { Activity } from '@schoolos/shared'
-import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenError } from '../components/Screen'
+import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenError, ScreenLoading } from '../components/Screen'
 import { useShortcutAction } from '../app/shortcuts'
 
 const iconMap: Record<string, LucideIcon> = { chess: SparklesIcon, art: Palette, sport: Trophy, music: Music, language: Languages }
@@ -59,7 +59,7 @@ export function ActivitiesPage() {
         </>}
         breadcrumbs={[{ label: t('nav.group.activities') }, { label: t('nav.activities') }]}
       />
-      <QueryState isLoading={activities.isLoading} error={activities.error} onRetry={() => void activities.refetch()} isEmpty={activities.data?.data?.length === 0}>{() => (<>
+      <QueryState isLoading={activities.isLoading} error={activities.error} onRetry={() => void activities.refetch()} isEmpty={activities.data?.data?.length === 0} loading={<ScreenLoading variant="cards" />}>{() => (<>
         {view === 'grid' ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {activities.data!.data.map(a => <ActivityCard key={a.id} activity={a} offeringId={offeringByActivity.get(a.id)?.id} onOpen={() => navigate(`/app/activities/${a.id}`)} />)}

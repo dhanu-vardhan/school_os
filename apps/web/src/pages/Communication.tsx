@@ -12,7 +12,7 @@ import {
 } from '@schoolos/api-client'
 import { formatDate } from '@schoolos/i18n'
 import type { Message } from '@schoolos/shared'
-import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenEmpty } from '../components/Screen'
+import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenEmpty, ScreenLoading } from '../components/Screen'
 
 export function NotificationsPage() {
   const { t } = useTranslation()
@@ -117,7 +117,7 @@ export function MessagesPage() {
     <div className="ui-page">
       <OfflineNotice />
       <PageHeader title={t('comm.messages')} actions={<MockNotice mock={messages.data?.mock} compact />} breadcrumbs={[{ label: t('nav.group.communication') }, { label: t('nav.messages') }]} />
-      <QueryState isLoading={messages.isLoading} error={messages.error} onRetry={() => void messages.refetch()} isEmpty={messages.data?.data?.length === 0}>{() => (<>
+      <QueryState isLoading={messages.isLoading} error={messages.error} onRetry={() => void messages.refetch()} isEmpty={messages.data?.data?.length === 0} loading={<ScreenLoading variant="detail" />}>{() => (<>
         <div className="grid gap-5 lg:grid-cols-5">
           <Card className="lg:col-span-2">
             <CardHeader title={t('comm.messages')} action={<Badge tone="neutral">{messages.data!.data.length}</Badge>} />

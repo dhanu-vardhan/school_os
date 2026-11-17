@@ -1226,3 +1226,30 @@ features:
     status: stubbed
     prompt_ref: P2-ux
     reason: "Announcements, messages and activity enrolment register guarded handlers through the shortcut event bus"
+  - id: UI-P7-SMOOTH-ROUTES
+    module: ui
+    name: "Part 2 progressive View Transitions with reduced-motion CSS fallback"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "navigateWithTransition cross-fades route changes via the View Transitions API and falls back to a CSS enter animation"
+  - id: UI-P7-PREFETCH
+    module: ui
+    name: "Part 2 nav hover/focus query prefetch with restricted routes excluded"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "Non-sensitive route first queries are warmed on hover/focus; safeguarding, compliance and audit are never prefetched"
+  - id: UI-P7-STABLE-LOADING
+    module: ui
+    name: "Part 2 shape-matched skeletons and keepPreviousData to keep CLS below 0.05"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "Dashboard/table/cards/detail skeletons match final layout and previousData prevents refetch flashes; measured CLS 0.0000 on desktop and mobile"

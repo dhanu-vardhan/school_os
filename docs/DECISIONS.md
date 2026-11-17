@@ -123,3 +123,13 @@
 | P6-4 | Give every clickable table/concern row `tabIndex=0`, a non-sensitive `aria-label` and Enter/Space handlers, and add per-row `RowActions` on the students roster with danger items last. | Keyboard and screen-reader users get the same navigation and actions as pointer users; no safeguarding detail leaks into labels. |
 | P6-5 | Implement `SwipeActions` with pointer/touch events and `touch-action: pan-y`, and always render a "More actions" toggle as the keyboard fallback; wire it into the students mobile card. | Mobile users get one-handed row actions without a gesture library, and the gesture is never the only path to an action. |
 | P6-6 | Hide the desktop-only help icon on small screens to keep the mobile header within the viewport. | The extra icon caused a 4 px horizontal overflow on the 390 px mobile viewport; keyboard help is not actionable on touch devices. |
+
+## 2026-11-17: Part 2 Phase 7 — smoothness and reduced clicks to first paint
+
+| # | Decision | Reason |
+|---|---|---|
+| P7-1 | Set `placeholderData: keepPreviousData` as a `QueryClient` default in `AppProviders`. | Route and filter changes reuse the previous result during a background refetch, so no skeleton flash or layout jump occurs; measured CLS is 0.0000 on desktop and mobile. |
+| P7-2 | Add `navigateWithTransition`, which uses the View Transitions API when available and falls back to the CSS `.ui-route-in` animation, and skip both when `ui-reduce-motion` or `prefers-reduced-motion` is active. | Progressive enhancement gives modern browsers one cross-fade without a dependency, while reduced-motion users and older browsers get a safe static or CSS path. |
+| P7-3 | Warm a route's first query on nav `mouseenter`/`focus` via a fixed `prefetch.ts` map, and deliberately exclude safeguarding, compliance, audit and other restricted routes. | Hover/focus prefetch shortens perceived navigation without speculatively requesting sensitive payloads before an explicit navigation. |
+| P7-4 | Add `ScreenLoading` variants (`dashboard`, `table`, `cards`, `detail`, `list`) that mirror the final page shape, and pass the matching variant from the key screens through a `QueryState.loading` slot. | Shape-matched skeletons hold page height steady while data loads, keeping CLS under the 0.05 budget. |
+| P7-5 | Measure CLS with a `PerformanceObserver` in a Playwright spec over repeated route changes, ignoring shifts with recent input, and assert `< 0.05`. | Provides an automated, repeatable regression gate for the layout-stability budget instead of a one-off manual check. |

@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { keepPreviousData, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   ActionLabelsProvider, TooltipProvider, ToastHost, type ActionLabels,
@@ -10,7 +10,9 @@ import { SessionProvider } from './session'
 export function AppProviders({ children }: { children: ReactNode }) {
   const [client] = useState(() => new QueryClient({
     defaultOptions: {
-      queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false },
+      // Keep the previous page's data during background refetches so route
+      // changes do not flash a skeleton and shift layout (CLS < 0.05).
+      queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false, placeholderData: keepPreviousData },
       mutations: { retry: 0 },
     },
   }))

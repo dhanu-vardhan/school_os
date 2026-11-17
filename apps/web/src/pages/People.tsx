@@ -18,7 +18,7 @@ import {
 } from '@schoolos/api-client'
 import { DISPLAY_ROLES, ROLE_ACCENT, ROLE_FAMILY, permissionsFor, type DisplayRole } from '@schoolos/shared'
 import { formatDate } from '@schoolos/i18n'
-import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenEmpty, ScreenError } from '../components/Screen'
+import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenEmpty, ScreenError, ScreenLoading } from '../components/Screen'
 
 const studentSchema = z.object({
   firstName: z.string().min(1, 'Required'),
@@ -73,7 +73,7 @@ export function StudentsPage() {
         actions={<><MockNotice mock={students.data?.mock} compact /><Button asChild><Link to="/app/people/students/new"><Plus className="h-4 w-4" />{t('students.new')}</Link></Button></>}
         breadcrumbs={[{ label: t('nav.group.people') }, { label: t('nav.students') }]}
       />
-      <QueryState isLoading={students.isLoading} error={students.error} onRetry={() => void students.refetch()} isEmpty={students.data?.data?.length === 0}>{() => (<>
+      <QueryState isLoading={students.isLoading} error={students.error} onRetry={() => void students.refetch()} isEmpty={students.data?.data?.length === 0} loading={<ScreenLoading variant="table" />}>{() => (<>
         <DataTable
           data={students.data?.data ?? []}
           columns={columns}

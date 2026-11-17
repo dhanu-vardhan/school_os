@@ -18,7 +18,7 @@ import { formatDate, formatMoney } from '@schoolos/i18n'
 import { ROLE_FAMILY } from '@schoolos/shared'
 import { useSession } from '../app/session'
 import { BarChart, TrendChart } from '../components/Charts'
-import { MockNotice, OfflineNotice, PageHeader, PartialNotice, QueryState, ScreenError } from '../components/Screen'
+import { MockNotice, OfflineNotice, PageHeader, PartialNotice, QueryState, ScreenError, ScreenLoading } from '../components/Screen'
 
 function Frame({ title, subtitle, children, mock }: { title: string; subtitle?: string; children: ReactNode; mock?: boolean }) {
   const { session } = useSession()
@@ -68,7 +68,7 @@ export function AdminDashboard() {
 
   return (
     <Frame title="admin" mock={mock}>
-      <QueryState isLoading={isLoading} error={error} onRetry={() => void dashboard.refetch()}>{() => (<>
+      <QueryState isLoading={isLoading} error={error} onRetry={() => void dashboard.refetch()} loading={<ScreenLoading variant="dashboard" />}>{() => (<>
         <PartialNotice show={dashboard.data?.mock} />
         <KpiRow kpis={dashboard.data!.data.kpis} t={t} />
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
