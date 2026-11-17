@@ -11,17 +11,37 @@ export interface AppConfig {
   locales: string[]
   authMode: 'demo' | 'oidc'
   demoEnabled: boolean
+  demoMode?: boolean
+  passkeyEnabled?: boolean
+  mfaRequiredRoles?: string[]
   apiBasePath: string
   timezone: string
+  store?: string
+}
+
+export interface SessionMembership {
+  schoolId: ID
+  schoolName: string
+  role: string
+  childIds?: string[]
 }
 
 export interface SessionUser {
   sub: string
   name: string
+  email?: string
   locale: string
   roles: string[]
   schoolId: ID
+  schoolName?: string
+  memberships?: SessionMembership[]
   demo: boolean
+  mfa?: boolean
+  mfaRequired?: boolean
+  stepUpUntil?: number
+  impersonating?: { actorSub: string } | null
+  fingerprintMismatch?: boolean
+  apiRoles?: string[]
 }
 
 export interface PublicSession {
@@ -29,6 +49,83 @@ export interface PublicSession {
   user?: SessionUser
   csrfToken?: string
   expiresAt?: string
+  idleExpiresAt?: string
+  authTime?: string
+}
+
+export interface DemoAccount {
+  key: string
+  name: string
+  email: string
+  role: string
+  title: string
+  scope: string
+  schoolId: ID
+  schoolName: string
+  schools: { id: ID; name: string }[]
+  mfa: boolean
+  legacy?: boolean
+  demoPassword?: string | null
+  demoTotpSecret?: string | null
+}
+
+export interface DemoAccountsResponse {
+  demoOnly: boolean
+  schools: { id: ID; name: string }[]
+  accounts: DemoAccount[]
+}
+
+export interface MfaChallenge {
+  mfaRequired: true
+  challengeId: string
+  methods: string[]
+  account?: { key: string; name: string; role: string }
+  demo?: { totpSecret?: string | null }
+}
+
+export interface MfaEnrolment {
+  secret: string
+  otpauthUrl: string
+  backupCodes: string[]
+}
+
+export interface ActiveSession {
+  authenticated: boolean
+  /** HMAC-derived public id; safe to show and use for revocation. */
+  id: string
+  user?: SessionUser
+  current: boolean
+  lastSeen: string
+  fingerprint?: string
+  expiresAt?: string
+}
+
+export interface SecurityEvent {
+  id: string
+  at: string
+  type: string
+  severity: 'info' | 'warning' | 'critical'
+  actorSub?: string
+  detail?: Record<string, unknown>
+}
+
+export interface AccountSecurity {
+  mfa: boolean
+  mfaRequired: boolean
+  trustedUntil: number
+  stepUpActive: boolean
+  sessions: ActiveSession[]
+  events: SecurityEvent[]
+}
+
+export interface SecurityOverview {
+  loginSuccess: number
+  loginFailure: number
+  lockouts: number
+  mfaEvents: number
+  auditChain: { ok: boolean; length: number; brokenAt?: string | null }
+  activeSessions: number
+  lastEvents: SecurityEvent[]
 }
 
 export interface School {
@@ -223,6 +320,17 @@ export interface TimetableEvent {
   tone?: 'brand' | 'accent' | 'warning' | 'danger' | 'info'
 }
 
+export type AttendanceStatus = 'present' | 'late' | 'absent'
+
+/** Daily attendance mark for one student. No health or personal detail is stored here. */
+export interface AttendanceRecord {
+  id: string
+  studentId: string
+  classId: string
+  date: ISODate
+  status: AttendanceStatus
+}
+
 export interface DataExportRequest {
   id: string
   type: 'export' | 'erasure'
@@ -230,4 +338,11 @@ export interface DataExportRequest {
   requestedAt: string
   status: 'pending' | 'in_progress' | 'completed'
   dueAt: string
+}
+
+/** Configurable product brand (placeholder "Acadia" by default). */
+export interface BrandConfig {
+  name: string
+  tagline: string
+  logoMark?: 'graduation-cap-bars'
 }

@@ -78,3 +78,26 @@ Notes: "mocked" = stateful in-browser demo engine/localStorage (not real backend
 - **Works now:** demo web renders styled (200) with in-browser fictional data/role switcher; API health up; `/api` correctly 401. Typecheck passes.
 - **Status:** 0 wired, 0 partial, 9 hard-coded, 7 mocked, 14 dead, 18 stubbed, 0 broken (48 rows). No real backend wiring in frontend.
 - **Next:** per Prompt 12, build foundation (api-client generation, HTTP/error/data layers, session/config bootstrap, guards, bundle guards) and address backend gaps starting with highest-value screens — after OpenAPI/BFF/auth are available or minimally added.
+
+## Part 8 analytics wiring addendum (2026-11-17)
+
+The Step 0 table above still describes the legacy demo shell. The governed analytics layer adds
+typed contracts; it does **not** turn the legacy screens into real-stack screens. Statuses in this
+addendum use the same vocabulary.
+
+| Screen / control | Role(s) | Data source | Auth/permission source | States | Status |
+|---|---|---|---|---|---|
+| `/app/analytics` dashboard cards, charts, insights, targets, interventions | all roles with `analytics.read` | `useAnalyticsOverview/Insights/Targets/Interventions` → `GET /api/v1/analytics/**` (mock adapter in demo) | `useCan('analytics.read/configure/export')` from session; backend remains authoritative | loading/error/retry, empty, suppressed cells, freshness, "Données fictives" badge, offline notice, 403 card | mocked (identical contracts; real aggregates have no upstream source) |
+| `/app/analytics/explore` (series, paginated table, matrix, explain, scenario, export) | analyst + any `analytics.read` role | `useAnalyticsSeries/Table/Matrix/Explain/Scenario`, `useAnalyticsExport` | same permissions; export requires step-up + `analytics.export` | same states; async export result shows row count + watermark | mocked |
+| `/ui-kit/analytics` | dev only | static sample data from the UI kit | `VITE_SHOW_UI_KIT` gate | light/dark, suppressed, empty variants | hard-coded (no school data) |
+| FilterBar URL sync (`apps/web/src/app/analytics.ts`) | all analytics users | `useSearchParams`; API supplies filter options via dictionary `meta` | no auth data in URL | reset, invalid values ignored, save/load in-memory views | partial (governed `GET/POST /api/analytics/views` exists but the UI does not consume it yet) |
+| `MetricCard`/`ChartCard` disclosure | all | metric dictionary definition + response `meta` | n/a | n/CI/freshness in tooltip and aria summary; table alternative | wired to contract; data source mocked |
+| Browser storage | all | **none** for analytics filters/views | n/a | URL is the single source of truth; views live in component state | wired (no localStorage/sessionStorage writes) |
+
+**Mock boundary:** `packages/api-client/src/mock/analytics.ts` generates deterministic synthetic
+facts from `packages/shared/src/analytics-demo.ts` and returns the same `data`/`meta` envelopes as
+the Java API. Every response includes `meta.mock=true`, `sourceAvailable=false`, suppression
+threshold, freshness and explain metadata; the UI shows a visible "Données fictives" badge.
+Production client imports demo types only with `import type`, so no mock number can reach a
+production path. The Java refresh job records `sourceAvailable=false` instead of inserting rows.
+Real upstream facts will replace the adapter without changing UI contracts.

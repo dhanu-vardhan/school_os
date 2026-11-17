@@ -3,7 +3,7 @@ import {
   CalendarDays, School, UserCog, Mail, Bell, Megaphone, ChartNoAxesCombined,
   Activity, Flag, Puzzle, Bot, Boxes, LifeBuoy, Settings2, FileClock,
   DatabaseBackup, ScrollText, ClipboardCheck, BookOpenText, Sparkles,
-  Palette, LibraryBig,
+  Palette, LibraryBig, KeyRound, ShieldEllipsis,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { can, type Permission } from '@schoolos/shared'
@@ -27,6 +27,8 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: 'nav.group.overview',
     items: [
       { to: '/app/dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard },
+      { to: '/app/timetable', labelKey: 'nav.timetable', icon: CalendarDays },
+      { to: '/app/attendance', labelKey: 'nav.attendance', icon: ClipboardCheck, permission: 'students.read' },
       { to: '/app/notifications', labelKey: 'nav.notifications', icon: Bell },
     ],
   },
@@ -62,6 +64,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: '/app/compliance/requests', labelKey: 'nav.compliance', icon: ClipboardCheck, permission: 'compliance.read' },
       { to: '/app/compliance/pack', labelKey: 'compliance.pack', icon: LibraryBig, permission: 'compliance.read' },
       { to: '/app/compliance/audit', labelKey: 'nav.audit', icon: ScrollText, permission: 'compliance.read' },
+      { to: '/app/security', labelKey: 'nav.securityCentre', icon: ShieldEllipsis, permission: 'security.read' },
     ],
   },
   {
@@ -70,6 +73,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: '/app/ai/suggestions', labelKey: 'nav.ai', icon: Sparkles, permission: 'ai.use' },
       { to: '/app/ai/tools', labelKey: 'nav.aiTools', icon: Bot, permission: 'ai.use' },
       { to: '/app/reports', labelKey: 'nav.reports', icon: ChartNoAxesCombined, permission: 'reports.read' },
+      { to: '/app/analytics', labelKey: 'analytics.dashboard', icon: ChartNoAxesCombined, permission: 'analytics.read' },
+      { to: '/app/analytics/explore', labelKey: 'analytics.explore', icon: Activity, permission: 'analytics.read', roles: ['analyst', 'director', 'school_admin', 'group_admin', 'auditor'] },
     ],
   },
   {
@@ -87,8 +92,10 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: '/app/platform/integrations', labelKey: 'nav.integrations', icon: Puzzle, permission: 'platform.admin' },
       { to: '/app/platform/models', labelKey: 'nav.models', icon: Boxes, permission: 'platform.admin' },
       { to: '/app/platform/support', labelKey: 'nav.support', icon: LifeBuoy },
+      { to: '/app/account/security', labelKey: 'nav.accountSecurity', icon: KeyRound },
       { to: '/app/settings', labelKey: 'common.settings', icon: Settings2 },
       { to: '/ui-kit', labelKey: 'uikit.title', icon: Palette, devOnly: true },
+      { to: '/ui-kit/analytics', labelKey: 'analytics.uiKit', icon: ChartNoAxesCombined, devOnly: true },
     ],
   },
 ]

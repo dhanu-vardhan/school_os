@@ -7,9 +7,10 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm --filter @schoolos/web test",
     "test:e2e": "pnpm --filter @schoolos/web test:e2e",
-    "lint": "node scripts/lint-colors.mjs && node scripts/lint-actions.mjs && node scripts/check-contrast.mjs",
+    "lint": "node scripts/lint-colors.mjs && node scripts/lint-actions.mjs && node scripts/check-contrast.mjs && node scripts/check-auth-safety.mjs",
     "lint:colors": "node scripts/lint-colors.mjs",
     "lint:actions": "node scripts/lint-actions.mjs",
-    "lint:contrast": "node scripts/check-contrast.mjs"
+    "lint:contrast": "node scripts/check-contrast.mjs",
+    "lint:auth": "node scripts/check-auth-safety.mjs"
   }
 }

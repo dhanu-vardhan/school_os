@@ -37,6 +37,29 @@ schoolos:
   auth:
     audience: ${SCHOOLOS_API_AUDIENCE:schoolos-api}
     clock-skew-seconds: 30
+  analytics:
+    # No upstream attendance/assessment/finance fact tables exist yet. The refresh job
+    # records this state explicitly and never inserts fabricated aggregates.
+    source-available: false
+    formula-version: "1.0.0"
+    # Part 8 (A8-3): default small-cell suppression floor, clamped 3–20; head/admin only
+    # may override per request. Configured here for documentation; enforcement is in code.
+    suppression-threshold: 5
+    teacher-class-ids: ""
+    step-up-claim: step_up_token
+    # A8-4: no upstream source yet. Minimal @Scheduled job records source_available=false
+    # for these schools (empty by default) and never inserts fact rows.
+    refresh-delay-ms: 3600000
+    refresh-initial-delay-ms: 60000
+    refresh-school-ids: ''
+    max-page-size: 200
+    exports:
+      core-pool-size: 2
+      max-pool-size: 4
+      queue-capacity: 100
+      # Object storage is deliberately not wired in Phase 1; exports complete with a
+      # reason instead of returning a fabricated download URL.
+      storage-wired: false
   storage:
     endpoint: http://localhost:9000
     bucket: schoolos

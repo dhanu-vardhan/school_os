@@ -3,13 +3,13 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
-  Bell, ChevronDown, GraduationCap, Keyboard, Languages, LogOut, Menu, Moon,
+  Bell, ChevronDown, GraduationCap, Keyboard, KeyRound, Languages, LogOut, Menu, Moon,
   Search, Settings2, ShieldAlert, Sun, Monitor, X, GraduationCap as SchoolIcon,
 } from 'lucide-react'
 import {
-  Avatar, Badge, Button, CommandPalette, DropdownMenu, IconButton, Tooltip, toast,
+  Avatar, Badge, Button, CommandPalette, DropdownMenu, IconButton, Modal, Tooltip, toast,
 } from '@schoolos/ui'
-import { SHOW_UI_KIT, listSchools, useNotifications } from '@schoolos/api-client'
+import { SHOW_UI_KIT, useNotifications } from '@schoolos/api-client'
 import { useSession } from '../app/session'
 import { usePreferences, type Theme } from '../app/preferences'
 import { ALL_NAV_ITEMS, visibleNavGroups } from '../app/nav'
@@ -17,36 +17,35 @@ import { useOnline } from '../app/hooks'
 import { prefetchNavigation } from '../app/prefetch'
 import { useGlobalShortcuts } from '../app/shortcuts'
 import { navigateWithTransition } from '../app/view-transitions'
+import { getNavigationGuard, subscribeNavigationGuard } from '../app/navigation-guard'
 import { QuickAddDialog, ShortcutsHelpDialog } from './ShortcutDialogs'
 import { MockNotice } from './Screen'
 
 function SchoolSwitcher() {
   const { t } = useTranslation()
-  const { role, schoolId, login } = useSession()
+  const { schoolId, schoolName, memberships, switchSchool } = useSession()
   const navigate = useNavigate()
-  const [schools, setSchools] = useState<{ id: string; name: string }[]>([])
-  const current = schools.find(s => s.id === schoolId)
-
-  useEffect(() => {
-    let active = true
-    listSchools().then(res => { if (active) setSchools(res.data) }).catch(() => setSchools([]))
-    return () => { active = false }
-  }, [])
+  const current = memberships.find(s => s.schoolId === schoolId)
+  const label = current?.schoolName ?? schoolName ?? t('common.school')
+  if (memberships.length < 2) return <span className="hidden max-w-56 truncate px-2 text-sm text-content-muted sm:inline">{label}</span>
 
   return (
     <DropdownMenu
       trigger={
         <Button variant="ghost" size="sm" className="max-w-56 gap-2">
-          <span className="truncate">{current?.name ?? t('common.school')}</span>
+          <span className="truncate">{label}</span>
           <ChevronDown className="h-3.5 w-3.5 shrink-0" />
         </Button>
       }
-      items={schools.map(s => ({
-        label: s.name,
+      items={memberships.map(membership => ({
+        label: membership.schoolName,
         onSelect: async () => {
-          if (!role || s.id === schoolId) return
-          try { await login(role, s.id); toast.success(t('common.school') + ' · ' + s.name); navigate('/app/dashboard') }
-          catch { toast.error(t('state.error')) }
+          if (membership.schoolId === schoolId) return
+          try {
+            await switchSchool(membership.schoolId)
+            toast.success(t('common.school') + ' · ' + membership.schoolName)
+            navigate('/app/dashboard')
+          } catch { toast.error(t('state.error')) }
         },
       }))}
     />
@@ -106,16 +105,37 @@ export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [quickAddOpen, setQuickAddOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [pendingPath, setPendingPath] = useState<string | null>(null)
+  const [, forceGuardRender] = useState(0)
   const groups = useMemo(() => visibleNavGroups(role, SHOW_UI_KIT), [role])
 
   useEffect(() => { setSidebarOpen(false) }, [location.pathname])
 
+  // Native reload protection plus in-app interception via attemptNavigate below.
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (getNavigationGuard()?.isDirty()) { event.preventDefault(); event.returnValue = '' }
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    const unsubscribe = subscribeNavigationGuard(() => forceGuardRender(n => n + 1))
+    return () => { window.removeEventListener('beforeunload', onBeforeUnload); unsubscribe() }
+  }, [])
+
   const togglePalette = useCallback(() => setPaletteOpen(open => !open), [])
   const openHelp = useCallback(() => setHelpOpen(true), [])
   const openQuickAdd = useCallback(() => setQuickAddOpen(true), [])
-  const goTo = useCallback((path: string) => navigateWithTransition(navigate, path), [navigate])
+  const navigateDirect = useCallback((path: string) => navigateWithTransition(navigate, path), [navigate])
+  const goTo = useCallback((path: string) => {
+    if (getNavigationGuard()?.isDirty()) setPendingPath(path)
+    else navigateDirect(path)
+  }, [navigateDirect])
   const warm = useCallback((path: string) => prefetchNavigation(queryClient, path), [queryClient])
   const closeSidebar = useCallback(() => setSidebarOpen(false), [])
+  const confirmLeave = useCallback(() => {
+    const path = pendingPath
+    setPendingPath(null)
+    if (path) { getNavigationGuard()?.discard(); navigateDirect(path) }
+  }, [pendingPath, navigateDirect])
 
   useGlobalShortcuts({
     onPalette: togglePalette,
@@ -127,10 +147,18 @@ export function AppShell() {
 
   const commandItems = ALL_NAV_ITEMS
     .filter(item => (!item.devOnly || SHOW_UI_KIT) && (!item.permission || groups.some(g => g.items.includes(item))))
-    .map(item => ({ id: item.to, label: t(item.labelKey), group: t('common.actions'), icon: <item.icon className="h-4 w-4" />, onSelect: () => navigate(item.to) }))
+    .map(item => ({ id: item.to, label: t(item.labelKey), group: t('common.actions'), icon: <item.icon className="h-4 w-4" />, onSelect: () => goTo(item.to) }))
 
   return (
-    <div className="min-h-screen bg-app text-content">
+    <div className="min-h-screen bg-app text-content"
+      onClickCapture={event => {
+        const anchor = (event.target as HTMLElement).closest('a')
+        if (!anchor || event.defaultPrevented || !getNavigationGuard()?.isDirty()) return
+        const target = new URL(anchor.href, window.location.href)
+        if (target.origin !== window.location.origin || target.hash) return
+        event.preventDefault()
+        setPendingPath(target.pathname + target.search)
+      }}>
       <Button asChild variant="bare" className="ui-skip focus-ring">
         <a href="#main-content" data-skip-link>{t('common.skipToContent')}</a>
       </Button>
@@ -141,12 +169,12 @@ export function AppShell() {
           onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`ui-scroll fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-line bg-surface transition-transform duration-base lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-16 items-center gap-3 border-b border-line px-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-neutral-0 shadow-sm"><SchoolIcon className="h-5 w-5" /></span>
+      <aside className={`ui-scroll fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-sidebar/40 bg-sidebar text-sidebar-text transition-transform duration-base lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex h-16 items-center gap-3 border-b border-sidebar-text/15 px-5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-neutral-0 shadow-sm"><SchoolIcon className="h-5 w-5" /></span>
           <div className="min-w-0">
-            <p className="font-display text-base font-bold leading-tight text-content">SchoolOS</p>
-            <p className="truncate text-[11px] text-content-subtle">{t('app.tagline')}</p>
+            <p className="font-display text-base font-bold leading-tight text-neutral-0">SchoolOS</p>
+            <p className="truncate text-[11px] text-sidebar-text/70">{t('app.tagline')}</p>
           </div>
           <IconButton variant="ghost" size="icon-sm" className="ml-auto lg:hidden" label={t('common.close')} onClick={() => setSidebarOpen(false)}><X className="h-4 w-4" /></IconButton>
         </div>
@@ -154,13 +182,13 @@ export function AppShell() {
         <nav aria-label={t('common.openMenu')} className="space-y-5 px-3 py-5">
           {groups.map(group => (
             <div key={group.labelKey}>
-              <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-content-subtle">{t(group.labelKey)}</p>
+              <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-sidebar-text/50">{t(group.labelKey)}</p>
               <div className="space-y-0.5">
                 {group.items.map(item => (
                   <NavLink key={item.to} to={item.to}
                     onMouseEnter={() => warm(item.to)}
                     onFocus={() => warm(item.to)}
-                    className={({ isActive }) => `focus-ring flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${isActive ? 'bg-brand-50 font-semibold text-brand-700 dark:bg-brand-500/15 dark:text-brand-200' : 'text-content-muted hover:bg-surface-2 hover:text-content'}`}>
+                    className={({ isActive }) => `focus-ring flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${isActive ? 'bg-brand-600 font-semibold text-neutral-0' : 'text-sidebar-text/80 hover:bg-sidebar-text/10 hover:text-neutral-0'}`}>
                     <item.icon className="h-4 w-4 shrink-0" aria-hidden />
                     <span className="truncate">{t(item.labelKey)}</span>
                   </NavLink>
@@ -174,8 +202,8 @@ export function AppShell() {
           <div className="flex items-center gap-3">
             <Avatar name={session.user?.name ?? 'User'} size="sm" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-content">{session.user?.name}</p>
-              <p className="truncate text-[11px] text-content-subtle">{role ? t(`role.${role}`) : '—'}</p>
+              <p className="truncate text-sm font-medium text-neutral-0">{session.user?.name}</p>
+              <p className="truncate text-[11px] text-sidebar-text/70">{role ? t(`role.${role}`) : '—'}</p>
             </div>
             <IconButton variant="ghost" size="icon-sm" label={t('common.logout')} onClick={() => void logout().then(() => navigate('/login'))}><LogOut className="h-4 w-4" /></IconButton>
           </div>
@@ -198,8 +226,13 @@ export function AppShell() {
             <Tooltip content={t('shortcuts.help')}>
               <IconButton variant="ghost" size="icon-sm" className="hidden sm:inline-flex" label={t('shortcuts.help')} aria-keyshortcuts="?" onClick={() => setHelpOpen(true)}><Keyboard className="h-4 w-4" /></IconButton>
             </Tooltip>
+            {/* On small screens these destinations stay in the sidebar; hiding the duplicate
+                header icons prevents the compact mock badge from pushing controls off-canvas. */}
+            <Tooltip content={t('nav.accountSecurity')}>
+              <IconButton variant="ghost" size="icon-sm" className="hidden sm:inline-flex" label={t('nav.accountSecurity')} onClick={() => navigate('/app/account/security')}><KeyRound className="h-4 w-4" /></IconButton>
+            </Tooltip>
             <Tooltip content={t('common.settings')}>
-              <IconButton variant="ghost" size="icon-sm" label={t('common.settings')} onClick={() => navigate('/app/settings')}><Settings2 className="h-4 w-4" /></IconButton>
+              <IconButton variant="ghost" size="icon-sm" className="hidden sm:inline-flex" label={t('common.settings')} onClick={() => navigate('/app/settings')}><Settings2 className="h-4 w-4" /></IconButton>
             </Tooltip>
           </div>
         </header>
@@ -223,6 +256,14 @@ export function AppShell() {
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} items={commandItems} />
       <QuickAddDialog open={quickAddOpen} onOpenChange={setQuickAddOpen} onNavigate={goTo} />
       <ShortcutsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+      <Modal open={pendingPath !== null} onOpenChange={open => { if (!open) setPendingPath(null) }}
+        title={t('unsaved.title')} description={t('unsaved.body')}
+        footer={<>
+          <Button variant="ghost" onClick={() => setPendingPath(null)}>{t('unsaved.keep')}</Button>
+          <Button variant="danger" onClick={confirmLeave}>{t('unsaved.discard')}</Button>
+        </>}>
+        <p className="text-sm text-content-muted">{t('unsaved.body')}</p>
+      </Modal>
       {!online && <div className="pointer-events-none fixed bottom-20 left-1/2 z-40 -translate-x-1/2 lg:bottom-6"><Badge tone="warning"><ShieldAlert className="h-3 w-3" />{t('common.offline')}</Badge></div>}
     </div>
   )

@@ -35,6 +35,7 @@ export interface ActionLabels {
   clear: string
   columns: string
   toggleDensity: string
+  resetView: string
   commandPalette: string
   searchPages: string
   general: string
@@ -74,6 +75,7 @@ export const defaultActionLabels: ActionLabels = {
   clear: 'Clear',
   columns: 'Columns',
   toggleDensity: 'Toggle density',
+  resetView: 'Reset saved view',
   commandPalette: 'Command palette',
   searchPages: 'Search pages and actions…',
   general: 'General',

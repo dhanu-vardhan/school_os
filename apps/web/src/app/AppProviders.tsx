@@ -50,6 +50,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     clear: t('action.clear'),
     columns: t('action.columns'),
     toggleDensity: t('action.toggleDensity'),
+    resetView: t('action.resetView'),
     commandPalette: t('action.commandPalette'),
     searchPages: t('action.searchPages'),
     general: t('action.general'),

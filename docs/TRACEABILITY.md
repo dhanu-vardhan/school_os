@@ -135,7 +135,7 @@ Status legend: done / partial / stubbed / missing / contradicted.
 ## Reporting/compliance (5.19)
 | ID | Requirement | Module | Status | Evidence |
 |---|---|---|---|---|
-| P1-5.19-dashboard | Director dashboard | reporting | missing | - |
+| P1-5.19-dashboard | Director dashboard | reporting | partial | `apps/web/src/pages/AnalyticsDashboard.tsx` is role-scoped; mock-only until upstream academic facts land |
 | P1-5.19-inspection | Inspection-ready records | reporting | missing | - |
 | P1-5.19-import | Import wizard | reporting | missing | - |
 
@@ -198,4 +198,25 @@ Status legend: done / partial / stubbed / missing / contradicted.
 | P5-12-reliability | Reliability/observability | - | missing | - |
 | P5-13-synthetic | Synthetic data generator | - | missing | - |
 | P5-15-docs | Documentation/devex | - | partial | multiple docs exist |
-echo done
+
+## Part 8 — governed analytics (2026-11-17)
+
+Statuses are evidence-based: `partial` means the contract and implementation exist but are
+backed by the flagged mock adapter, not production academic facts. Full design is in
+`docs/ANALYTICS_DESIGN.md`; formulae are in `docs/METRIC_DICTIONARY.md`.
+
+| ID | Requirement | Module | Status | Evidence |
+|---|---|---|---|---|
+| P8-A-dictionary | Versioned metric dictionary + explain payloads | reporting | partial | `docs/METRIC_DICTIONARY.md`, `packages/shared/src/metrics/`, `GET /api/analytics/dictionary` |
+| P8-A-core | Wilson/t/OLS/seasonal stats + golden tests | analytics | done | `packages/analytics-core/src`, mirrored Java tests + `services/api/src/test/resources/analytics/golden.json` |
+| P8-A-aggregates | RLS-forced aggregate tables + refresh state | db | partial | `services/api/src/main/resources/db/migration/V6__analytics.sql`; refresh has no real source (`sourceAvailable=false`) |
+| P8-A-endpoints | `/api/analytics/**` read-only, paged, explained | reporting | partial | Java analytics package; mock adapter with identical envelopes; `meta.mock=true` in demo |
+| P8-A-suppression | Small-cell suppression n<5 before serialisation | compliance | partial | `packages/analytics-core/src/suppression.ts` + Java mirror; threshold configurable by head/admin only |
+| P8-A-audit | Student-level access audit + deny-by-default | security | partial | `PolicyService`, `@RequirePermission`, hash-chained audit in BFF; no real academic rows yet |
+| P8-B-uikit | Accessible analytics primitives (FR/EN, light/dark) | ui | partial | `packages/ui/src/components/Analytics.tsx`, `/ui-kit/analytics` |
+| P8-B-urlfilters | URL-synced filters, saved views in memory | web | partial | `apps/web/src/app/analytics.ts`; governed `/api/analytics/views` exists but the UI does not consume it yet |
+| P8-B-insights | Rule-based insights with dismiss/snooze | ai | partial | `analytics-core/insights`, rule engine only; AI narratives disabled (no pinned model) |
+| P8-B-simulator | Scenario simulator, targets, interventions | web | partial | `ScenarioPanel`, `TargetEditor`, `InterventionTracker`; mock-backed state |
+| P8-C-roles | Role-scoped dashboards incl. Data Analyst | web | partial | `AnalyticsDashboard.tsx` maps API roles to scoped dashboards; Explore workspace for `analyst` |
+| P8-D-tests | Privacy/correctness/a11y/e2e coverage | - | partial | 89 Vitest tests (29 analytics-core, 5 invariants, 10 analytics UI), 94 Gradle tests (55 analytics), Playwright `e2e/analytics.spec.ts` 7 passed/1 skipped; p95 load test and full axe audit pending |
+| P8-demo | 3-year synthetic dataset with P1–P6 patterns | - | partial | `packages/shared/src/analytics-demo.ts`, `docs/DEMO_SCRIPT.md`; flagged `meta.mock=true` |

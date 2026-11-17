@@ -50,3 +50,22 @@ it is replaced by an evidence-based table. Statuses: **real** (working code behi
 
 ## Effort legend
 S = small, M = medium, L = large. Effort is recorded per slice in `docs/PROGRESS.md`.
+
+## Part 8 analytics addendum (2026-11-17, evidence from the working tree)
+
+The Part 8 layer is implemented behind identical contracts but is **not** backed by production
+academic facts. These are the remaining, honest gaps; none are claimed as working.
+
+| # | Gap | Evidence | Impact / next step | Effort |
+|---|---|---|---|---|
+| A1 | No upstream attendance/assessment/homework/finance fact tables exist | Discovery in `docs/ANALYTICS_DESIGN.md` §2; V6 creates the governed aggregates only | Refresh job records `sourceAvailable=false`; dashboards are mock-backed until Part 3 epics land. Wire the real source behind `AnalyticsFactSource`. | L |
+| A2 | Mock adapter supplies all demo numbers | `packages/shared/src/analytics-demo.ts`, `packages/api-client/src/mock/analytics.ts` | Every demo response carries `meta.mock=true` and the UI shows “Données fictives”. No production path imports the generator (type-only imports). | M |
+| A3 | Saved views are wired only in the front end | `apps/web/src/app/analytics.ts` keeps views in component state; the governed `GET/POST /api/analytics/views` endpoint and `analytics_saved_view` RLS table exist in the API | A refresh still loses named views in the demo UI; the UI does not yet consume the server store. URL filters persist correctly and no localStorage is used. | S |
+| A4 | Role dashboards are scoped variants of two routes, not bespoke per-role tab sets | `AnalyticsDashboardPage.dashboardForRole`; design §6 lists conceptual per-role routes | HR/IT/Librarian/Reception and Deputy currently fall back to the principal scope variant; dedicated widgets are follow-up work. | M |
+| A5 | `DrillDown`, `TargetEditor` and `InterventionTracker` primitives exist but are not yet composed into the pages | `packages/ui/src/components/Analytics.tsx` vs `AnalyticsDashboard.tsx` | Dashboard uses simpler Card lists for targets/interventions and opens `ExplainPanel` instead of a breadcrumb drill-down. Component coverage exists in `/ui-kit/analytics`. | S |
+| A6 | Only a subset of the design's chart catalogue is implemented | `AnalyticsChart` renders tokenised line/bar with table alternative; design §7 lists heatmaps, funnel, bullet, scatter, box, waterfall, etc. | No extra chart library added; richer chart types require a reviewed dependency or hand-built SVG. | M |
+| A7 | Export rendering/storage is incomplete | Governed `POST /api/analytics/exports` enforces step-up + watermark confirmation + idempotency and returns an async job; legacy `POST /api/v1/analytics/export` returns CSV text; config `exports.storage-wired: false` | No XLSX/PDF, no object-storage download and no fresh-per-export pseudonym salt yet; no fabricated URL is returned. | M |
+| A8 | AI narratives remain disabled | `MODEL_REGISTRY.md` pins no model | Only rule-based insights ship; a model must be pinned, evaluated and approved first. | M |
+| A9 | Full perf, axe and cross-tenant browser runs are authored but not fully executed in this environment | `apps/web/e2e/analytics.spec.ts`, Java analytics test suite, Vitest suites | p95<400 ms at 5,000 students × 5 years is a target, not a measured result. See `docs/PHASE_REPORTS/analytics.md` for what actually ran. | M |
+| A10 | No server-side per-user insight dismissal/snooze store | Mock state only (`resetAnalyticsMockState`) | Dismiss/snooze does not survive reload in demo; production needs a governed preferences endpoint. | S |
+| A11 | French sensitive-statistics and profiling features need legal/DPO sign-off | `COMPLIANCE.md` analytics section | Chronic flag, support composite and fairness panel stay disabled for real data. `TODO(legal-review)`. | M |

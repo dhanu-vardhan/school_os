@@ -98,6 +98,30 @@ test('parents see only their own sessions and cannot revoke another user session
   }
 })
 
+test('session list exposes public ids and can revoke the matching session', async () => {
+  const app = await makeTestApp()
+  try {
+    const first = await app.login('teacher')
+    const second = await app.login('teacher')
+
+    const listRes = await fetch(`${app.base}/account/security/sessions`, { headers: { cookie: first.cookie } })
+    assert.equal(listRes.status, 200)
+    const { sessions } = await listRes.json()
+    assert.equal(sessions.length, 2)
+    assert.equal(sessions.some(s => s.sid), false)
+    const other = sessions.find(s => !s.current)
+    assert.ok(other.id)
+
+    const revoked = await app.post(`/account/security/sessions/${encodeURIComponent(other.id)}/revoke`, {}, {
+      cookie: first.cookie, csrf: first.csrf,
+    })
+    assert.equal(revoked.status, 200)
+    assert.equal((await fetch(`${app.base}/session`, { headers: { cookie: second.cookie } })).status, 401)
+  } finally {
+    await app.close()
+  }
+})
+
 test('impersonation requires step-up, a reason and forbids sensitive routes', async () => {
   const app = await makeTestApp()
   try {

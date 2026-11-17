@@ -1,6 +1,5 @@
 # Generated/maintained for Prompt 10 verify-all
 features:
-features:
   - id: INFRA-WEB-01
     module: infra
     name: Web preview reachable and styled
@@ -1253,3 +1252,120 @@ features:
     status: stubbed
     prompt_ref: P2-ux
     reason: "Dashboard/table/cards/detail skeletons match final layout and previousData prevents refetch flashes; measured CLS 0.0000 on desktop and mobile"
+  - id: P8-A-DICTIONARY
+    module: reporting
+    name: "Part 8 versioned metric dictionary and explain payloads"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    reason: "Implemented in docs/METRIC_DICTIONARY.md, packages/shared/src/metrics and GET /api/analytics/dictionary; covered by unit tests, no verify/runner.py check registered"
+    prompt_ref: P8-A
+  - id: P8-A-CORE
+    module: analytics
+    name: "Part 8 statistical core with golden and invariant tests"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    reason: "packages/analytics-core golden/invariants pass and Java mirrors share golden.json; no verify/runner.py check registered"
+    prompt_ref: P8-A
+  - id: P8-A-AGGREGATES
+    module: db
+    name: "Part 8 RLS-forced analytics aggregate tables"
+    roles: [system]
+    platform: [web]
+    checks: [api, tenant]
+    status: stubbed
+    reason: "Flyway V6 tables plus Java migration contract test; no live verifier check registered and no upstream fact source yet"
+    prompt_ref: P8-A
+  - id: P8-A-ENDPOINTS
+    module: reporting
+    name: "Part 8 governed read-only analytics endpoints"
+    roles: [director,teacher,parent,finance,auditor,analyst]
+    platform: [web]
+    checks: [api, permission]
+    status: stubbed
+    reason: "GET /api/analytics/** plus async exports and saved views implemented; mock adapter carries meta.mock=true; no verify/runner.py check registered"
+    prompt_ref: P8-A
+  - id: P8-A-SUPPRESSION
+    module: compliance
+    name: "Part 8 small-cell suppression n<5 before serialisation"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    reason: "TypeScript core and Java mirror tested; threshold 3-20 head/admin only; no verify/runner.py check registered"
+    prompt_ref: P8-A
+  - id: P8-A-AUDIT
+    module: security
+    name: "Part 8 student-level access audit and deny-by-default"
+    roles: [system]
+    platform: [web]
+    checks: [api, permission]
+    status: stubbed
+    reason: "@RequirePermission catalog + AnalyticsAuditService with denied attempts audited; no live verifier check registered"
+    prompt_ref: P8-A
+  - id: P8-B-UIKIT
+    module: ui
+    name: "Part 8 accessible colour-blind-safe analytics UI kit"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    reason: "packages/ui Analytics primitives and /ui-kit/analytics; Playwright spec covers light/dark/mobile; no verify/runner.py check registered"
+    prompt_ref: P8-B
+  - id: P8-B-FILTERS
+    module: web
+    name: "Part 8 URL-synced analytics filters and saved views"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    reason: "URL is the source of truth; views are in-memory in the UI (governed API store exists); no browser storage writes; no verify/runner.py check registered"
+    prompt_ref: P8-B
+  - id: P8-B-INSIGHTS
+    module: ai
+    name: "Part 8 rule-based insights with dismiss/snooze"
+    roles: [system]
+    platform: [web]
+    checks: [api, ui]
+    status: stubbed
+    reason: "Deterministic rule engine and InsightCard shipped; AI narratives disabled (no pinned model); no verify/runner.py check registered"
+    prompt_ref: P8-B
+  - id: P8-B-SIMULATOR
+    module: web
+    name: "Part 8 scenario simulator, targets and intervention tracker"
+    roles: [director,analyst]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    reason: "Explore ScenarioPanel and dashboard target/intervention UI are mock-backed; no verify/runner.py check registered"
+    prompt_ref: P8-B
+  - id: P8-C-ROLES
+    module: web
+    name: "Part 8 role-scoped dashboards including Data Analyst"
+    roles: [director,teacher,parent,student,finance,analyst,auditor]
+    platform: [web]
+    checks: [ui, permission]
+    status: stubbed
+    reason: "Two governed routes with role-scoped variants (A4 gap); frontend permissions are UX only; no verify/runner.py check registered"
+    prompt_ref: P8-C
+  - id: P8-D-TESTS
+    module: -
+    name: "Part 8 privacy/correctness/a11y/e2e coverage"
+    roles: [system]
+    platform: [web]
+    checks: [api, ui]
+    status: stubbed
+    reason: "Vitest 89 passed, Gradle 94 tests passed, Playwright analytics 7 passed/1 skipped; p95 load test and full axe audit not run; no verify/runner.py check registered"
+    prompt_ref: P8-D
+  - id: P8-DEMO-PATTERNS
+    module: -
+    name: "Part 8 three-year synthetic demo data with planted P1-P6 patterns"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    reason: "docs/DEMO_SCRIPT.md documents P1-P6 from packages/shared/src/analytics-demo.ts; every demo response is flagged meta.mock=true; no verify/runner.py check registered"
+    prompt_ref: P8-demo

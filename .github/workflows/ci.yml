@@ -29,6 +29,18 @@ jobs:
       - name: Test
         working-directory: services/api
         run: ./gradlew test
+  bff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Session, CSRF, MFA and demo-guard tests
+        working-directory: services/bff
+        run: npm test
+      - name: Syntax check
+        working-directory: services/bff
+        run: npm run typecheck
   frontend:
     runs-on: ubuntu-latest
     steps:
@@ -38,4 +50,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install
+      - name: Auth safety (no demo secrets, browser tokens or tenant header)
+        run: pnpm lint:auth
+      - run: pnpm --filter @schoolos/web test
       - run: pnpm --filter @schoolos/web build

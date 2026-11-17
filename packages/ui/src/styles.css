@@ -8,31 +8,31 @@
 :root {
   color-scheme: light;
 
-  /* Brand — indigo / violet */
-  --brand-50: 238 242 255;
-  --brand-100: 224 231 255;
-  --brand-200: 199 210 254;
-  --brand-300: 165 180 252;
-  --brand-400: 129 140 248;
-  --brand-500: 99 102 241;
-  --brand-600: 79 70 229;
-  --brand-700: 67 56 202;
-  --brand-800: 55 48 163;
-  --brand-900: 49 46 129;
-  --brand-950: 29 27 73;
+  /* Brand — navy (deep) to royal blue */
+  --brand-50: 239 243 252;
+  --brand-100: 222 229 248;
+  --brand-200: 196 208 244;
+  --brand-300: 162 181 238;
+  --brand-400: 120 145 228;
+  --brand-500: 84 112 214;
+  --brand-600: 58 91 199;
+  --brand-700: 46 72 168;
+  --brand-800: 36 56 132;
+  --brand-900: 24 38 92;
+  --brand-950: 11 27 63;
 
-  /* Accent — emerald / teal (success + growth) */
-  --accent-50: 236 253 245;
-  --accent-100: 209 250 229;
-  --accent-200: 167 243 208;
-  --accent-300: 110 231 183;
-  --accent-400: 52 211 153;
-  --accent-500: 16 185 129;
-  --accent-600: 5 150 105;
-  --accent-700: 4 120 87;
-  --accent-800: 6 95 70;
-  --accent-900: 6 78 59;
-  --accent-950: 3 44 34;
+  /* Accent — sky blue (icons on dark, highlights, chart secondary) */
+  --accent-50: 236 245 255;
+  --accent-100: 214 235 255;
+  --accent-200: 176 218 255;
+  --accent-300: 130 192 255;
+  --accent-400: 110 168 255;
+  --accent-500: 74 139 247;
+  --accent-600: 50 110 220;
+  --accent-700: 36 84 180;
+  --accent-800: 26 62 140;
+  --accent-900: 18 44 104;
+  --accent-950: 10 24 58;
 
   /* Warning — amber */
   --warning-50: 255 251 235;
@@ -75,8 +75,8 @@
 
   /* Neutrals — slate */
   --neutral-0: 255 255 255;
-  --neutral-50: 248 250 252;
-  --neutral-100: 241 245 249;
+  --neutral-50: 245 248 252;
+  --neutral-100: 238 242 248;
   --neutral-200: 226 232 240;
   --neutral-300: 203 213 225;
   --neutral-400: 148 163 184;
@@ -88,30 +88,30 @@
   --neutral-950: 2 6 23;
 
   /* Semantic layer — light */
-  --app-bg: 247 248 252;
+  --app-bg: 245 248 252;
   --surface: 255 255 255;
-  --surface-2: 248 250 252;
-  --surface-3: 241 245 249;
-  --border: 226 232 240;
-  --border-strong: 203 213 225;
+  --surface-2: 248 250 253;
+  --surface-3: 241 245 250;
+  --border: 213 221 234;
+  --border-strong: 196 205 224;
   /* WCAG 1.4.11: interactive control boundaries need >= 3:1, decorative borders do not. */
   --control-border: 100 116 139;
-  --text: 15 23 42;
-  --text-muted: 71 85 105;
-  --text-subtle: 100 116 139;
+  --text: 15 27 58;
+  --text-muted: 81 96 122;
+  --text-subtle: 90 105 130;
   --text-inverse: 255 255 255;
-  --sidebar: 255 255 255;
-  --sidebar-text: 51 65 85;
-  --overlay: 15 23 42 / 0.45;
-  --grid-line: 226 232 240;
+  --sidebar: 11 27 63;
+  --sidebar-text: 203 213 225;
+  --overlay: 15 27 58 / 0.45;
+  --grid-line: 213 221 234;
 
   /* Role accents */
-  --role-admin: 79 70 229;
+  --role-admin: 58 91 199;
   --role-teacher: 2 132 199;
   --role-parent: 5 150 105;
   --role-student: 217 119 6;
   --role-safeguarding: 225 29 72;
-  --role-finance: 124 58 237;
+  --role-finance: 58 91 199;
   --role-operator: 71 85 105;
 
   /* Typography */
@@ -128,8 +128,8 @@
   --radius-full: 9999px;
 
   /* Elevation — every literal colour lives in a token, including the shadow tint */
-  --shadow-color: 15 23 42;
-  --focus-color: 99 102 241;
+  --shadow-color: 15 27 58;
+  --focus-color: 58 91 199;
   --shadow-xs: 0 1px 2px rgb(var(--shadow-color) / 0.05);
   --shadow-sm: 0 1px 3px rgb(var(--shadow-color) / 0.06), 0 1px 2px rgb(var(--shadow-color) / 0.04);
   --shadow-md: 0 4px 6px -1px rgb(var(--shadow-color) / 0.07), 0 2px 4px -2px rgb(var(--shadow-color) / 0.05);
@@ -197,40 +197,50 @@
   --chart-label: var(--text-subtle);
   --chart-bar-start: var(--brand-500);
   --chart-bar-end: var(--accent-400);
+
+  /* Colour-blind-safe categorical series (Okabe–Ito derived). Never encode
+     meaning with hue alone: every series also carries a label, pattern or icon. */
+  --chart-cb-1: 0 107 165;       /* blue */
+  --chart-cb-2: 213 94 0;        /* vermillion */
+  --chart-cb-3: 0 158 115;       /* bluish green */
+  --chart-cb-4: 230 159 0;       /* orange */
+  --chart-cb-5: 114 78 155;      /* reddish purple */
+  --chart-cb-6: 86 180 233;      /* sky blue */
+  --chart-suppressed: 148 163 184;
 }
 
 .dark {
   color-scheme: dark;
-  --app-bg: 11 15 25;
-  --surface: 20 26 40;
-  --surface-2: 26 33 50;
-  --surface-3: 33 41 61;
-  --border: 43 53 74;
-  --border-strong: 63 75 99;
+  --app-bg: 10 18 38;
+  --surface: 17 27 51;
+  --surface-2: 22 34 62;
+  --surface-3: 28 42 74;
+  --border: 44 60 96;
+  --border-strong: 64 82 120;
   --control-border: 148 163 184;
-  --text: 241 245 249;
-  --text-muted: 174 185 203;
-  --text-subtle: 136 150 171;
-  --text-inverse: 15 23 42;
-  --sidebar: 17 22 35;
+  --text: 232 238 250;
+  --text-muted: 174 186 214;
+  --text-subtle: 136 152 184;
+  --text-inverse: 10 18 38;
+  --sidebar: 8 16 34;
   --sidebar-text: 203 213 225;
   --overlay: 2 6 23 / 0.7;
-  --grid-line: 43 53 74;
+  --grid-line: 44 60 96;
   --role-admin: 165 180 252;
   --role-teacher: 125 211 252;
   --role-parent: 110 231 183;
   --role-student: 252 211 77;
   --role-safeguarding: 253 164 175;
-  --role-finance: 196 181 253;
+  --role-finance: 165 180 252;
   --role-operator: 174 185 203;
   /* Shadows derive from these two tokens; no duplicate literal values in dark mode. */
   --shadow-color: 0 0 0;
-  --focus-color: 129 140 248;
-  --action-primary-bg: var(--brand-500);
-  --action-primary-bg-hover: var(--brand-600);
+  --focus-color: 110 168 255;
+  --action-primary-bg: var(--brand-400);
+  --action-primary-bg-hover: var(--brand-500);
   --action-primary-fg: var(--neutral-950);
-  --action-secondary-bg: var(--brand-500);
-  --action-secondary-bg-hover: var(--brand-400);
+  --action-secondary-bg: var(--brand-400);
+  --action-secondary-bg-hover: var(--brand-300);
   --action-secondary-fg: var(--neutral-950);
   --action-danger-bg: var(--danger-500);
   --action-danger-bg-hover: var(--danger-600);
@@ -238,9 +248,9 @@
   --action-success-bg: var(--accent-500);
   --action-success-bg-hover: var(--accent-600);
   --action-success-fg: var(--neutral-950);
-  --action-ai-bg: var(--brand-500);
+  --action-ai-bg: var(--brand-400);
   --action-ai-fg: var(--neutral-950);
-  --action-ai-border: var(--brand-400);
+  --action-ai-border: var(--brand-300);
   --state-layer-hover: 241 245 249 / 0.12;
   --state-layer-active: 241 245 249 / 0.2;
   --ripple-color: 15 23 42;
@@ -259,6 +269,14 @@
   --status-info-fg: var(--info-300);
   --status-info-bg: var(--info-950);
   --status-info-border: var(--info-800);
+  /* Categorical series stay distinguishable on dark surfaces. */
+  --chart-cb-1: 125 211 252;
+  --chart-cb-2: 253 164 175;
+  --chart-cb-3: 110 231 183;
+  --chart-cb-4: 252 211 77;
+  --chart-cb-5: 196 181 253;
+  --chart-cb-6: 130 192 255;
+  --chart-suppressed: 100 116 139;
 }
 
 * { border-color: rgb(var(--border)); }
@@ -414,6 +432,26 @@ html.dark.ui-high-contrast {
   --state-layer-active: 241 245 249 / 0.28;
 }
 html.ui-large-text { font-size: 17px; }
+
+/* Analytics kit — token-driven chart marks, includes non-colour suppression texture. */
+.ui-chart-bar { height: 0.625rem; border-radius: var(--radius-full); transition: width var(--duration-base) var(--ease-out); }
+.ui-chart-series-1 { background: rgb(var(--chart-cb-1)); }
+.ui-chart-series-2 { background: rgb(var(--chart-cb-2)); }
+.ui-chart-series-3 { background: rgb(var(--chart-cb-3)); }
+.ui-chart-series-4 { background: rgb(var(--chart-cb-4)); }
+.ui-chart-series-5 { background: rgb(var(--chart-cb-5)); }
+.ui-chart-series-6 { background: rgb(var(--chart-cb-6)); }
+.ui-chart-suppressed {
+  background: repeating-linear-gradient(135deg,
+    rgb(var(--chart-suppressed) / 0.35) 0 4px,
+    rgb(var(--surface-3)) 4px 8px);
+  border: 1px dashed rgb(var(--control-border));
+}
+.ui-chart-grid-line { stroke: rgb(var(--chart-grid)); }
+.ui-chart-line { fill: none; stroke: rgb(var(--chart-line)); stroke-width: 2; }
+.ui-chart-area { fill: rgb(var(--chart-fill) / 0.12); }
+.ui-chart-point { fill: rgb(var(--chart-point)); stroke: rgb(var(--chart-line)); stroke-width: 2; }
+.ui-chart-tooltip { border-bottom: 1px dotted rgb(var(--control-border)); cursor: help; }
 
 /* Interaction layers — used by Button and other action primitives */
 .ui-state {

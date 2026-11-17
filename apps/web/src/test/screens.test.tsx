@@ -16,7 +16,7 @@ describe('authentication and dashboards', () => {
     const user = userEvent.setup()
     renderApp(<App />, { route: '/login' })
 
-    expect(await screen.findByRole('heading', { name: 'Bienvenue sur SchoolOS' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Bon retour !' })).toBeInTheDocument()
     expect(screen.getByText('Mode démonstration — données fictives, aucun service réel contacté.')).toBeInTheDocument()
     const directorButton = await screen.findByRole('button', { name: /Camille Durand/ })
     expect(directorButton).toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('authentication and dashboards', () => {
 
   it('redirects unauthenticated users to login', async () => {
     renderApp(<App />, { route: '/app/people/students' })
-    expect(await screen.findByRole('heading', { name: 'Bienvenue sur SchoolOS' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Bon retour !' })).toBeInTheDocument()
   })
 })
 

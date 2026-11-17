@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 type TFunction = ReturnType<typeof useTranslation>['t']
 import {
-  ArrowRight, CalendarDays, CheckCircle2, ClipboardList, FileText, HeartPulse,
+  ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, ClipboardList, FileText, HeartPulse,
   Inbox, Megaphone, ShieldCheck, Sparkles, UsersRound, Wallet,
 } from 'lucide-react'
 import {
@@ -15,10 +15,27 @@ import {
   useMessages, useNotifications, useStudents, useSuggestions, useTimetable,
 } from '@schoolos/api-client'
 import { formatDate, formatMoney } from '@schoolos/i18n'
-import { ROLE_FAMILY } from '@schoolos/shared'
+import { can, ROLE_FAMILY } from '@schoolos/shared'
 import { useSession } from '../app/session'
 import { BarChart, TrendChart } from '../components/Charts'
 import { MockNotice, OfflineNotice, PageHeader, PartialNotice, QueryState, ScreenError, ScreenLoading } from '../components/Screen'
+
+/** Always-visible shortcuts for the two top tasks that previously had no route. */
+function TopTasks() {
+  const { t } = useTranslation()
+  const { role } = useSession()
+  return (
+    <Card className="mb-6">
+      <CardBody className="flex flex-wrap items-center gap-3">
+        <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-content-subtle">{t('dash.topTasks')}</span>
+        <Button asChild size="sm"><Link to="/app/timetable"><CalendarDays className="h-4 w-4" />{t('nav.timetable')}</Link></Button>
+        {can(role, 'students.read') && (
+          <Button asChild variant="outline" size="sm"><Link to="/app/attendance"><ClipboardCheck className="h-4 w-4" />{t('nav.attendance')}</Link></Button>
+        )}
+      </CardBody>
+    </Card>
+  )
+}
 
 function Frame({ title, subtitle, children, mock }: { title: string; subtitle?: string; children: ReactNode; mock?: boolean }) {
   const { session } = useSession()
@@ -33,6 +50,7 @@ function Frame({ title, subtitle, children, mock }: { title: string; subtitle?: 
         actions={<MockNotice mock={mock} />}
       />
       <div className="ui-sr-only">{t(`dash.${title}`)} {subtitle}</div>
+      <TopTasks />
       {children}
     </div>
   )
