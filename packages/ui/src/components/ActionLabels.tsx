@@ -35,6 +35,10 @@ export interface ActionLabels {
   clear: string
   columns: string
   toggleDensity: string
+  commandPalette: string
+  searchPages: string
+  general: string
+  noMatches: string
 }
 
 export const defaultActionLabels: ActionLabels = {
@@ -70,6 +74,10 @@ export const defaultActionLabels: ActionLabels = {
   clear: 'Clear',
   columns: 'Columns',
   toggleDensity: 'Toggle density',
+  commandPalette: 'Command palette',
+  searchPages: 'Search pages and actions…',
+  general: 'General',
+  noMatches: 'No matches found.',
 }
 
 const ActionLabelsContext = createContext<ActionLabels>(defaultActionLabels)

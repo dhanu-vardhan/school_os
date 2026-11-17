@@ -51,7 +51,7 @@ test('navigates to a section, opens the command palette and toggles locale', asy
   await expect(page.getByRole('heading', { name: 'Élèves', level: 1 })).toBeVisible()
 
   await page.getByRole('button', { name: /Rechercher/ }).first().click()
-  const searchInput = page.getByPlaceholder('Search pages and actions…')
+  const searchInput = page.getByPlaceholder(/pages et des actions|pages and actions/)
   await expect(searchInput).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(searchInput).toHaveCount(0)
@@ -119,4 +119,47 @@ test('renders a usable mobile layout with bottom navigation', async ({ page }, t
   await expect(page.getByRole('heading', { name: /Bonjour,/ })).toBeVisible()
   const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2)
   expect(horizontalOverflow).toBe(false)
+})
+
+test('keyboard shortcuts open help, navigate by chord, quick add and the palette', async ({ page }) => {
+  await signIn(page)
+
+  await page.keyboard.press('?')
+  await expect(page.getByRole('dialog', { name: 'Raccourcis clavier' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'Raccourcis clavier' })).toHaveCount(0)
+
+  await page.keyboard.press('g')
+  await page.keyboard.press('s')
+  await expect(page).toHaveURL(/\/app\/people\/students$/)
+
+  await page.keyboard.press('n')
+  const quickAddInput = page.getByRole('combobox', { name: 'Ajout rapide' })
+  await expect(quickAddInput).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(quickAddInput).toHaveCount(0)
+
+  await page.keyboard.press('/')
+  const paletteInput = page.getByRole('combobox', { name: 'Palette de commandes' })
+  await expect(paletteInput).toBeVisible()
+  // Plain-letter shortcuts must be suspended while typing in the palette.
+  await page.keyboard.type('n')
+  await expect(quickAddInput).toHaveCount(0)
+  await page.keyboard.press('Escape')
+  await expect(paletteInput).toHaveCount(0)
+
+  await page.keyboard.press('Control+k')
+  await expect(paletteInput).toBeVisible()
+  await page.keyboard.press('Escape')
+})
+
+test('data table rows activate with Enter and Space', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'desktop table rows only')
+  await signIn(page)
+  await goTo(page, '/app/people/students')
+  const row = page.locator('tbody tr[aria-label]').first()
+  await expect(row).toBeVisible()
+  await row.focus()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/\/app\/people\/students\/[^/]+$/)
 })

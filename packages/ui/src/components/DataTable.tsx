@@ -21,6 +21,8 @@ export interface DataTableProps<T> {
   getRowId?: (row: T, index: number) => string
   searchPlaceholder?: string
   onRowClick?: (row: T) => void
+  /** Accessible name for a clickable row; should use non-sensitive fields only. */
+  rowAriaLabel?: (row: T) => string
   mobileCard?: (row: T) => React.ReactNode
   bulkActions?: { label: string; onAction: (ids: string[]) => void; danger?: boolean }[]
   pageSize?: number
@@ -29,7 +31,7 @@ export interface DataTableProps<T> {
 }
 
 export function DataTable<T>({
-  data, columns, getRowId, searchPlaceholder = 'Search…', onRowClick, mobileCard,
+  data, columns, getRowId, searchPlaceholder = 'Search…', onRowClick, rowAriaLabel, mobileCard,
   bulkActions, pageSize = 10, emptyTitle = 'Nothing to show yet', emptyAction,
 }: DataTableProps<T>) {
   const labels = useActionLabels()
@@ -91,6 +93,17 @@ export function DataTable<T>({
   }
 
   const pad = density === 'compact' ? 'px-3 py-2' : 'px-4 py-3'
+
+  const rowKeyboardProps = (row: T) => onRowClick ? {
+    tabIndex: 0,
+    'aria-label': rowAriaLabel?.(row),
+    onKeyDown: (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        onRowClick(row)
+      }
+    },
+  } : {}
 
   return (
     <div className="ui-card overflow-hidden">
@@ -167,8 +180,8 @@ export function DataTable<T>({
                 </thead>
                 <tbody>
                   {rows.map((row, i) => (
-                    <tr key={row.id} onClick={() => onRowClick?.(row.original)}
-                      className={cn('border-b border-line/70 transition-colors last:border-0 hover:bg-brand-50/50 dark:hover:bg-brand-500/5', i % 2 === 1 && 'bg-surface-2/40', row.getIsSelected() && 'bg-brand-50 dark:bg-brand-500/10', onRowClick && 'cursor-pointer')}>
+                    <tr key={row.id} onClick={() => onRowClick?.(row.original)} {...rowKeyboardProps(row.original)}
+                      className={cn('border-b border-line/70 transition-colors last:border-0 hover:bg-brand-50/50 dark:hover:bg-brand-500/5', i % 2 === 1 && 'bg-surface-2/40', row.getIsSelected() && 'bg-brand-50 dark:bg-brand-500/10', onRowClick && 'cursor-pointer focus-visible:bg-brand-50 dark:focus-visible:bg-brand-500/10')}>
                       {row.getVisibleCells().map(cell => (
                         <td key={cell.id} className={cn(pad, 'tnum max-w-xs truncate')}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -182,7 +195,12 @@ export function DataTable<T>({
           </div>
           {mobileCard && (
             <div className="space-y-2 p-3 md:hidden">
-              {rows.map(row => <div key={row.id} onClick={() => onRowClick?.(row.original)}>{mobileCard(row.original)}</div>)}
+              {rows.map(row => (
+                <div key={row.id} onClick={() => onRowClick?.(row.original)} {...rowKeyboardProps(row.original)}
+                  className={onRowClick ? 'focus-ring rounded-lg' : undefined}>
+                  {mobileCard(row.original)}
+                </div>
+              ))}
             </div>
           )}
           {!virtualize && (

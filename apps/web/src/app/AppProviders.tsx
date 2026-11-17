@@ -48,6 +48,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
     clear: t('action.clear'),
     columns: t('action.columns'),
     toggleDensity: t('action.toggleDensity'),
+    commandPalette: t('action.commandPalette'),
+    searchPages: t('action.searchPages'),
+    general: t('action.general'),
+    noMatches: t('action.noMatches'),
   }), [t])
 
   return (

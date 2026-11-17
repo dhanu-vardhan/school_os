@@ -112,3 +112,14 @@
 | P5-3 | Add translated control labels (`previousPage`, `nextPage`, `clearSearch`, `search`, `selectAll`, `clear`, `columns`, `toggleDensity`) to `ActionLabels` so shared widgets no longer hard-code English aria-labels. | Keeps `packages/ui` i18n-free while every screen is FR/EN and screen-reader labels stay localised. |
 | P5-4 | Extend `scripts/lint-actions.mjs` to fail any raw `<button>` and any `<a>` carrying `className` (except UI kit and tests), while allowing unstyled anchors used as `Button asChild` children. | Prevents regression to ad-hoc actions without forbidding the legitimate anchor child pattern. |
 | P5-5 | Preserve each migrated control's accessible name from its visible content; only add explicit `aria-label` where the content is ambiguous (calendar events, messages, notifications). | Keeps existing E2E/profile-picker matching intact and avoids redundant or conflicting labels. |
+
+## 2026-11-17: Part 2 Phase 6 — keyboard layer, quick actions and row gestures
+
+| # | Decision | Reason |
+|---|---|---|
+| P6-1 | Add one window-level `useGlobalShortcuts` listener in `AppShell` plus a `schoolos:shortcut-action` event bus; screens register guarded `primary`/`save` handlers with `useShortcutAction`. | A single keyboard owner avoids competing listeners and lets modals/screens bind Cmd/Ctrl+Enter and Cmd/Ctrl+S without leaking handlers between routes. |
+| P6-2 | Suspend plain-letter shortcuts and the G chord inside inputs, textareas, selects, contenteditable regions, `role="textbox"` and cmdk inputs; keep Cmd/Ctrl-modified shortcuts active everywhere. | Prevents keystroke theft while typing, while still letting users save or open the palette from a field. |
+| P6-3 | Localise the command palette and add translated quick-add/shortcut help dialogs in `web`; keep `packages/ui` i18n-free via extended `ActionLabels`. | Every screen is FR/EN; shared primitives must not import the i18n package. |
+| P6-4 | Give every clickable table/concern row `tabIndex=0`, a non-sensitive `aria-label` and Enter/Space handlers, and add per-row `RowActions` on the students roster with danger items last. | Keyboard and screen-reader users get the same navigation and actions as pointer users; no safeguarding detail leaks into labels. |
+| P6-5 | Implement `SwipeActions` with pointer/touch events and `touch-action: pan-y`, and always render a "More actions" toggle as the keyboard fallback; wire it into the students mobile card. | Mobile users get one-handed row actions without a gesture library, and the gesture is never the only path to an action. |
+| P6-6 | Hide the desktop-only help icon on small screens to keep the mobile header within the viewport. | The extra icon caused a 4 px horizontal overflow on the 390 px mobile viewport; keyboard help is not actionable on touch devices. |

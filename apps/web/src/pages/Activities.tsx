@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -13,6 +13,7 @@ import { useActivity, useActivities, useEnrolInActivity, useOfferings, useStuden
 import { formatDate, formatMoney } from '@schoolos/i18n'
 import type { Activity } from '@schoolos/shared'
 import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenError } from '../components/Screen'
+import { useShortcutAction } from '../app/shortcuts'
 
 const iconMap: Record<string, LucideIcon> = { chess: SparklesIcon, art: Palette, sport: Trophy, music: Music, language: Languages }
 const toneMap = { brand: 'from-brand-500 to-brand-700', accent: 'from-accent-500 to-accent-700', warning: 'from-warning-500 to-warning-700', info: 'from-info-500 to-info-700' }
@@ -162,6 +163,13 @@ export function EnrolPage() {
       navigate(`/app/activities/${id}`)
     } catch { toast.error(t('state.error')) }
   }
+
+  // Cmd/Ctrl+Enter confirms enrolment only on the final review step.
+  const confirmShortcut = useCallback(() => {
+    if (step === 2 && studentId && offering && !enrol.isPending) void confirm()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, studentId, offering, enrol.isPending])
+  useShortcutAction('primary', confirmShortcut)
 
   return (
     <div className="ui-page">

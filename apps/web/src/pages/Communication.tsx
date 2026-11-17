@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useShortcutAction } from '../app/shortcuts'
 import { useTranslation } from 'react-i18next'
 import { Bell, CheckCheck, Mail, Megaphone, Send } from 'lucide-react'
 import {
@@ -57,6 +58,14 @@ export function AnnouncementsPage() {
     } catch { toast.error(t('state.error')) }
   }
 
+  // Cmd/Ctrl+Enter publishes only while the compose modal has valid content.
+  const publishShortcut = useCallback(() => {
+    if (open && title.trim() && body.trim() && !create.isPending) void publish()
+    // publish is recreated each render; the guard above is what matters for shortcuts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, title, body, create.isPending])
+  useShortcutAction('primary', publishShortcut)
+
   return (
     <div className="ui-page">
       <OfflineNotice />
@@ -96,6 +105,13 @@ export function MessagesPage() {
     try { await send.mutateAsync({ to: selected.from, subject: `Re: ${selected.subject}`, body: reply }); toast.success(t('common.submit')); setReply('') }
     catch { toast.error(t('state.error')) }
   }
+
+  // Cmd/Ctrl+Enter sends the reply only when a message is selected and text exists.
+  const replyShortcut = useCallback(() => {
+    if (selected && reply.trim() && !send.isPending) void sendReply()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, reply, send.isPending])
+  useShortcutAction('primary', replyShortcut)
 
   return (
     <div className="ui-page">

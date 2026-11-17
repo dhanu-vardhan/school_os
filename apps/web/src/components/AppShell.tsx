@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Bell, ChevronDown, GraduationCap, Languages, LogOut, Menu, Moon,
+  Bell, ChevronDown, GraduationCap, Keyboard, Languages, LogOut, Menu, Moon,
   Search, Settings2, ShieldAlert, Sun, Monitor, X, GraduationCap as SchoolIcon,
 } from 'lucide-react'
 import {
@@ -13,6 +13,8 @@ import { useSession } from '../app/session'
 import { usePreferences, type Theme } from '../app/preferences'
 import { ALL_NAV_ITEMS, visibleNavGroups } from '../app/nav'
 import { useOnline } from '../app/hooks'
+import { useGlobalShortcuts } from '../app/shortcuts'
+import { QuickAddDialog, ShortcutsHelpDialog } from './ShortcutDialogs'
 import { MockNotice } from './Screen'
 
 function SchoolSwitcher() {
@@ -98,16 +100,25 @@ export function AppShell() {
   const online = useOnline()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [quickAddOpen, setQuickAddOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const groups = useMemo(() => visibleNavGroups(role, SHOW_UI_KIT), [role])
 
   useEffect(() => { setSidebarOpen(false) }, [location.pathname])
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPaletteOpen(v => !v) }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
+
+  const togglePalette = useCallback(() => setPaletteOpen(open => !open), [])
+  const openHelp = useCallback(() => setHelpOpen(true), [])
+  const openQuickAdd = useCallback(() => setQuickAddOpen(true), [])
+  const goTo = useCallback((path: string) => navigate(path), [navigate])
+  const closeSidebar = useCallback(() => setSidebarOpen(false), [])
+
+  useGlobalShortcuts({
+    onPalette: togglePalette,
+    onHelp: openHelp,
+    onQuickAdd: openQuickAdd,
+    onGo: goTo,
+    onEscape: closeSidebar,
+  })
 
   const commandItems = ALL_NAV_ITEMS
     .filter(item => (!item.devOnly || SHOW_UI_KIT) && (!item.permission || groups.some(g => g.items.includes(item))))
@@ -177,6 +188,9 @@ export function AppShell() {
             <div className="hidden sm:block"><SchoolSwitcher /></div>
             <NotificationBell />
             <LanguageThemeControls />
+            <Tooltip content={t('shortcuts.help')}>
+              <IconButton variant="ghost" size="icon-sm" className="hidden sm:inline-flex" label={t('shortcuts.help')} aria-keyshortcuts="?" onClick={() => setHelpOpen(true)}><Keyboard className="h-4 w-4" /></IconButton>
+            </Tooltip>
             <Tooltip content={t('common.settings')}>
               <IconButton variant="ghost" size="icon-sm" label={t('common.settings')} onClick={() => navigate('/app/settings')}><Settings2 className="h-4 w-4" /></IconButton>
             </Tooltip>
@@ -197,6 +211,8 @@ export function AppShell() {
       </nav>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} items={commandItems} />
+      <QuickAddDialog open={quickAddOpen} onOpenChange={setQuickAddOpen} onNavigate={goTo} />
+      <ShortcutsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       {!online && <div className="pointer-events-none fixed bottom-20 left-1/2 z-40 -translate-x-1/2 lg:bottom-6"><Badge tone="warning"><ShieldAlert className="h-3 w-3" />{t('common.offline')}</Badge></div>}
     </div>
   )

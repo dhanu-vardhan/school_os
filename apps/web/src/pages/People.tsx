@@ -5,12 +5,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
-  ArrowLeft, BadgeCheck, BookOpen, FileText, History, Pencil, Plus, ShieldCheck, UsersRound,
+  ArrowLeft, BadgeCheck, BookOpen, Eye, FileText, History, Mail, Pencil, Plus, ShieldCheck, UsersRound,
 } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import {
-  Avatar, Badge, Button, Card, CardBody, CardHeader, DataTable, FormField, Input, Select,
-  StatCard, Stepper, Tabs, Timeline, toast,
+  Avatar, Badge, Button, Card, CardBody, CardHeader, DataTable, FormField, Input, RowActions,
+  Select, StatCard, Stepper, SwipeActions, Tabs, Timeline, toast, type DropdownMenuItem,
 } from '@schoolos/ui'
 import {
   useClasses, useCreateStudent, useGuardians, useMembers, useStaff, useStudent, useStudents,
@@ -51,7 +51,18 @@ export function StudentsPage() {
     { accessorKey: 'birthDate', header: t('students.col.birth'), cell: ({ getValue }) => formatDate(getValue<string>()) },
     { accessorKey: 'languagesSpoken', header: t('students.col.languages') },
     { id: 'status', header: t('students.col.status'), cell: () => <Badge tone="success" dot>Active</Badge> },
-  ], [t, classById])
+    {
+      id: 'actions', header: t('action.actions'), enableSorting: false, enableHiding: false, size: 96,
+      cell: ({ row }) => {
+        const items: DropdownMenuItem[] = [
+          { label: t('action.view'), icon: <Eye className="h-4 w-4" aria-hidden />, onSelect: () => navigate(`/app/people/students/${row.original.id}`) },
+          { label: t('action.edit'), icon: <Pencil className="h-4 w-4" aria-hidden />, onSelect: () => navigate(`/app/people/students/${row.original.id}/edit`) },
+          { label: t('quick.messageParent'), icon: <Mail className="h-4 w-4" aria-hidden />, onSelect: () => navigate('/app/communication/messages') },
+        ]
+        return <RowActions items={items} label={`${t('action.actions')} ${row.original.firstName} ${row.original.lastName}`} />
+      },
+    },
+  ], [t, classById, navigate])
 
   return (
     <div className="ui-page">
@@ -69,12 +80,25 @@ export function StudentsPage() {
           getRowId={row => row.id}
           searchPlaceholder={t('students.searchPlaceholder')}
           onRowClick={row => navigate(`/app/people/students/${row.id}`)}
+          rowAriaLabel={row => `${row.firstName} ${row.lastName}`}
+          bulkActions={[
+            { label: t('action.exportCsv'), onAction: () => toast.info(t('common.mockHint')) },
+            { label: t('quick.messageParent'), onAction: () => navigate('/app/communication/messages') },
+          ]}
           emptyTitle={t('state.empty')}
           mobileCard={row => (
-            <div className="ui-card flex items-center gap-3 p-3">
-              <Avatar name={`${row.firstName} ${row.lastName}`} size="sm" />
-              <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-content">{row.firstName} {row.lastName}</p><p className="text-xs text-content-subtle">{classById.get(row.classId)?.name ?? row.classId}</p></div>
-            </div>
+            <SwipeActions
+              label={`${row.firstName} ${row.lastName}`}
+              actions={[
+                { label: t('action.view'), icon: <Eye className="h-4 w-4" aria-hidden />, tone: 'primary', onAction: () => navigate(`/app/people/students/${row.id}`) },
+                { label: t('quick.messageParent'), icon: <Mail className="h-4 w-4" aria-hidden />, onAction: () => navigate('/app/communication/messages') },
+              ]}
+            >
+              <div className="ui-card flex items-center gap-3 p-3 pr-10">
+                <Avatar name={`${row.firstName} ${row.lastName}`} size="sm" />
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-content">{row.firstName} {row.lastName}</p><p className="text-xs text-content-subtle">{classById.get(row.classId)?.name ?? row.classId}</p></div>
+              </div>
+            </SwipeActions>
           )}
         />
       </>)}</QueryState>

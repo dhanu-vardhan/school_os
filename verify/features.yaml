@@ -1190,3 +1190,39 @@ features:
     status: stubbed
     prompt_ref: P2-actions
     reason: "scripts/lint-actions.mjs extended and wired into pnpm lint"
+  - id: UI-P6-GLOBAL-SHORTCUTS
+    module: ui
+    name: "Part 2 central keyboard layer with typing guard and G chord"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "Cmd/Ctrl+K, /, ?, N, G-then-key, Escape and modified screen actions with focus/typing guards"
+  - id: UI-P6-QUICK-ADD
+    module: ui
+    name: "Part 2 quick add menu and shortcuts help dialogs"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "Localised quick-add command dialog and keyboard help modal reachable from the header and shortcuts"
+  - id: UI-P6-ROW-ACTIONS
+    module: ui
+    name: "Part 2 keyboard-accessible row actions and swipe actions"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "DataTable/Safeguarding rows activate with Enter/Space; SwipeActions adds mobile gestures with a keyboard fallback"
+  - id: UI-P6-SCREEN-ACTION-SHORTCUTS
+    module: ui
+    name: "Part 2 screen-primary actions bound to Cmd/Ctrl+Enter and Cmd/Ctrl+S"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-ux
+    reason: "Announcements, messages and activity enrolment register guarded handlers through the shortcut event bus"

@@ -36,7 +36,15 @@ export function SafeguardingPage() {
             <thead className="bg-surface-2 text-left text-xs uppercase text-content-subtle"><tr><th className="p-3">{t('safeguarding.reference')}</th><th className="p-3">{t('safeguarding.category')}</th><th className="p-3">{t('safeguarding.status')}</th><th className="p-3">{t('common.updatedAt')}</th><th className="p-3" /></tr></thead>
             <tbody>
               {concerns.data!.data.map(c => (
-                <tr key={c.id} className="cursor-pointer border-b border-line/70 last:border-0 hover:bg-brand-50/50 dark:hover:bg-brand-500/5" onClick={() => navigate(`/app/safeguarding/${c.id}`)}>
+                <tr key={c.id} tabIndex={0} aria-label={`${t('safeguarding.reference')} ${c.reference}`}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      navigate(`/app/safeguarding/${c.id}`)
+                    }
+                  }}
+                  className="cursor-pointer border-b border-line/70 last:border-0 hover:bg-brand-50/50 focus-visible:bg-brand-50 dark:hover:bg-brand-500/5 dark:focus-visible:bg-brand-500/10"
+                  onClick={() => navigate(`/app/safeguarding/${c.id}`)}>
                   <td className="p-3 font-mono text-xs text-content">{c.reference}</td>
                   <td className="p-3 text-content-muted">{c.category}</td>
                   <td className="p-3"><StatusPill status={c.status} /></td>
