@@ -1,6 +1,7 @@
 schoolos:
   demo:
     jwt-secret: ${SCHOOLOS_DEMO_JWT_SECRET:schoolos-local-demo-jwt-secret-change-me}
+    credentials-file: ${DEMO_CREDENTIALS_FILE:}
 
 spring:
   security:

@@ -34,6 +34,9 @@ management:
       exposure:
         include: health,info,metrics
 schoolos:
+  auth:
+    audience: ${SCHOOLOS_API_AUDIENCE:schoolos-api}
+    clock-skew-seconds: 30
   storage:
     endpoint: http://localhost:9000
     bucket: schoolos

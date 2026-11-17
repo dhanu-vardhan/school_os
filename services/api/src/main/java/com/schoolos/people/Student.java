@@ -32,6 +32,10 @@ public class Student extends BaseEntity {
     @Column(name = "languages_spoken")
     private String languagesSpoken;
 
+    /** Set only for STUDENT accounts: the pupil's own login is scoped to this row. */
+    @Column(name = "user_subject")
+    private String userSubject;
+
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public String getLastName() { return lastName; }
@@ -46,4 +50,6 @@ public class Student extends BaseEntity {
     public void setEnrolmentDate(LocalDate enrolmentDate) { this.enrolmentDate = enrolmentDate; }
     public String getLanguagesSpoken() { return languagesSpoken; }
     public void setLanguagesSpoken(String languagesSpoken) { this.languagesSpoken = languagesSpoken; }
+    public String getUserSubject() { return userSubject; }
+    public void setUserSubject(String userSubject) { this.userSubject = userSubject; }
 }
