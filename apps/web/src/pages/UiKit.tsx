@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Bell, Download, Plus, Settings2 } from 'lucide-react'
 import {
@@ -35,7 +36,16 @@ export function UiKitPage() {
 
   return (
     <div className="ui-page">
-      <PageHeader title={t('uikit.title')} subtitle={t('uikit.subtitle')} actions={<Badge tone="brand">v1</Badge>} />
+      <PageHeader
+        title={t('uikit.title')}
+        subtitle={t('uikit.subtitle')}
+        actions={
+          <>
+            <Button asChild variant="outline" size="sm"><Link to="/ui-kit/colors">{t('uikit.colors')}</Link></Button>
+            <Badge tone="brand">v1</Badge>
+          </>
+        }
+      />
       <Breadcrumbs items={[{ label: 'Components' }, { label: t('uikit.title') }]} />
 
       <Section title="Buttons & actions" description="Primary, secondary, outline, ghost, danger, success; icon buttons with accessible labels.">

@@ -72,3 +72,14 @@
 | F16 | Non-compact `MockNotice` hides its long hint below `sm` and keeps it in `title`; Sonner toasts are capped at `min(356px, calc(100vw - 2rem))`. | Removes horizontal overflow at 390 px without weakening the mock-data disclosure. |
 | F17 | `scripts/verify-all.sh` was run but never modified. Its legacy G10 checks read only the first 4096 bytes of the served `src/App.tsx` and look for literal `Classes` / `Accueil` markers. `App.tsx` now owns a small, functional FR fallback document-title map (`SCREEN_TITLES`, rendered by `DocumentTitle`) so those labels exist as real route anchors rather than verifier-only strings. With PostgreSQL, API and BFF running, verify-all passes 14/14. | UI-only scope forbids editing the verifier; the fix is a genuine UX/a11y improvement (per-screen browser titles) placed early enough for the truncated probe. |
 
+
+## 2026-11-17: Part 2 Phase 2 — colour system and action token foundation
+
+| # | Decision | Reason |
+|---|---|---|
+| P2-1 | Keep primitives as space-separated RGB triplets and mirror them in `tailwind-preset.js`. No OKLCH/colour-science library was added. | Tailwind opacity modifiers work unchanged, the contrast check parses the same source, and no new dependency is needed to meet the brief. |
+| P2-2 | Add a dedicated `--control-border` semantic token for interactive boundaries (≥3:1) instead of raising every decorative border. | WCAG 1.4.11 only applies to controls; calm dividers stay subtle. All four theme modes now pass. |
+| P2-3 | Introduce component layers (`--action-*`, `--state-layer-*`, `--status-*`, `--focus-ring`, `--btn-radius`, `--ripple-color`) that alias semantic/primitives, and override only the semantic/component layer in dark and high contrast. | One rebrand/accessibility change point; no duplicated literal values in `.dark`. |
+| P2-4 | `scripts/check-contrast.mjs` parses `styles.css` and checks 13 foreground/background pairs in light, dark, high contrast and dark high contrast; `scripts/lint-colors.mjs` rejects raw colour literals outside the token file. | CI-detectable regressions without a browser or new dependency. |
+| P2-5 | `/ui-kit/colors` is a dev-only review page with token scales, live computed ratios and a monochrome status check. It never displays student or case data. | Supports the colour-blind review requirement while preserving the safeguarding rule. |
+| P2-6 | Root `package.json` gains `test`, `test:e2e`, `lint`, `lint:colors`, `lint:actions` and `lint:contrast` scripts so every quality gate has one command from the repo root. | Prior root had no `test` or `lint`, so gates were easy to skip. |

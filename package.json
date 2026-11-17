@@ -4,6 +4,12 @@
   "packageManager": "pnpm@10.15.1",
   "scripts": {
     "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @schoolos/web test",
+    "test:e2e": "pnpm --filter @schoolos/web test:e2e",
+    "lint": "node scripts/lint-colors.mjs && node scripts/lint-actions.mjs && node scripts/check-contrast.mjs",
+    "lint:colors": "node scripts/lint-colors.mjs",
+    "lint:actions": "node scripts/lint-actions.mjs",
+    "lint:contrast": "node scripts/check-contrast.mjs"
   }
 }

@@ -27,6 +27,7 @@ export default {
         line: {
           DEFAULT: css('--border'),
           strong: css('--border-strong'),
+          control: css('--control-border'),
         },
         content: {
           DEFAULT: css('--text'),
@@ -38,6 +39,23 @@ export default {
           DEFAULT: css('--sidebar'),
           text: css('--sidebar-text'),
         },
+        /* Component tokens — prefer these in action components. */
+        action: {
+          primary: css('--action-primary-bg'),
+          'primary-hover': css('--action-primary-bg-hover'),
+          'primary-fg': css('--action-primary-fg'),
+          secondary: css('--action-secondary-bg'),
+          'secondary-hover': css('--action-secondary-bg-hover'),
+          'secondary-fg': css('--action-secondary-fg'),
+          danger: css('--action-danger-bg'),
+          'danger-hover': css('--action-danger-bg-hover'),
+          'danger-fg': css('--action-danger-fg'),
+          ai: css('--action-ai-bg'),
+          'ai-fg': css('--action-ai-fg'),
+          'ai-border': css('--action-ai-border'),
+        },
+        overlay: css('--overlay'),
+        grid: css('--grid-line'),
         role: {
           admin: css('--role-admin'),
           teacher: css('--role-teacher'),
@@ -69,6 +87,7 @@ export default {
         md: 'var(--radius-md)',
         lg: 'var(--radius-lg)',
         xl: 'var(--radius-xl)',
+        full: 'var(--radius-full)',
       },
       boxShadow: {
         xs: 'var(--shadow-xs)',
@@ -78,19 +97,25 @@ export default {
         xl: 'var(--shadow-xl)',
         focus: 'var(--shadow-focus)',
       },
-      transitionTimingFunction: { out: 'var(--ease-out)' },
+      transitionTimingFunction: { out: 'var(--ease-out)', spring: 'var(--ease-spring)' },
       transitionDuration: {
+        press: 'var(--duration-press)',
+        state: 'var(--duration-state)',
+        exit: 'var(--duration-exit)',
         fast: 'var(--duration-fast)',
         base: 'var(--duration-base)',
+        enter: 'var(--duration-enter)',
         slow: 'var(--duration-slow)',
       },
       keyframes: {
         shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
         'page-in': { from: { opacity: '0', transform: 'translateY(6px)' }, to: { opacity: '1', transform: 'none' } },
+        ripple: { from: { transform: 'scale(0)', opacity: '0.5' }, to: { transform: 'scale(2.6)', opacity: '0' } },
       },
       animation: {
         shimmer: 'shimmer 1.4s ease-in-out infinite',
-        'page-in': 'page-in 200ms var(--ease-out) both',
+        'page-in': 'page-in var(--duration-enter) var(--ease-out) both',
+        ripple: 'ripple var(--duration-ripple) var(--ease-out) forwards',
       },
       minHeight: { touch: '44px' },
       minWidth: { touch: '44px' },

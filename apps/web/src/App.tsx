@@ -83,6 +83,7 @@ const MessagesPage = lazy(() => import('./pages/Communication').then(m => ({ def
 const SettingsPage = lazy(() => import('./pages/Settings').then(m => ({ default: m.SettingsPage })))
 const DemoPage = lazy(() => import('./pages/Demo').then(m => ({ default: m.DemoPage })))
 const UiKitPage = lazy(() => import('./pages/UiKit').then(m => ({ default: m.UiKitPage })))
+const UiKitColorsPage = lazy(() => import('./pages/UiKitColors').then(m => ({ default: m.UiKitColorsPage })))
 
 function FullPageLoader() {
   return <div className="flex min-h-screen items-center justify-center bg-app"><div className="flex flex-col items-center gap-3 text-content-subtle"><GraduationCap className="h-8 w-8 animate-pulse text-brand-500" /><span className="text-sm">SchoolOS</span></div></div>
@@ -162,6 +163,7 @@ export default function App() {
           <Route path="/app/settings" element={<SettingsPage />} />
           <Route path="/demo" element={<DemoPage />} />
           {SHOW_UI_KIT && <Route path="/ui-kit" element={<UiKitPage />} />}
+          {SHOW_UI_KIT && <Route path="/ui-kit/colors" element={<UiKitColorsPage />} />}
         </Route>
 
         <Route path="/403" element={<ForbiddenCard />} />

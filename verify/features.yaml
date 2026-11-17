@@ -1091,3 +1091,30 @@ features:
     status: stubbed
     prompt_ref: screen-inventory
     reason: "Pending"
+  - id: UI-P2-COLOR-TOKENS
+    module: ui
+    name: "Part 2 primitive, semantic and component colour tokens"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-colors
+    reason: "UI implemented; verifier coverage registry intentionally unchanged"
+  - id: UI-P2-CONTRAST-LINT
+    module: ui
+    name: "Part 2 WCAG contrast and raw-colour lint gates"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-colors
+    reason: "Implemented as pnpm lint; not a backend feature"
+  - id: UI-P2-COLOR-KIT
+    module: ui
+    name: "Part 2 /ui-kit/colors token and contrast review page"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-colors
+    reason: "Dev-only UI kit route; covered by Playwright smoke"

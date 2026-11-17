@@ -61,6 +61,19 @@ test('navigates to a section, opens the command palette and toggles locale', asy
   await expect(page.getByRole('heading', { name: 'Students', level: 1 })).toBeVisible()
 })
 
+test('colour kit renders token contrast in light, dark and high contrast', async ({ page }) => {
+  await signIn(page)
+  await goTo(page, '/ui-kit/colors')
+  await expect(page.getByRole('heading', { name: 'Couleurs', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Contraste WCAG AA', level: 2 })).toBeVisible()
+  await expect(page.getByText('FAIL', { exact: true })).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Basculer le thème sombre' }).click()
+  await expect(page.getByText('FAIL', { exact: true })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Basculer le contraste élevé' }).click()
+  await expect(page.getByText('FAIL', { exact: true })).toHaveCount(0)
+})
+
 test('safeguarding lists expose no restricted content', async ({ page }) => {
   await signIn(page)
   await goTo(page, '/app/safeguarding')

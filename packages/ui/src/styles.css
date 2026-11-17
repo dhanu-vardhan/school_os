@@ -94,6 +94,8 @@
   --surface-3: 241 245 249;
   --border: 226 232 240;
   --border-strong: 203 213 225;
+  /* WCAG 1.4.11: interactive control boundaries need >= 3:1, decorative borders do not. */
+  --control-border: 100 116 139;
   --text: 15 23 42;
   --text-muted: 71 85 105;
   --text-subtle: 100 116 139;
@@ -125,19 +127,54 @@
   --radius-xl: 1.25rem;
   --radius-full: 9999px;
 
-  /* Elevation */
-  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.05);
-  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
-  --shadow-md: 0 4px 6px -1px rgb(15 23 42 / 0.07), 0 2px 4px -2px rgb(15 23 42 / 0.05);
-  --shadow-lg: 0 12px 24px -8px rgb(15 23 42 / 0.14), 0 4px 8px -4px rgb(15 23 42 / 0.06);
-  --shadow-xl: 0 24px 48px -12px rgb(15 23 42 / 0.22);
-  --shadow-focus: 0 0 0 3px rgb(99 102 241 / 0.35);
+  /* Elevation — every literal colour lives in a token, including the shadow tint */
+  --shadow-color: 15 23 42;
+  --focus-color: 99 102 241;
+  --shadow-xs: 0 1px 2px rgb(var(--shadow-color) / 0.05);
+  --shadow-sm: 0 1px 3px rgb(var(--shadow-color) / 0.06), 0 1px 2px rgb(var(--shadow-color) / 0.04);
+  --shadow-md: 0 4px 6px -1px rgb(var(--shadow-color) / 0.07), 0 2px 4px -2px rgb(var(--shadow-color) / 0.05);
+  --shadow-lg: 0 12px 24px -8px rgb(var(--shadow-color) / 0.14), 0 4px 8px -4px rgb(var(--shadow-color) / 0.06);
+  --shadow-xl: 0 24px 48px -12px rgb(var(--shadow-color) / 0.22);
+  --shadow-focus: 0 0 0 3px rgb(var(--focus-color) / 0.35);
 
-  /* Motion */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Motion — enter/exit/press/state are separate so components never invent durations */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.2, 0.9, 0.25, 1.15);
+  --duration-press: 80ms;
+  --duration-state: 120ms;
+  --duration-exit: 150ms;
   --duration-fast: 150ms;
   --duration-base: 200ms;
+  --duration-enter: 250ms;
   --duration-slow: 250ms;
+  --duration-ripple: 220ms;
+  --duration-toast-undo: 8000ms;
+
+  /* Component layer — actions. Values reference semantic primitives only. */
+  --action-primary-bg: var(--brand-600);
+  --action-primary-bg-hover: var(--brand-700);
+  --action-primary-fg: var(--neutral-0);
+  --action-secondary-bg: var(--brand-50);
+  --action-secondary-bg-hover: var(--brand-100);
+  --action-secondary-fg: var(--brand-700);
+  --action-danger-bg: var(--danger-600);
+  --action-danger-bg-hover: var(--danger-700);
+  --action-danger-fg: var(--neutral-0);
+  --action-ai-bg: var(--brand-50);
+  --action-ai-fg: var(--brand-700);
+  --action-ai-border: var(--brand-300);
+  --state-layer-hover: 15 23 42 / 0.06;
+  --state-layer-active: 15 23 42 / 0.12;
+  --ripple-color: 255 255 255;
+  --btn-radius: var(--radius-xs);
+  --focus-ring: 0 0 0 3px rgb(var(--focus-color) / 0.35);
+
+  /* Component layer — status (colour is never the only signal: text + icon too) */
+  --status-brand-fg: var(--brand-700);
+  --status-success-fg: var(--accent-700);
+  --status-warning-fg: var(--warning-700);
+  --status-danger-fg: var(--danger-700);
+  --status-info-fg: var(--info-700);
 }
 
 .dark {
@@ -148,6 +185,7 @@
   --surface-3: 33 41 61;
   --border: 43 53 74;
   --border-strong: 63 75 99;
+  --control-border: 148 163 184;
   --text: 241 245 249;
   --text-muted: 174 185 203;
   --text-subtle: 136 150 171;
@@ -163,12 +201,29 @@
   --role-safeguarding: 253 164 175;
   --role-finance: 196 181 253;
   --role-operator: 174 185 203;
-  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
-  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 4px 10px rgb(0 0 0 / 0.35);
-  --shadow-lg: 0 12px 28px rgb(0 0 0 / 0.45);
-  --shadow-xl: 0 24px 48px rgb(0 0 0 / 0.55);
-  --shadow-focus: 0 0 0 3px rgb(129 140 248 / 0.45);
+  /* Shadows derive from these two tokens; no duplicate literal values in dark mode. */
+  --shadow-color: 0 0 0;
+  --focus-color: 129 140 248;
+  --action-primary-bg: var(--brand-500);
+  --action-primary-bg-hover: var(--brand-600);
+  --action-primary-fg: var(--neutral-950);
+  --action-secondary-bg: var(--brand-500);
+  --action-secondary-bg-hover: var(--brand-400);
+  --action-secondary-fg: var(--neutral-950);
+  --action-danger-bg: var(--danger-500);
+  --action-danger-bg-hover: var(--danger-600);
+  --action-danger-fg: var(--neutral-950);
+  --action-ai-bg: var(--brand-500);
+  --action-ai-fg: var(--neutral-950);
+  --action-ai-border: var(--brand-400);
+  --state-layer-hover: 241 245 249 / 0.12;
+  --state-layer-active: 241 245 249 / 0.2;
+  --ripple-color: 15 23 42;
+  --status-brand-fg: var(--brand-300);
+  --status-success-fg: var(--accent-300);
+  --status-warning-fg: var(--warning-300);
+  --status-danger-fg: var(--danger-300);
+  --status-info-fg: var(--info-300);
 }
 
 * { border-color: rgb(var(--border)); }
@@ -195,7 +250,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font
 }
 
 ::selection { background: rgb(var(--brand-200)); color: rgb(var(--brand-950)); }
-.dark ::selection { background: rgb(var(--brand-800)); color: white; }
+.dark ::selection { background: rgb(var(--brand-800)); color: rgb(var(--neutral-0)); }
 
 .tnum { font-variant-numeric: tabular-nums; }
 
@@ -260,7 +315,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font
 /* Skip link */
 .ui-skip {
   position: fixed; left: 1rem; top: -4rem; z-index: 100;
-  background: rgb(var(--brand-600)); color: white;
+  background: rgb(var(--brand-600)); color: rgb(var(--neutral-0));
   padding: 0.625rem 1rem; border-radius: var(--radius-sm);
   transition: top var(--duration-fast) var(--ease-out);
 }
@@ -283,8 +338,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font
 @media print {
   :root { --app-bg: 255 255 255; --surface: 255 255 255; --text: 15 23 42; }
   .ui-no-print, nav, aside, header, button { display: none !important; }
-  .ui-card { box-shadow: none; border: 1px solid #d4d4d8; break-inside: avoid; }
-  body { background: white; }
+  .ui-card { box-shadow: none; border: 1px solid rgb(var(--border-strong)); break-inside: avoid; }
+  body { background: rgb(var(--surface)); }
   .ui-print-only { display: block !important; }
 }
 .ui-print-only { display: none; }
@@ -306,11 +361,64 @@ html.ui-reduce-motion *, html.ui-reduce-motion *::before, html.ui-reduce-motion 
 html.ui-high-contrast {
   --border: 100 116 139;
   --border-strong: 51 65 85;
+  --text: 0 0 0;
   --text-muted: 30 41 59;
+  --text-subtle: 51 65 85;
+  --focus-color: 29 27 73;
+  --state-layer-hover: 15 23 42 / 0.12;
+  --state-layer-active: 15 23 42 / 0.2;
 }
 html.dark.ui-high-contrast {
   --border: 136 150 171;
   --border-strong: 203 213 225;
+  --text: 255 255 255;
   --text-muted: 226 232 240;
+  --text-subtle: 203 213 225;
+  --focus-color: 255 255 255;
+  --state-layer-hover: 241 245 249 / 0.2;
+  --state-layer-active: 241 245 249 / 0.28;
 }
 html.ui-large-text { font-size: 17px; }
+
+/* Interaction layers — used by Button and other action primitives */
+.ui-state {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.ui-state::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgb(var(--state-layer-hover));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-state) var(--ease-out);
+}
+.ui-state:hover::after,
+.ui-state:focus-visible::after { opacity: 1; }
+.ui-state:active::after { background: rgb(var(--state-layer-active)); opacity: 1; }
+
+@keyframes ui-ripple {
+  from { transform: scale(0); opacity: 0.5; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+.ui-ripple {
+  position: absolute;
+  z-index: -1;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: -1.25rem 0 0 -1.25rem;
+  border-radius: var(--radius-full);
+  background: rgb(var(--ripple-color) / 0.45);
+  pointer-events: none;
+  animation: ui-ripple var(--duration-ripple) var(--ease-out) forwards;
+}
+
+/* Route transition — transform/opacity only, disabled under reduced motion */
+@keyframes ui-route-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.ui-route-in { animation: ui-route-in var(--duration-enter) var(--ease-out) both; }
