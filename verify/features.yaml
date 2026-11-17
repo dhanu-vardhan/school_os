@@ -1,0 +1,1093 @@
+# Generated/maintained for Prompt 10 verify-all
+features:
+features:
+  - id: INFRA-WEB-01
+    module: infra
+    name: Web preview reachable and styled
+    roles: [director,teacher,guardian,finance,reception,provider,safeguarding]
+    platform: [web]
+    checks: [ui]
+    status: expected-working
+    prompt_ref: P9-A1A2
+  - id: INFRA-API-01
+    module: infra
+    name: API health endpoint reachable
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: expected-working
+    prompt_ref: P8
+  - id: INFRA-DB-01
+    module: infra
+    name: PostgreSQL reachable with RLS migrations
+    roles: [system]
+    platform: [web]
+    checks: [api,tenant]
+    status: expected-working
+    prompt_ref: P2-7
+  - id: P1-5.1-roles
+    module: tenancy
+    name: Roles and permissions
+    roles: [director]
+    platform: [web]
+    checks: [api,permission]
+    status: stubbed
+    reason: PolicyService/permissions matrix not implemented
+    prompt_ref: P1-5.1
+  - id: P1-5.2-profile
+    module: people
+    name: Student profile
+    roles: [director,teacher]
+    platform: [web]
+    checks: [api,ui,tenant]
+    status: stubbed
+    reason: No real API-backed UI flow; entity partial
+    prompt_ref: P1-5.2
+  - id: P1-5.4-daily
+    module: attendance
+    name: Daily attendance two taps
+    roles: [teacher]
+    platform: [web]
+    checks: [api,ui]
+    status: stubbed
+    reason: Attendance module not created
+    prompt_ref: P1-5.4
+  - id: P1-5.14-catalogue
+    module: activities
+    name: Activity catalogue
+    roles: [director,guardian]
+    platform: [web]
+    checks: [api,ui]
+    status: stubbed
+    reason: Entities partial, no end-to-end flow
+    prompt_ref: P1-5.14
+  - id: P2-7-tenantflow
+    module: security
+    name: Tenant request flow and RLS isolation
+    roles: [system]
+    platform: [web]
+    checks: [api,tenant]
+    status: expected-working
+    prompt_ref: P2-7
+  - id: P3-8-safeguarding
+    module: safeguarding
+    name: Safeguarding concern workflow
+    roles: [safeguarding,director]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: stubbed
+    reason: Entity only, no workflow/UI
+    prompt_ref: P3-8
+  - id: SCR-DIR-CLASSES
+    module: ui
+    name: Director Classes screen
+    roles: [director]
+    platform: [web]
+    checks: [ui]
+    status: expected-working
+    prompt_ref: P9-C1
+  - id: SCR-DIR-HOME
+    module: ui
+    name: Director Home screen
+    roles: [director]
+    platform: [web]
+    checks: [ui]
+    status: expected-working
+    prompt_ref: P9
+  - id: P1-5.1-multichild
+    module: people
+    name: "Multiple children under one parent"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: no guardian model yet"
+  - id: P1-5.1-guardianship
+    module: people
+    name: "Multiple guardians with rights"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: no guardianship entity"
+  - id: P1-5.1-i18n
+    module: web
+    name: "French/English UI"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: i18n not wired in client"
+  - id: P1-5.1-pwa
+    module: web
+    name: "PWA mobile-first"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: Vite app, no PWA plugin"
+  - id: P1-5.1-notifications
+    module: notifications
+    name: "Push/email/SMS"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: module not created"
+  - id: P1-5.1-audit
+    module: audit
+    name: "Audit log"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status stubbed: package only"
+  - id: P1-5.1-export
+    module: compliance
+    name: "Data export/erasure"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: no implementation"
+  - id: P1-5.2-ine
+    module: people
+    name: "INE number"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: expected-working
+    prompt_ref: traceability
+  - id: P1-5.2-guardians
+    module: people
+    name: "Guardians/emergency contacts"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.2-pickup
+    module: people
+    name: "Authorised pickup list"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.2-custody
+    module: people
+    name: "Custody restrictions"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.2-siblings
+    module: people
+    name: "Sibling links"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.2-docs
+    module: files
+    name: "Document storage"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.3-inquiry
+    module: admissions
+    name: "Inquiry form"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.3-waitlist
+    module: admissions
+    name: "Waitlist"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.3-contract
+    module: forms-signatures
+    name: "Enrolment contract e-sign"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.3-deposit
+    module: billing
+    name: "Deposit payment"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.4-statuses
+    module: attendance
+    name: "Statuses"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.4-parentdecl
+    module: attendance
+    name: "Parent absence declaration"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.4-notify
+    module: notifications
+    name: "Instant parent notification"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.5-classes
+    module: pedagogy
+    name: "Class/group management"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.5-obs
+    module: pedagogy
+    name: "Observation capture"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.5-skills
+    module: pedagogy
+    name: "Skill progression"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.5-socle
+    module: pedagogy
+    name: "Socle commun mapping"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.5-reports
+    module: ai
+    name: "AI-drafted narrative reports"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.5-portfolio
+    module: pedagogy
+    name: "Parent progress summaries"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.6-plans
+    module: support-plans
+    name: "Individual plans PAP/PPS/PAI"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.6-versions
+    module: support-plans
+    name: "Version history"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.6-confidentiality
+    module: support-plans
+    name: "Role-based confidentiality"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.7-logs
+    module: care
+    name: "Meals/naps/toilet/mood/temp"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.7-report
+    module: care
+    name: "End-of-day report"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.7-photo
+    module: files
+    name: "Photo/video sharing with consent"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.7-incident
+    module: care
+    name: "Incident/accident reports"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.8-messages
+    module: communication
+    name: "Direct messages"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.8-announcements
+    module: communication
+    name: "School/class announcements"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.8-feed
+    module: communication
+    name: "Class feed"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.8-liaison
+    module: communication
+    name: "Liaison notebook"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.8-translation
+    module: ai
+    name: "Auto translation"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.9-calendar
+    module: calendar
+    name: "Shared calendar iCal sync"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.9-rsvp
+    module: calendar
+    name: "Events RSVP"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.9-ptm
+    module: calendar
+    name: "Parent-teacher meeting scheduling"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.9-trips
+    module: forms-signatures
+    name: "Trips permission slips"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.10-yearsetup
+    module: calendar
+    name: "School year setup"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.10-holidays
+    module: calendar
+    name: "French holiday calendars by zone"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: fr-holidays-zone-c.json data file"
+  - id: P1-5.10-closures
+    module: calendar
+    name: "Closures/strike handling"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.12-fees
+    module: billing
+    name: "Fee structures"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.12-sepa
+    module: billing
+    name: "SEPA direct debit"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.12-invoices
+    module: billing
+    name: "French-compliant invoices"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.12-reminders
+    module: billing
+    name: "Automatic reminders"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.12-split
+    module: billing
+    name: "Split billing"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.13-menu
+    module: activities-canteen
+    name: "Weekly menu publishing"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.13-allergy
+    module: activities-canteen
+    name: "Allergy/dietary info"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.14-registration
+    module: activities
+    name: "Registration/waitlist"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: ActivityOffering, ActivityRegistration entities"
+  - id: P1-5.14-attendance
+    module: activities
+    name: "Per-session attendance"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: ActivityAttendance entity"
+  - id: P1-5.14-billing
+    module: activities
+    name: "Billing attached"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-1.4-#2
+    module: activities
+    name: "Parent books activities conflict detection"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-1.4-#3
+    module: activities
+    name: "Waitlist auto-promotion"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-1.4-#4
+    module: activities
+    name: "Offline attendance + notifications"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-1.4-#5
+    module: activities
+    name: "Provider scoped access"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.15-medical
+    module: care
+    name: "Medical/allergy alerts"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.15-emergency
+    module: care
+    name: "Emergency contacts one-tap"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.16-profiles
+    module: people
+    name: "Staff profiles/roles"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.16-docs
+    module: people
+    name: "Staff docs/qualifications"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.17-formbuilder
+    module: forms-signatures
+    name: "Form builder"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.17-templates
+    module: forms-signatures
+    name: "Templates"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.17-esign
+    module: forms-signatures
+    name: "E-signature"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.19-dashboard
+    module: reporting
+    name: "Director dashboard"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.19-inspection
+    module: reporting
+    name: "Inspection-ready records"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.19-import
+    module: reporting
+    name: "Import wizard"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.21-reports
+    module: ai
+    name: "AI-drafted narrative reports"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.21-stt
+    module: ai
+    name: "Voice-to-text"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P1-5.21-translate
+    module: ai
+    name: "Translate messages/reports"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P2-7-rls
+    module: db
+    name: "RLS enabled+forced all tenant tables"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: expected-working
+    prompt_ref: traceability
+  - id: P2-7-roles
+    module: db
+    name: "DB roles owner/app/support"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: init-db.sql creates app/support; owner is POSTGRES_USER"
+  - id: P2-8-storage
+    module: files
+    name: "Object storage rules"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P2-9-encryption
+    module: common
+    name: "Field-level encryption"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P2-10-crossTenant
+    module: security
+    name: "Cross-tenant security suite"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: CrossTenantIsolationTest for Student"
+  - id: P2-11-testing
+    module: -
+    name: "Integration/e2e"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: one integration test"
+  - id: P4-3-adapters
+    module: platform
+    name: "Platform adapter layer"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: interfaces + web + mock"
+  - id: P4-4-auth
+    module: security
+    name: "Auth per platform"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P4-5-push
+    module: notifications
+    name: "Push gateway"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P4-6-offline
+    module: platform
+    name: "Offline store"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: interface only"
+  - id: P4-11-spike
+    module: -
+    name: "Phase 0 spike on real devices"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: docs/PLATFORM_SPIKE.md"
+  - id: P4-8-cicd
+    module: -
+    name: "CI/CD signing"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: .github/workflows/ci.yml basic"
+  - id: P3-4-export
+    module: lifecycle
+    name: "Per-school export/restore"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-4-retention
+    module: lifecycle
+    name: "Retention engine"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: RetentionPolicy entity"
+  - id: P3-5-rollover
+    module: lifecycle
+    name: "Year rollover"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-6-guardianlifecycle
+    module: people
+    name: "Guardian account lifecycle"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-7-notifinfra
+    module: notifications
+    name: "Notification deliverability"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-9-paper
+    module: -
+    name: "Paper fallbacks/print"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-10-nfr
+    module: -
+    name: "NFR quality gates"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P3-11-compliance
+    module: compliance
+    name: "Compliance doc pack"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: docs/COMPLIANCE.md"
+  - id: P3-12-support
+    module: support
+    name: "Support/help"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status stubbed: package only"
+  - id: P3-13-pilot
+    module: -
+    name: "Pilot readiness mode"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: docs/PILOT_READINESS.md"
+  - id: P5-2-authz
+    module: security
+    name: "Authorisation model/matrix"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: docs not created"
+  - id: P5-3-multicampus
+    module: tenancy
+    name: "Multi-campus hierarchy"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-4-inclusion
+    module: inclusion
+    name: "Inclusion module"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-5-health
+    module: care
+    name: "Health/canteen/transport"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-6-facilities
+    module: facilities-safety
+    name: "Facilities/safety"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-7-staff
+    module: people
+    name: "Staff administration"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-8-finance
+    module: billing
+    name: "Finance depth"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-9-integrations
+    module: -
+    name: "Data migration/integrations"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-10-search
+    module: reporting
+    name: "Search/reporting/exports"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-11-ai
+    module: ai
+    name: "AI governance"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-12-reliability
+    module: -
+    name: "Reliability/observability"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-13-synthetic
+    module: -
+    name: "Synthetic data generator"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: planned
+    prompt_ref: traceability
+    reason: "traceability status missing: -"
+  - id: P5-15-docs
+    module: -
+    name: "Documentation/devex"
+    roles: [system]
+    platform: [web]
+    checks: [api]
+    status: stubbed
+    prompt_ref: traceability
+    reason: "traceability status partial: multiple docs exist"
+  - id: SCR-DIRECTOR-PEOPLE-BILLING-ACTIVITIES-SETTINGS
+    module: ui
+    name: "Director People/Billing/Activities/Settings"
+    roles: [director]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: screen-inventory
+    reason: "Pending"
+  - id: SCR-TEACHER-HOME-CLASSES-PR-SENCES-MESSAGES-RAPPORTS
+    module: ui
+    name: "Teacher Home/Classes/Présences/Messages/Rapports"
+    roles: [teacher]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: screen-inventory
+    reason: "Pending"
+  - id: SCR-GUARDIAN-ACCUEIL-MESSAGES-ABSENCE-CALENDRIER-PAIEMENTS-ACTIVIT-S
+    module: ui
+    name: "Guardian Accueil/Messages/Absence/Calendrier/Paiements/Activités"
+    roles: [guardian]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: screen-inventory
+    reason: "Pending"
+  - id: SCR-FINANCE-RECEPTION-PROVIDER-SAFEGUARDING-OPERATOR-MARKETING
+    module: ui
+    name: "Finance/Reception/Provider/Safeguarding/Operator/Marketing -"
+    roles: [finance/reception/provider/safeguarding/operator/marketing]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: screen-inventory
+    reason: "Pending"

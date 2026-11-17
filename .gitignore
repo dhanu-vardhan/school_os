@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+out/
+*.tsbuildinfo
+.gradle/
+__pycache__/
+*.pyc
+
+# Test / tooling output
+coverage/
+playwright-report/
+test-results/
+.playwright-mcp/
+reports/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# OS / editor noise
+.DS_Store
+*.log
+.idea/
+.vscode/

@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: schoolos-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/schoolos
+    username: schoolos_app
+    password: schoolos_app
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/schoolos
+    user: schoolos_owner
+    password: schoolos_owner
+    locations: classpath:db/migration
+    schemas: public
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/schoolos
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+schoolos:
+  storage:
+    endpoint: http://localhost:9000
+    bucket: schoolos
+    access-key: minioadmin
+    secret-key: minioadmin

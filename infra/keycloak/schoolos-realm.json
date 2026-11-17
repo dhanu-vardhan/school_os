@@ -1,0 +1,56 @@
+{
+  "realm": "schoolos",
+  "enabled": true,
+  "displayName": "SchoolOS",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "organizationsEnabled": true,
+  "clients": [
+    {
+      "clientId": "schoolos-bff",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "schoolos-bff-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    },
+    {
+      "clientId": "schoolos-desktop",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://127.0.0.1/*", "schoolos://callback"],
+      "webOrigins": ["*"],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    },
+    {
+      "clientId": "schoolos-api",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "bearerOnly": true
+    }
+  ],
+  "roles": {
+    "realm": [
+      { "name": "director" },
+      { "name": "admin" },
+      { "name": "teacher" },
+      { "name": "assistant" },
+      { "name": "accountant" },
+      { "name": "parent" },
+      { "name": "student" },
+      { "name": "therapist" }
+    ]
+  }
+}

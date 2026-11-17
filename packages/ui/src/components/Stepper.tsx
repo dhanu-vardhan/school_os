@@ -1,0 +1,30 @@
+import { Check } from 'lucide-react'
+import { cn } from '../lib/cn'
+
+export function Stepper({ steps, current, onStepClick }: {
+  steps: { title: string; description?: string }[]; current: number; onStepClick?: (i: number) => void
+}) {
+  return (
+    <ol className="flex flex-col gap-3 sm:flex-row sm:items-start" aria-label="Progress">
+      {steps.map((step, i) => {
+        const done = i < current
+        const active = i === current
+        return (
+          <li key={step.title} className="flex flex-1 items-start gap-3">
+            <button type="button" disabled={!onStepClick} onClick={() => onStepClick?.(i)}
+              aria-current={active ? 'step' : undefined}
+              className={cn('focus-ring flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+                done ? 'border-accent-500 bg-accent-500 text-white' : active ? 'border-brand-600 bg-brand-600 text-white' : 'border-line-strong bg-surface text-content-subtle')}>
+              {done ? <Check className="h-4 w-4" /> : i + 1}
+            </button>
+            <div className="min-w-0 pt-1">
+              <p className={cn('text-sm font-medium', active ? 'text-content' : 'text-content-muted')}>{step.title}</p>
+              {step.description && <p className="text-xs text-content-subtle">{step.description}</p>}
+            </div>
+            {i < steps.length - 1 && <span className="mt-4 hidden h-px flex-1 bg-line sm:block" />}
+          </li>
+        )
+      })}
+    </ol>
+  )
+}

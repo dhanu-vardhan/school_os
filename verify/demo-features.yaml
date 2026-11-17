@@ -1,0 +1,42 @@
+# Demo interaction registry (Prompt 11 step 1)
+features:
+  - id: DEMO-LANDING
+    role: all
+    action: open landing and pick any role
+    expected: role session created, styled app, no console errors
+    status: implemented
+  - id: DEMO-RESET
+    role: director
+    action: click Réinitialiser la démo
+    expected: seed state restored
+    status: implemented
+  - id: SCR-DIR-CLASSES
+    role: director
+    action: search, select class, create class
+    expected: list updates, detail shown, toast
+    status: implemented
+  - id: GUARDIAN-ABSENCE
+    role: guardian
+    action: declare absence for child
+    expected: child status absent; visible to teacher/director
+    status: implemented
+  - id: GUARDIAN-PAYMENT
+    role: guardian
+    action: pay invoice (sandbox)
+    expected: status payee, receipt in inbox/audit
+    status: implemented
+  - id: GUARDIAN-MESSAGE-REPLY
+    role: guardian
+    action: reply to message
+    expected: reply visible to teacher
+    status: implemented
+  - id: TEACHER-ATTENDANCE
+    role: teacher
+    action: mark present/absent/retard
+    expected: child+class attendance updates
+    status: implemented
+  - id: TEACHER-MESSAGE
+    role: teacher
+    action: send message
+    expected: message visible to guardian
+    status: implemented

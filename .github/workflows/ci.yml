@@ -1,0 +1,41 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: schoolos
+          POSTGRES_USER: schoolos_owner
+          POSTGRES_PASSWORD: schoolos_owner
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Init DB roles
+        env:
+          PGPASSWORD: schoolos_owner
+        run: psql -h localhost -U schoolos_owner -d schoolos -f infra/compose/init-db.sql
+      - name: Test
+        working-directory: services/api
+        run: ./gradlew test
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install
+      - run: pnpm --filter @schoolos/web build

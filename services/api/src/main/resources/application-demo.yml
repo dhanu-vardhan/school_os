@@ -1,0 +1,14 @@
+schoolos:
+  demo:
+    jwt-secret: ${SCHOOLOS_DEMO_JWT_SECRET:schoolos-local-demo-jwt-secret-change-me}
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SCHOOLOS_ISSUER_URI:http://localhost:8081/realms/schoolos}
+
+logging:
+  level:
+    com.schoolos: INFO

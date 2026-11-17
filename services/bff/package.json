@@ -1,0 +1,15 @@
+{
+  "name": "@schoolos/bff",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "SchoolOS backend-for-frontend: cookie session, CSRF, demo login and API token relay",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js",
+    "typecheck": "node --check src/index.js && node --check src/server.js && node --check src/session.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

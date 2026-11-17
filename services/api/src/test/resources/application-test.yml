@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/schoolos
+    username: schoolos_app
+    password: schoolos_app
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none

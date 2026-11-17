@@ -1,0 +1,13 @@
+{
+  "source": "Ministere de l'Education nationale - calendrier scolaire zone C (Paris)",
+  "updateProcedure": "Replace this file annually from the official source; bump version; notify directors",
+  "version": "2026-2027",
+  "zone": "C",
+  "holidays": [
+    { "name": "Toussaint", "start": "2026-10-17", "end": "2026-11-02" },
+    { "name": "Noel", "start": "2026-12-19", "end": "2027-01-04" },
+    { "name": "Hiver", "start": "2027-02-06", "end": "2027-02-22" },
+    { "name": "Printemps", "start": "2027-04-03", "end": "2027-04-19" },
+    { "name": "Ete", "start": "2027-07-03", "end": "2027-09-01" }
+  ]
+}
