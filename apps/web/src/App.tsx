@@ -19,6 +19,10 @@ const SCREEN_TITLES: Record<string, string> = {
   '/app/safeguarding': 'Sauvegarde',
   '/app/reports': 'Rapports',
   '/app/settings': 'Paramètres',
+  '/app/attendance': 'Présences',
+  '/app/timetable': 'Emploi du temps',
+  '/app/analytics': 'Pilotage',
+  '/app/analytics/explore': 'Analyses',
 }
 
 function DocumentTitle() {
@@ -37,12 +41,20 @@ const SchoolSelectPage = lazy(() => import('./pages/Auth').then(m => ({ default:
 const SessionExpiredPage = lazy(() => import('./pages/Auth').then(m => ({ default: m.SessionExpiredPage })))
 const ForbiddenPage = lazy(() => import('./pages/Auth').then(m => ({ default: m.ForbiddenPage })))
 const NotFoundPage = lazy(() => import('./pages/Auth').then(m => ({ default: m.NotFoundPage })))
+const ForgotPasswordPage = lazy(() => import('./pages/Auth').then(m => ({ default: m.ForgotPasswordPage })))
+const ResetPasswordPage = lazy(() => import('./pages/Auth').then(m => ({ default: m.ResetPasswordPage })))
+const InvitationPage = lazy(() => import('./pages/Auth').then(m => ({ default: m.InvitationPage })))
+const AccountSecurityPage = lazy(() => import('./pages/Security').then(m => ({ default: m.AccountSecurityPage })))
+const SecurityCentrePage = lazy(() => import('./pages/Security').then(m => ({ default: m.SecurityCentrePage })))
 
 const AdminDashboard = lazy(() => import('./pages/Dashboards').then(m => ({ default: m.AdminDashboard })))
 const TeacherDashboard = lazy(() => import('./pages/Dashboards').then(m => ({ default: m.TeacherDashboard })))
 const ParentDashboard = lazy(() => import('./pages/Dashboards').then(m => ({ default: m.ParentDashboard })))
 const StudentDashboard = lazy(() => import('./pages/Dashboards').then(m => ({ default: m.StudentDashboard })))
 const DashboardSwitch = lazy(() => import('./pages/Dashboards').then(m => ({ default: m.DashboardSwitch })))
+
+const AttendancePage = lazy(() => import('./pages/Attendance').then(m => ({ default: m.AttendancePage })))
+const TimetablePage = lazy(() => import('./pages/Timetable').then(m => ({ default: m.TimetablePage })))
 
 const StudentsPage = lazy(() => import('./pages/People').then(m => ({ default: m.StudentsPage })))
 const StudentProfilePage = lazy(() => import('./pages/People').then(m => ({ default: m.StudentProfilePage })))
@@ -70,6 +82,9 @@ const DataRequestsPage = lazy(() => import('./pages/Compliance').then(m => ({ de
 const CompliancePackPage = lazy(() => import('./pages/Compliance').then(m => ({ default: m.CompliancePackPage })))
 const AuditPage = lazy(() => import('./pages/Compliance').then(m => ({ default: m.AuditPage })))
 const ReportsPage = lazy(() => import('./pages/Reports').then(m => ({ default: m.ReportsPage })))
+const AnalyticsDashboardPage = lazy(() => import('./pages/AnalyticsDashboard').then(m => ({ default: m.AnalyticsDashboardPage })))
+const AnalyticsExplorePage = lazy(() => import('./pages/AnalyticsExplore').then(m => ({ default: m.AnalyticsExplorePage })))
+const AnalyticsUiKitPage = lazy(() => import('./pages/AnalyticsUiKit').then(m => ({ default: m.AnalyticsUiKitPage })))
 
 const SystemStatusPage = lazy(() => import('./pages/Platform').then(m => ({ default: m.SystemStatusPage })))
 const FeatureFlagsPage = lazy(() => import('./pages/Platform').then(m => ({ default: m.FeatureFlagsPage })))
@@ -111,6 +126,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
         <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
+        <Route path="/forgot-password" element={<PublicOnly><ForgotPasswordPage /></PublicOnly>} />
+        <Route path="/reset-password" element={<PublicOnly><ResetPasswordPage /></PublicOnly>} />
+        <Route path="/invite" element={<PublicOnly><InvitationPage /></PublicOnly>} />
         <Route path="/session-expired" element={<SessionExpiredPage />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
 
@@ -121,6 +139,9 @@ export default function App() {
           <Route path="/app/dashboard/teacher" element={<TeacherDashboard />} />
           <Route path="/app/dashboard/parent" element={<ParentDashboard />} />
           <Route path="/app/dashboard/student" element={<StudentDashboard />} />
+
+          <Route path="/app/attendance" element={<AttendancePage />} />
+          <Route path="/app/timetable" element={<TimetablePage />} />
 
           <Route path="/app/people/students" element={<StudentsPage />} />
           <Route path="/app/people/students/new" element={<StudentWizardPage />} />
@@ -151,7 +172,12 @@ export default function App() {
           <Route path="/app/compliance/pack" element={<CompliancePackPage />} />
           <Route path="/app/compliance/audit" element={<AuditPage />} />
 
+          <Route path="/app/account/security" element={<AccountSecurityPage />} />
+          <Route path="/app/security" element={<SecurityCentrePage />} />
+
           <Route path="/app/reports" element={<ReportsPage />} />
+          <Route path="/app/analytics" element={<AnalyticsDashboardPage />} />
+          <Route path="/app/analytics/explore" element={<AnalyticsExplorePage />} />
           <Route path="/app/platform/status" element={<SystemStatusPage />} />
           <Route path="/app/platform/flags" element={<FeatureFlagsPage />} />
           <Route path="/app/platform/integrations" element={<IntegrationsPage />} />
@@ -166,6 +192,7 @@ export default function App() {
           {SHOW_UI_KIT && <Route path="/ui-kit" element={<UiKitPage />} />}
           {SHOW_UI_KIT && <Route path="/ui-kit/colors" element={<UiKitColorsPage />} />}
           {SHOW_UI_KIT && <Route path="/ui-kit/buttons" element={<UiKitButtonsPage />} />}
+          {SHOW_UI_KIT && <Route path="/ui-kit/analytics" element={<AnalyticsUiKitPage />} />}
         </Route>
 
         <Route path="/403" element={<ForbiddenCard />} />

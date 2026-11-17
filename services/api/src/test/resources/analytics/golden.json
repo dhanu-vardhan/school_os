@@ -1,0 +1,49 @@
+{
+  "source": "packages/analytics-core/src/stats.ts, metrics.ts and suppression.ts (mirrored from apps/web/src/test/analytics-core.test.ts)",
+  "note": "Hand-computed golden values shared by the TypeScript and Java implementations. Any formula change must update METRIC_DICTIONARY.md and both fixtures.",
+  "wilson": [
+    { "successes": 90, "trials": 100, "lower": 0.8256, "upper": 0.9447, "method": "wilson-95", "precision": 3 },
+    { "successes": 50, "trials": 100, "lower": 0.4038, "upper": 0.5962, "method": "wilson-95", "precision": 3 }
+  ],
+  "normalQuantile": [
+    { "p": 0.975, "value": 1.959964, "precision": 5 }
+  ],
+  "rates": [
+    { "id": "attendance.rate", "successes": 1102, "trials": 1180, "value": 93.3898, "n": 1180, "method": "wilson-95", "precision": 3, "ciPercentLower": 91.827, "ciPercentUpper": 94.671 },
+    { "id": "marks.pass_rate", "successes": 3, "trials": 4, "value": 75, "n": 4, "method": "wilson-95", "precision": 6 },
+    { "id": "assessment.difficulty", "successes": 4, "trials": 10, "value": 40, "n": 10, "method": "wilson-95", "precision": 6 }
+  ],
+  "suppression": {
+    "threshold": 5,
+    "cells": [
+      { "key": "a", "label": "A", "n": 3, "value": 50, "numerator": 1.5 },
+      { "key": "b", "label": "B", "n": 6, "value": 80, "numerator": 4.8 },
+      { "key": "c", "label": "C", "n": 2, "value": 20, "numerator": 0.4 },
+      { "key": "d", "label": "D", "n": 12, "value": 90, "numerator": 10.8 }
+    ],
+    "expected": {
+      "hiddenGroups": 2,
+      "cellCount": 3,
+      "otherN": 5,
+      "otherValue": 0.38
+    },
+    "dropCase": {
+      "cells": [
+        { "key": "a", "label": "A", "n": 2, "value": 10, "numerator": null },
+        { "key": "b", "label": "B", "n": 1, "value": 20, "numerator": null }
+      ],
+      "expectedCellCount": 0,
+      "expectedHiddenGroups": 2
+    },
+    "guard": [
+      { "filteredN": 3, "threshold": 5, "allowed": false },
+      { "filteredN": 5, "threshold": 5, "allowed": true }
+    ],
+    "thresholdClamp": [
+      { "input": null, "expected": 5 },
+      { "input": 1, "expected": 3 },
+      { "input": 99, "expected": 20 },
+      { "input": 7, "expected": 7 }
+    ]
+  }
+}

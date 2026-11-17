@@ -51,8 +51,8 @@ export function QuickAddDialog({ open, onOpenChange, onNavigate }: {
     { id: 'concern', label: t('quick.logConcern'), group, icon: <ShieldAlert className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/safeguarding/new') },
     { id: 'activity', label: t('quick.enrolActivity'), group, icon: <CalendarDays className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/activities') },
     { id: 'message', label: t('quick.messageParent'), group, icon: <Mail className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/communication/messages') },
-    { id: 'attendance', label: t('quick.takeAttendance'), group, icon: <ClipboardCheck className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/activities') },
-    { id: 'timetable', label: t('quick.viewTimetable'), group, icon: <Clock className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/dashboard') },
+    { id: 'attendance', label: t('quick.takeAttendance'), group, icon: <ClipboardCheck className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/attendance') },
+    { id: 'timetable', label: t('quick.viewTimetable'), group, icon: <Clock className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/timetable') },
     { id: 'ai', label: t('quick.approveAi'), group, icon: <Sparkles className="h-4 w-4" aria-hidden />, onSelect: () => onNavigate('/app/ai/suggestions') },
   ]
   return (

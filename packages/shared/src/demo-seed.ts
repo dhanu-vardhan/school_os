@@ -1,7 +1,7 @@
 import type {
   Announcement, AiSuggestion, AuditEvent, ClassGroup, ConsentRecord, DataExportRequest,
   Guardian, Holiday, Invoice, Message, Notification, RetentionPolicy, SafeguardingConcern,
-  School, Student, Activity, ActivityOffering, TimetableEvent,
+  School, Student, Activity, ActivityOffering, TimetableEvent, AttendanceRecord,
 } from './types'
 import type { DisplayRole } from './roles'
 
@@ -36,6 +36,7 @@ export interface DemoData {
   audit: AuditEvent[]
   holidays: Holiday[]
   timetable: TimetableEvent[]
+  attendance: AttendanceRecord[]
   dataRequests: DataExportRequest[]
 }
 
@@ -75,6 +76,16 @@ export function makeDemoData(): DemoData {
     version: 1,
   }))
 
+  // Today's marks are deterministic demo data: mostly present with a few late/absent.
+  const today = new Date().toISOString().slice(0, 10)
+  const attendance: AttendanceRecord[] = students.map((s, i) => ({
+    id: `att-${s.id}`,
+    studentId: s.id,
+    classId: s.classId ?? '',
+    date: today,
+    status: i % 11 === 0 ? 'absent' : i % 5 === 0 ? 'late' : 'present',
+  }))
+
   return {
     schools: [
       { id: SCHOOL_A, name: 'École Primaire Saint-Denis', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '12 rue de la République, 93100 Saint-Denis', logoText: 'PSD' },
@@ -96,6 +107,7 @@ export function makeDemoData(): DemoData {
       { role: 'safeguarding', sub: 'demo-safeguarding', name: 'Dr Paul Girard', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'protection@saint-denis.edu.fr' },
       { role: 'therapist', sub: 'demo-therapist', name: 'Claire Aubry', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'c.aubry@saint-denis.edu.fr' },
       { role: 'operator', sub: 'demo-operator', name: 'Opérateur Plateforme', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'ops@schoolos.app' },
+      { role: 'analyst', sub: 'demo-analyst', name: 'Analyste de données', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'analyste@saint-denis.edu.fr' },
     ],
     students,
     classes,
@@ -187,6 +199,7 @@ export function makeDemoData(): DemoData {
       { id: 't-6', day: 3, start: 10, end: 11, title: 'Arts plastiques', subtitle: 'Atelier 2', tone: 'accent' },
       { id: 't-7', day: 4, start: 9, end: 10, title: 'Conseil de classe', subtitle: 'Salle des professeurs', tone: 'info' },
     ],
+    attendance,
     dataRequests: [
       { id: 'dr-1', type: 'export', subject: 'Famille Martin', requestedAt: '2026-11-12', status: 'in_progress', dueAt: '2026-12-12' },
       { id: 'dr-2', type: 'erasure', subject: 'Ancien élève — anonymisation', requestedAt: '2026-11-05', status: 'pending', dueAt: '2026-12-05' },

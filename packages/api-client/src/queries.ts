@@ -5,6 +5,7 @@ import {
 import * as api from './client'
 import type { ApiResponse } from './http'
 import type { Notification, SafeguardingConcern, AiSuggestion, Invoice } from '@schoolos/shared'
+import type { AnalyticsQuery, Intervention, ScenarioInput, Target } from './client'
 
 export const queryKeys = {
   all: ['schoolos'] as const,
@@ -32,9 +33,24 @@ export const queryKeys = {
   dataRequests: () => [...queryKeys.all, 'dataRequests'] as const,
   holidays: () => [...queryKeys.all, 'holidays'] as const,
   timetable: () => [...queryKeys.all, 'timetable'] as const,
+  attendance: () => [...queryKeys.all, 'attendance'] as const,
   dashboard: () => [...queryKeys.all, 'dashboard'] as const,
   report: (input: unknown) => [...queryKeys.all, 'report', input] as const,
+  analytics: () => [...queryKeys.all, 'analytics'] as const,
+  analyticsOverview: (params: AnalyticsQuery) => [...queryKeys.analytics(), 'overview', params] as const,
+  analyticsSeries: (params: AnalyticsQuery) => [...queryKeys.analytics(), 'series', params] as const,
+  analyticsTable: (params: AnalyticsQuery) => [...queryKeys.analytics(), 'table', params] as const,
+  analyticsMatrix: (params: AnalyticsQuery) => [...queryKeys.analytics(), 'matrix', params] as const,
+  analyticsInsights: (params: AnalyticsQuery) => [...queryKeys.analytics(), 'insights', params] as const,
+  analyticsExplain: (metricId: string, params: AnalyticsQuery) => [...queryKeys.analytics(), 'explain', metricId, params] as const,
+  analyticsTargets: () => [...queryKeys.analytics(), 'targets'] as const,
+  analyticsInterventions: () => [...queryKeys.analytics(), 'interventions'] as const,
+  analyticsDictionary: () => [...queryKeys.analytics(), 'dictionary'] as const,
   platform: () => [...queryKeys.all, 'platform'] as const,
+  demoAccounts: () => [...queryKeys.all, 'demoAccounts'] as const,
+  accountSecurity: () => [...queryKeys.all, 'accountSecurity'] as const,
+  securityOverview: () => [...queryKeys.all, 'securityOverview'] as const,
+  securityEvents: () => [...queryKeys.all, 'securityEvents'] as const,
 }
 
 export function useApiQuery<T>(
@@ -69,14 +85,104 @@ export const useRetention = (enabled = true) => useApiQuery(queryKeys.retention(
 export const useDataRequests = (enabled = true) => useApiQuery(queryKeys.dataRequests(), api.listDataRequests, { enabled })
 export const useHolidays = () => useApiQuery(queryKeys.holidays(), api.listHolidays)
 export const useTimetable = () => useApiQuery(queryKeys.timetable(), api.listTimetable)
+export const useAttendance = () => useApiQuery(queryKeys.attendance(), api.listAttendance)
+
+export function useSaveAttendance() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: api.saveAttendance,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: queryKeys.attendance() })
+      void qc.invalidateQueries({ queryKey: queryKeys.dashboard() })
+    },
+  })
+}
 export const useDashboard = () => useApiQuery(queryKeys.dashboard(), api.getDashboard)
 export const useSystemStatus = (enabled = true) => useApiQuery([...queryKeys.platform(), 'status'], api.getSystemStatus, { enabled })
 export const useFeatureFlags = (enabled = true) => useApiQuery([...queryKeys.platform(), 'flags'], api.getFeatureFlags, { enabled })
 export const useIntegrations = (enabled = true) => useApiQuery([...queryKeys.platform(), 'integrations'], api.getIntegrations, { enabled })
 export const useModels = (enabled = true) => useApiQuery([...queryKeys.platform(), 'models'], api.getModels, { enabled })
+export const useDemoAccounts = (enabled = true) => useApiQuery(queryKeys.demoAccounts(), api.demoAccounts, { enabled })
+export const useAccountSecurity = (enabled = true) => useApiQuery(queryKeys.accountSecurity(), api.getAccountSecurity, { enabled })
+export const useSecurityOverview = (enabled = true) => useApiQuery(queryKeys.securityOverview(), api.getSecurityOverview, { enabled })
+export const useSecurityEvents = (enabled = true) => useApiQuery(queryKeys.securityEvents(), api.listSecurityEvents, { enabled })
 
 export function useReport(input: { metric: string; groupBy: string; from: string; to: string }, enabled = false) {
   return useApiQuery(queryKeys.report(input), () => api.runReport(input), { enabled })
+}
+
+// ---------------------------------------------------------------------- analytics
+
+export const useAnalyticsDictionary = (enabled = true) =>
+  useApiQuery(queryKeys.analyticsDictionary(), api.getAnalyticsDictionary, { enabled })
+export const useAnalyticsOverview = (params: AnalyticsQuery, enabled = true) =>
+  useApiQuery(queryKeys.analyticsOverview(params), () => api.getAnalyticsOverview(params), { enabled })
+export const useAnalyticsSeries = (params: AnalyticsQuery, enabled = true) =>
+  useApiQuery(queryKeys.analyticsSeries(params), () => api.getAnalyticsSeries(params), { enabled })
+export const useAnalyticsTable = (params: AnalyticsQuery, enabled = true) =>
+  useApiQuery(queryKeys.analyticsTable(params), () => api.getAnalyticsTable(params), { enabled })
+export const useAnalyticsMatrix = (params: AnalyticsQuery, enabled = true) =>
+  useApiQuery(queryKeys.analyticsMatrix(params), () => api.getAnalyticsMatrix(params), { enabled })
+export const useAnalyticsInsights = (params: AnalyticsQuery = {}, enabled = true) =>
+  useApiQuery(queryKeys.analyticsInsights(params), () => api.getAnalyticsInsights(params), { enabled })
+export const useMetricExplain = (metricId: string, params: AnalyticsQuery = {}, enabled = false) =>
+  useApiQuery(queryKeys.analyticsExplain(metricId, params), () => api.explainMetric(metricId, params), { enabled })
+export const useAnalyticsTargets = (enabled = true) =>
+  useApiQuery(queryKeys.analyticsTargets(), api.listTargets, { enabled })
+export const useInterventions = (enabled = true) =>
+  useApiQuery(queryKeys.analyticsInterventions(), api.listInterventions, { enabled })
+
+function invalidateAnalytics(qc: ReturnType<typeof useQueryClient>) {
+  void qc.invalidateQueries({ queryKey: queryKeys.analytics() })
+  void qc.invalidateQueries({ queryKey: queryKeys.dashboard() })
+}
+
+export function useSaveTarget() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: api.saveTarget,
+    onSuccess: () => invalidateAnalytics(qc),
+  })
+}
+
+export function useCreateIntervention() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: api.createIntervention,
+    onSuccess: () => invalidateAnalytics(qc),
+  })
+}
+
+export function useUpdateIntervention() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: Intervention['status'] }) => api.updateIntervention(id, status),
+    onSuccess: () => invalidateAnalytics(qc),
+  })
+}
+
+export function useDismissInsight() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: api.dismissInsight,
+    onSuccess: () => invalidateAnalytics(qc),
+  })
+}
+
+export function useSnoozeInsight() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ dedupeKey, days }: { dedupeKey: string; days?: number }) => api.snoozeInsight(dedupeKey, days),
+    onSuccess: () => invalidateAnalytics(qc),
+  })
+}
+
+export function useScenario() {
+  return useMutation({ mutationFn: api.runScenario })
+}
+
+export function useAnalyticsExport() {
+  return useMutation({ mutationFn: api.createAnalyticsExport })
 }
 
 export function useCreateStudent() {

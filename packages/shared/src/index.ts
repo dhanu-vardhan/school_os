@@ -1,3 +1,7 @@
 export * from './types'
 export * from './roles'
 export * from './demo-seed'
+export * from './brand'
+export * from './access'
+export * from './metrics'
+export * from './analytics-demo'

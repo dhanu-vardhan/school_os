@@ -92,6 +92,49 @@ def g2_db_tenant():
     for r in res: r.duration=time.time()-t
     return res
 
+def g11_auth_security():
+    res=[]; t=time.time()
+    st,body=http_status('http://localhost:8085/healthz')
+    try: health=json.loads(body.decode('utf-8','ignore') or '{}')
+    except Exception: health={}
+    res.append(CheckResult('G11','bff.health','pass' if st==200 and health.get('status')=='UP' else 'fail',
+                           f'status={st} store={health.get("store")}', ['INFRA-BFF-01']))
+
+    st,body=http_status('http://localhost:8085/config')
+    try: config=json.loads(body.decode('utf-8','ignore') or '{}')
+    except Exception: config={}
+    leaks=[k for k in config if re.search(r'secret|password|credential|token|private', k, re.I)]
+    res.append(CheckResult('G11','bff.config_no_secrets','pass' if st==200 and config.get('authMode') in ('demo','oidc') and not leaks else 'fail',
+                           f'status={st} authMode={config.get("authMode")} leaks={leaks or "none"}', ['P4-4-auth']))
+
+    st,body=http_status('http://localhost:8085/session')
+    res.append(CheckResult('G11','bff.session_unauthenticated','pass' if st==401 and b'authenticated' in body else 'fail',
+                           f'status={st} (expected 401 without a session cookie)', ['P4-4-auth']))
+
+    st,body=http_status('http://localhost:8085/auth/csrf')
+    res.append(CheckResult('G11','bff.csrf_unauthenticated','pass' if st==401 else 'fail',
+                           f'status={st} (CSRF token must not be issued without a session)', ['P4-4-auth']))
+
+    # Security headers are applied to every BFF response.
+    import urllib.request as _r
+    try:
+        with _r.urlopen(_r.Request('http://localhost:8085/healthz'), timeout=5) as r:
+            headers={k.lower(): v for k, v in r.headers.items()}
+        ok_headers=headers.get('x-frame-options','').upper()=='DENY' and headers.get('x-content-type-options','').lower()=='nosniff'
+        res.append(CheckResult('G11','bff.security_headers','pass' if ok_headers else 'fail',
+                               f'frame={headers.get("x-frame-options")} nosniff={headers.get("x-content-type-options")}', ['P5-2-authz']))
+    except Exception as exc:
+        res.append(CheckResult('G11','bff.security_headers','fail', str(exc), ['P5-2-authz']))
+
+    # Demo endpoints exist only when demo is active; a non-demo BFF must answer 404.
+    demo_st,_=http_status('http://localhost:8085/demo/accounts')
+    expect=200 if config.get('demoEnabled') else 404
+    res.append(CheckResult('G11','bff.demo_gated','pass' if demo_st==expect else 'fail',
+                           f'/demo/accounts status={demo_st} demoEnabled={config.get("demoEnabled")}', ['P4-4-auth']))
+
+    for r in res: r.duration=time.time()-t
+    return res
+
 def g10_screen_smoke():
     res=[]; t=time.time()
     st,body=http_status('http://localhost:3000/')
@@ -114,7 +157,43 @@ GROUPS = {
   'G1': g1_infra,
   'G2': g2_db_tenant,
   'G10': g10_screen_smoke,
+  'G11': g11_auth_security,
 }
+
+def selftest_break(kind):
+    """Inject a known fault into the check inputs and require a non-passing result.
+
+    This proves the detectors are sensitive: an injected outage must make its
+    own check fail. It never mutates the real environment.
+    """
+    global http_status, run_cmd
+    original_http, original_cmd = http_status, run_cmd
+    failures = []
+    try:
+        if kind == 'api401':
+            # Every endpoint now answers 200, so the "protected API" probe must fail.
+            http_status = lambda url, timeout=5: (200, b'')
+            failures = [r for r in g1_infra() if r.status != 'pass']
+        elif kind == 'nostyle':
+            # Serve the legacy unstyled placeholder markup.
+            html = b'<html><body>Screen: classes (director)</body></html>'
+            http_status = lambda url, timeout=5: (200, html)
+            failures = [r for r in g1_infra()
+                        if r.cid == 'web.not_unstyled_marker' and r.status != 'pass']
+        elif kind == 'rls':
+            # Pretend the catalog query returned no forced-RLS tables.
+            run_cmd = lambda cmd, timeout=30: (0, '', '')
+            failures = [r for r in g2_db_tenant() if r.status != 'pass']
+        else:
+            return CheckResult('SELFTEST', f'break.{kind}', 'fail', f'unknown selftest {kind}')
+    finally:
+        http_status, run_cmd = original_http, original_cmd
+    if not failures:
+        return CheckResult('SELFTEST', f'break.{kind}', 'fail',
+                           f'injected {kind} fault was NOT detected')
+    return CheckResult('SELFTEST', f'break.{kind}', 'pass',
+                       f'{len(failures)} check(s) failed as expected: '
+                       + ', '.join(r.cid for r in failures))
 
 def main():
     ap=argparse.ArgumentParser()
@@ -131,16 +210,11 @@ def main():
     if args.env.lower() in ('prod','production'):
         print('REFUSED: production environment', file=sys.stderr); return 3
     if args.selftest_break:
-        print(f'selftest-break {args.selftest_break}: not implemented in this step'); return 1
+        result = selftest_break(args.selftest_break)
+        print(f"selftest-break {args.selftest_break}: {result.status.upper()} - {result.msg}")
+        return 0 if result.status == 'pass' else 1
     features = load_features(FEATURES_PATH) if FEATURES_PATH.exists() else []
-    all_checks_defined = set()
-    # compute coverage against implemented checks
-    implemented = {'G0.preflight.python3','G0.preflight.node','G0.preflight.pnpm','G0.preflight.docker','G0.preflight.java','G1.web.document','G1.api.health','G1.db.select1','G1.api.protected','G1.web.not_unstyled_marker','G2.rls.forced.core_tables','G10.screen.director.classes','G10.screen.director.home'}
-    unchecked = [f['id'] for f in features if f.get('status')=='expected-working' and not any((c in ''.join([x.cid for x in []])) for c in f.get('checks',[]))]
-    # real unchecked: expected-working features whose id not covered by any result feature tags we will produce
-    covered_ids=set(['INFRA-WEB-01','INFRA-API-01','INFRA-DB-01','P2-7-tenantflow','P2-7-rls','P1-5.2-ine','SCR-DIR-CLASSES','SCR-DIR-HOME'])
-    missing_checks=[f['id'] for f in features if f.get('status')=='expected-working' and f['id'] not in covered_ids]
-    groups = [args.group] if args.group else (['G0','G1'] if args.quick else ['G0','G1','G2','G10'])
+    groups = [args.group] if args.group else (['G0','G1','G11'] if args.quick else ['G0','G1','G2','G10','G11'])
     results=[]
     start=time.time()
     for g in groups:
@@ -151,6 +225,9 @@ def main():
             continue
         rs=fn(); results.extend(rs)
         if args.fail_fast and any(r.status=='fail' for r in rs): break
+    # Coverage is derived from the executed checks themselves, never hard-coded.
+    covered_ids={fid for r in results for fid in r.features}
+    missing_checks=[f['id'] for f in features if f.get('status')=='expected-working' and f['id'] not in covered_ids]
     # mark missing checks as failures
     for fid in missing_checks:
         results.append(CheckResult('REG','coverage','fail',f'expected-working feature {fid} has no implemented check'))

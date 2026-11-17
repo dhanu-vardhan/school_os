@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       '@schoolos/ui': r('../../packages/ui/src/index.ts'),
       '@schoolos/shared': r('../../packages/shared/src/index.ts'),
+      '@schoolos/analytics-core': r('../../packages/analytics-core/src/index.ts'),
       '@schoolos/i18n': r('../../packages/i18n/src/index.ts'),
       '@schoolos/api-client': r('../../packages/api-client/src/index.ts'),
       '@': r('./src'),

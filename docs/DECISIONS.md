@@ -134,6 +134,12 @@
 | P7-4 | Add `ScreenLoading` variants (`dashboard`, `table`, `cards`, `detail`, `list`) that mirror the final page shape, and pass the matching variant from the key screens through a `QueryState.loading` slot. | Shape-matched skeletons hold page height steady while data loads, keeping CLS under the 0.05 budget. |
 | P7-5 | Measure CLS with a `PerformanceObserver` in a Playwright spec over repeated route changes, ignoring shifts with recent input, and assert `< 0.05`. | Provides an automated, repeatable regression gate for the layout-stability budget instead of a one-off manual check. |
 
+## 2026-11-17: Part 6 — brand moved from indigo to navy/royal blue to match approved mockup
+- Brand deep navy #0B1B3F, royal blue #3A5BC7, sky accent #6EA8FF; app bg #F5F8FC; text navy/slate; sidebar navy.
+- Indigo/violet primitives replaced (not aliased); emerald accent replaced by sky.
+- Placeholder text colour darkened to pass 4.5:1 (deviation logged in UI_LOGIN_SPEC.md).
+- Product name/tagline made configurable via packages/shared brand config (default "Acadia" / "School Management Platform").
+
 ## 2026-11-17: Part 5 — authentication, demo identities and role dashboards
 
 | # | Decision | Reason |
@@ -152,3 +158,17 @@
 | A12 | Keycloak 25 uses **PBKDF2-SHA512 (210k)** with a 12-char minimum + history(10); Argon2id is deferred pending a Keycloak upgrade/SPI. | Honest capability of the pinned version; parameters are documented, not implied. |
 | A13 | The demo tenant seed covers identity/tenancy in Postgres; rich academic data is served by the mock adapter and marked `mock:true` in the UI. | No fake data is written into production tables beyond the demo profile, and the wiring doc states the boundary. |
 | A14 | Role dashboards are selected from the **API role** (session claim), not from a client-side preference; the layout is a widget list per role, persisted per user in `localStorage` (non-sensitive). | Prevents a user from choosing a dashboard they are not entitled to; layout is UX only, never a security control. |
+
+## 2026-11-17: Part 8 — governed analytics (decision ids A8-n are scoped to this section; auth A8 above is unrelated)
+
+| # | Decision | Reason |
+|---|---|---|
+| A8-1 | Use ordinary RLS-forced aggregate **tables**, not materialised views, in Flyway V6. | `RlsCatalogCheckTest` discovers `relkind='r'` + `school_id`, so MVs would escape the forced-RLS catalog check. |
+| A8-2 | Implement `analytics-core` in TypeScript (shared by mock adapter and UI) with golden tests; mirror the formulae in Java against the same `golden.json` fixture. | One formula source of truth across demo and governed API; every statistic is documented in `METRIC_DICTIONARY.md` and tested in both languages. |
+| A8-3 | Default small-cell suppression threshold 5, configurable 3–20 by head/admin only, applied before serialisation on series/table/matrix/drill-down. | Prevents differencing attacks; hide small cells before they leave the server, not in the browser. |
+| A8-4 | Minimal Spring `@Scheduled` refresh job; no upstream source today → explicit `sourceAvailable=false`, never fabricated rows. | No new broker in Phase 1 (AGENTS.md rule 8) and no invented production numbers. |
+| A8-5 | Demo data comes from a flagged mock adapter with identical `data`/`meta` contracts; production client imports demo types only with `import type`. | Real facts can drop in without UI changes, and no mock number can enter a production path. |
+| A8-6 | Supportive-only risk language; chronic flag, support composite and fairness panel are DPO-review gated. | Decisions support humans; no pupil label, no automated action, no staff ranking (AGENTS.md rule 12 + `AI_GOVERNANCE.md`). |
+| A8-7 | Frontend display role `analyst` maps to API `DATA_ANALYST`/`ANALYST`; mock display roles `admin`→`school_admin` and `operator`→`group_admin`. | Legacy demo labels and modern API roles must coexist without weakening server-side scope checks. |
+| A8-8 | Frontend permissions are `analytics.read`, `analytics.student`, `analytics.configure`, `analytics.export`; mock and types are imported type-only by the production client. | Deny-by-default parity between UI gating (UX only) and the authoritative backend policy. |
+| A8-9 | URL is the single source of truth for analytics filters; saved views are in-memory only until a governed server store exists; no `localStorage`/`sessionStorage` writes for analytics filters. | Shareable, deterministic views without persisting sensitive filter state in browser storage (AGENTS.md rule 5). |

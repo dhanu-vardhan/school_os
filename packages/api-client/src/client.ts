@@ -2,8 +2,14 @@ import type {
   Activity, ActivityOffering, Announcement, AppConfig, AuditEvent, ConsentRecord,
   DataExportRequest, Guardian, Holiday, Invoice, Membership, Message, Notification,
   PublicSession, RetentionPolicy, SafeguardingConcern, School, Student, TimetableEvent,
-  AiSuggestion, ClassGroup,
+  AiSuggestion, ClassGroup, AttendanceRecord, AttendanceStatus,
+  AccountSecurity, ActiveSession, DemoAccountsResponse, MfaChallenge, MfaEnrolment,
+  SecurityEvent, SecurityOverview, AnalyticsResponse, DataPoint, Paginated, TimePoint,
 } from '@schoolos/shared'
+import type {
+  AnalyticsOverview, AnalyticsQuery, Freshness, Intervention, ScenarioInput, ScenarioResult,
+  Target,
+} from './mock/analytics'
 import { jsonBody, request, type ApiResponse } from './http'
 import { sessionStore } from './session-store'
 import { USE_MOCK } from './env'
@@ -33,9 +39,63 @@ export async function demoUsers(): Promise<ApiResponse<{ role: string; name: str
   return { ...res, data: res.data.users }
 }
 
+/** Demo account picker. Passwords and TOTP secrets are revealed only in demo mode. */
+export function demoAccounts() {
+  return request<DemoAccountsResponse>('/demo/accounts')
+}
+
+export function currentDemoTotp(key: string) {
+  return request<{ code: string }>(`/demo/totp?key=${encodeURIComponent(key)}`)
+}
+
+/** Legacy helper kept for mock mode and existing screens; real sign-in uses demoSignIn/authSignIn. */
 export async function demoLogin(role: string, schoolId?: string): Promise<ApiResponse<PublicSession>> {
   const res = await request<PublicSession>('/demo/session', { method: 'POST', body: jsonBody({ role, schoolId }) })
   sessionStore.set(useMockSession(res.data))
+  return res
+}
+
+export interface PasswordSignIn {
+  identifier: string
+  password: string
+  remember?: boolean
+  returnTo?: string
+}
+
+/** Production/local credential sign-in. In OIDC mode the BFF answers with an authorization URL. */
+export async function authSignIn(input: PasswordSignIn) {
+  const res = await request<PublicSession | MfaChallenge | { mode: 'oidc'; authorizationUrl: string }>('/auth/login', {
+    method: 'POST', body: jsonBody(input),
+  })
+  if ('authenticated' in res.data && res.data.authenticated) sessionStore.set(res.data)
+  return res
+}
+
+export async function demoSignIn(input: { key: string; password: string; schoolId?: string; remember?: boolean }) {
+  const res = await request<PublicSession | MfaChallenge>('/demo/session', { method: 'POST', body: jsonBody(input) })
+  if ('authenticated' in res.data && res.data.authenticated) sessionStore.set(res.data)
+  return res
+}
+
+export async function verifyMfa(input: { challengeId: string; code: string; mode?: 'demo' | 'oidc' }) {
+  const path = input.mode === 'oidc' ? '/auth/mfa/verify' : '/demo/session/verify'
+  const res = await request<PublicSession>(path, {
+    method: 'POST', body: jsonBody({ challengeId: input.challengeId, code: input.code }),
+  })
+  sessionStore.set(res.data)
+  return res
+}
+
+export async function getCsrfToken() {
+  const res = await request<{ csrfToken: string }>('/auth/csrf')
+  const current = sessionStore.get()
+  sessionStore.set({ ...current, csrfToken: res.data.csrfToken })
+  return res
+}
+
+export async function switchSchool(schoolId: string) {
+  const res = await request<PublicSession>('/auth/switch-school', { method: 'POST', body: jsonBody({ schoolId }) })
+  sessionStore.set(res.data)
   return res
 }
 
@@ -43,6 +103,66 @@ export async function logout(): Promise<ApiResponse<null>> {
   const res = await request<null>('/auth/logout', { method: 'POST' })
   sessionStore.set({ authenticated: false })
   return res
+}
+
+export async function logoutAll() {
+  const res = await request<{ revoked: number }>('/auth/logout-all', { method: 'POST' })
+  sessionStore.set({ authenticated: false })
+  return res
+}
+
+export function getAccountSecurity() {
+  return request<AccountSecurity>('/account/security')
+}
+
+export function listAccountSessions() {
+  return request<{ sessions: ActiveSession[] }>('/account/security/sessions')
+}
+
+export function revokeAccountSession(sid: string) {
+  return request<{ revoked: boolean }>(`/account/security/sessions/${encodeURIComponent(sid)}/revoke`, { method: 'POST' })
+}
+
+export function listAccountEvents(limit = 20) {
+  return request<{ events: SecurityEvent[] }>(`/account/security/events?limit=${limit}`)
+}
+
+export function beginMfaEnrolment() {
+  return request<MfaEnrolment>('/auth/mfa/enroll/start', { method: 'POST' })
+}
+
+export function verifyMfaEnrolment(code: string) {
+  return request<{ enrolled: boolean; mfa: boolean }>('/auth/mfa/enroll/verify', { method: 'POST', body: jsonBody({ code }) })
+}
+
+export async function stepUp(code: string) {
+  const res = await request<PublicSession>('/auth/mfa/step-up', { method: 'POST', body: jsonBody({ code }) })
+  sessionStore.set(res.data)
+  return res
+}
+
+export function getSecurityOverview() {
+  return request<SecurityOverview>('/security/overview')
+}
+
+export function listSecurityEvents() {
+  return request<{ events: SecurityEvent[] }>('/security/events')
+}
+
+export function forgotPassword(identifier: string) {
+  return request<{ accepted: boolean; demoToken?: string }>('/auth/forgot-password', {
+    method: 'POST', body: jsonBody({ identifier }),
+  })
+}
+
+export function resetPassword(input: { token: string; password: string }) {
+  return request<{ reset: boolean }>('/auth/reset-password', { method: 'POST', body: jsonBody(input) })
+}
+
+export function acceptInvitation(input: { token?: string; email: string; password: string; privileged?: boolean }) {
+  return request<{ accepted: boolean; mfaEnrollmentRequired: boolean }>('/auth/invitations/accept', {
+    method: 'POST', body: jsonBody(input),
+  })
 }
 
 export const listStudents = () => request<Student[]>('/v1/students')
@@ -101,6 +221,10 @@ export const createDataRequest = (input: { type: 'export' | 'erasure'; subject: 
 export const listHolidays = () => request<Holiday[]>('/v1/holidays')
 export const listTimetable = () => request<TimetableEvent[]>('/v1/timetable')
 
+export const listAttendance = () => request<AttendanceRecord[]>('/v1/attendance')
+export const saveAttendance = (marks: Array<{ studentId: string; classId: string; date: string; status: AttendanceStatus }>) =>
+  request<{ saved: number }>('/v1/attendance', { method: 'PUT', body: jsonBody({ marks }) })
+
 export interface DashboardData {
   kpis: { enrolment: number; attendanceRate: number; openConcerns: number; activityUptake: number; aiPending: number; presentToday: number }
   attendanceTrend: { label: string; value: number }[]
@@ -114,6 +238,66 @@ export interface ReportResult {
 }
 export const runReport = (input: { metric: string; groupBy: string; from: string; to: string }) =>
   request<ReportResult>('/v1/reports', { method: 'POST', body: jsonBody(input) })
+
+export interface AnalyticsDictionary {
+  version: string
+  metricIds: string[]
+  definitions: Record<string, import('@schoolos/shared').MetricDefinition>
+  options: {
+    years: string[]
+    terms: string[]
+    classes: Array<{ value: string; label: string }>
+    levels: string[]
+    subjects: string[]
+  }
+  freshness: Freshness
+}
+
+function analyticsUrl(path: string, params: Record<string, unknown> = {}): string {
+  const search = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') search.set(key, String(value))
+  }
+  const query = search.toString()
+  return `/v1/analytics/${path}${query ? `?${query}` : ''}`
+}
+
+/** Governed analytics endpoints. Tenant scope is always derived by the BFF from the session. */
+export const getAnalyticsDictionary = () => request<AnalyticsDictionary>(analyticsUrl('meta'))
+export const getAnalyticsOverview = (params: AnalyticsQuery = {}) =>
+  request<AnalyticsResponse<AnalyticsOverview>>(analyticsUrl('overview', params as Record<string, unknown>))
+export const getAnalyticsSeries = (params: AnalyticsQuery) =>
+  request<AnalyticsResponse<TimePoint[]>>(analyticsUrl('series', params as Record<string, unknown>))
+export const getAnalyticsTable = (params: AnalyticsQuery) =>
+  request<AnalyticsResponse<Paginated<DataPoint>>>(analyticsUrl('table', params as Record<string, unknown>))
+export const getAnalyticsMatrix = (params: AnalyticsQuery) =>
+  request<AnalyticsResponse<{ rows: (DataPoint | null)[][]; columns: string[] }>>(analyticsUrl('matrix', params as Record<string, unknown>))
+export const getAnalyticsInsights = (params: AnalyticsQuery = {}) =>
+  request<AnalyticsResponse<import('@schoolos/analytics-core').Insight[]>>(analyticsUrl('insights', params as Record<string, unknown>))
+export const explainMetric = (metricId: string, params: AnalyticsQuery = {}) =>
+  request<AnalyticsResponse<Record<string, unknown>>>(analyticsUrl(`explain/${encodeURIComponent(metricId)}`, params as Record<string, unknown>))
+export const listTargets = () => request<AnalyticsResponse<Target[]>>(analyticsUrl('targets'))
+export const saveTarget = (input: { metricId: string; value: number }) =>
+  request<AnalyticsResponse<Target>>(analyticsUrl('targets'), { method: 'POST', body: jsonBody(input) })
+export const listInterventions = () => request<AnalyticsResponse<Intervention[]>>(analyticsUrl('interventions'))
+export const createIntervention = (input: { metricId: string; scope?: string; note?: string }) =>
+  request<AnalyticsResponse<Intervention>>(analyticsUrl('interventions'), { method: 'POST', body: jsonBody(input) })
+export const updateIntervention = (id: string, status: Intervention['status']) =>
+  request<AnalyticsResponse<Intervention>>(analyticsUrl(`interventions/${encodeURIComponent(id)}`), { method: 'PATCH', body: jsonBody({ status }) })
+export const dismissInsight = (dedupeKey: string) =>
+  request<AnalyticsResponse<{ dismissed: boolean }>>(analyticsUrl('insights/dismiss'), { method: 'POST', body: jsonBody({ dedupeKey }) })
+export const snoozeInsight = (dedupeKey: string, days = 7) =>
+  request<AnalyticsResponse<{ snoozedUntil: string }>>(analyticsUrl('insights/snooze'), { method: 'POST', body: jsonBody({ dedupeKey, days }) })
+export const runScenario = (input: ScenarioInput) =>
+  request<AnalyticsResponse<ScenarioResult>>(analyticsUrl('scenario'), { method: 'POST', body: jsonBody(input) })
+export const createAnalyticsExport = (input: { metricId: string; format?: 'csv' | 'print' }) =>
+  request<AnalyticsResponse<{ id: string; status: string; format: string; rows: number; watermark: string; csv?: string }>>(analyticsUrl('export'), { method: 'POST', body: jsonBody(input) })
+export const getAnalyticsExport = (id: string) =>
+  request<AnalyticsResponse<{ id: string; status: string; format: string; rows: number; watermark: string; csv?: string }>>(analyticsUrl(`export/${encodeURIComponent(id)}`))
+export type {
+  AnalyticsOverview, AnalyticsQuery, Freshness, Intervention, ScenarioInput, ScenarioResult, Target,
+}
+export type { Insight } from '@schoolos/analytics-core'
 
 export const getSystemStatus = () => request<{ name: string; status: string; latencyMs: number }[]>('/v1/platform/status')
 export const getFeatureFlags = () => request<{ key: string; enabled: boolean; scope: string; rollout: number }[]>('/v1/platform/flags')

@@ -215,6 +215,18 @@ export function clearCookie(config) {
   return [`${config.cookieName}=; ${attrs.join('; ')}`, `${config.csrfCookieName}=; ${['Path=/', 'SameSite=Lax', 'Max-Age=0', ...(config.secureCookies ? ['Secure'] : [])].join('; ')}`]
 }
 
+/**
+ * Stable, non-secret identifier for a session. It is derived with HMAC so the
+ * browser can revoke its own sessions without ever receiving the bearer sid.
+ */
+export function publicSessionId(sid, config) {
+  if (!sid) return ''
+  return crypto.createHmac('sha256', config.sessionSecret)
+    .update(`session:${sid}`)
+    .digest('base64url')
+    .slice(0, 24)
+}
+
 export function publicSession(record, config) {
   if (!record) return { authenticated: false }
   return {

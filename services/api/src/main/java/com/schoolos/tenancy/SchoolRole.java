@@ -27,6 +27,8 @@ public enum SchoolRole {
     INSTRUCTOR,
     PROVIDER,
     THERAPIST,
+    /** Part 8: pseudonymised, audited student-level exploration; no direct identifiers. */
+    DATA_ANALYST,
     OPERATOR,
     OWNER;
 

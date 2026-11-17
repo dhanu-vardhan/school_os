@@ -69,6 +69,18 @@ public class CurrentUser {
         return auth != null && auth.getPrincipal() instanceof Jwt jwt && jwt.getClaim("impersonated_by") != null;
     }
 
+    /**
+     * Reads a named claim from the validated JWT (null when absent). Used by the analytics
+     * export gate to compare a submitted one-time step-up token with the token bound to
+     * the freshly verified MFA challenge. Never reads request headers or parameters.
+     */
+    public String jwtClaim(String name) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof Jwt jwt)) return null;
+        Object claim = jwt.getClaim(name);
+        return claim == null ? null : claim.toString();
+    }
+
     public String impersonatedBy() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {

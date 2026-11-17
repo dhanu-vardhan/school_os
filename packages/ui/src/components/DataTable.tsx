@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel,
   getSortedRowModel, useReactTable,
   type ColumnDef, type SortingState, type VisibilityState, type RowSelectionState,
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ArrowUpDown, ArrowUp, ArrowDown, Columns3, Download, Rows3, Trash2 } from 'lucide-react'
+import { ArrowUpDown, ArrowUp, ArrowDown, Columns3, Download, RotateCcw, Rows3, Trash2 } from 'lucide-react'
 import { cn } from '../lib/cn'
 import { Button } from './Button'
 import { useActionLabels } from './ActionLabels'
@@ -28,6 +28,22 @@ export interface DataTableProps<T> {
   pageSize?: number
   emptyTitle?: string
   emptyAction?: React.ReactNode
+  /**
+   * Auto-save presentation state (density, visible columns, sort) under this
+   * key. Search text is deliberately excluded because it may contain personal
+   * data; nothing is ever written to storage beyond UI configuration.
+   */
+  viewKey?: string
+}
+
+interface TableView { density: 'compact' | 'comfortable'; columnVisibility: VisibilityState; sorting: SortingState }
+const VIEW_PREFIX = 'schoolos.view.'
+
+function loadView(key: string): Partial<TableView> {
+  try {
+    const raw = localStorage.getItem(`${VIEW_PREFIX}${key}`)
+    return raw ? JSON.parse(raw) as Partial<TableView> : {}
+  } catch { return {} }
 }
 
 export function DataTable<T>({

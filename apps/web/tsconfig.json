@@ -15,6 +15,7 @@
       "@schoolos/ui": ["../../packages/ui/src/index.ts"],
       "@schoolos/ui/*": ["../../packages/ui/src/*"],
       "@schoolos/shared": ["../../packages/shared/src/index.ts"],
+      "@schoolos/analytics-core": ["../../packages/analytics-core/src/index.ts"],
       "@schoolos/i18n": ["../../packages/i18n/src/index.ts"],
       "@schoolos/api-client": ["../../packages/api-client/src/index.ts"],
       "@/*": ["src/*"]

@@ -36,6 +36,7 @@ export default defineConfig({
     alias: {
       '@schoolos/ui': r('../../packages/ui/src/index.ts'),
       '@schoolos/shared': r('../../packages/shared/src/index.ts'),
+      '@schoolos/analytics-core': r('../../packages/analytics-core/src/index.ts'),
       '@schoolos/i18n': r('../../packages/i18n/src/index.ts'),
       '@schoolos/api-client': r('../../packages/api-client/src/index.ts'),
       '@': r('./src'),
@@ -50,6 +51,9 @@ export default defineConfig({
       '/session': 'http://localhost:8085',
       '/auth': 'http://localhost:8085',
       '/demo': 'http://localhost:8085',
+      '/account': 'http://localhost:8085',
+      '/security': 'http://localhost:8085',
+      '/admin': 'http://localhost:8085',
       '/healthz': 'http://localhost:8085',
     },
   },

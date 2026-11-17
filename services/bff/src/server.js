@@ -8,7 +8,7 @@ import { assertSafeConfig } from './config.js'
 import {
   clearCookie, createSession, deleteSession, getSession,
   isStepUpActive, issueDemoJwt, listUserSessions, markStepUp, parseCookies,
-  publicSession, readSession, revokeUserSessions, serializeCookie, serializeCsrfCookie,
+  publicSession, publicSessionId, readSession, revokeUserSessions, serializeCookie, serializeCsrfCookie,
 } from './session.js'
 import { createStore } from './store/index.js'
 import { SecurityLog, SECURITY_EVENTS } from './security/security-log.js'
@@ -800,23 +800,24 @@ export async function createApp(config, deps = {}) {
           mfaRequired: session.mfaRequired,
           trustedUntil: session.trustedUntil,
           stepUpActive: isStepUpActive(session, config),
-          sessions: sessions.map(s => ({ ...publicSession(s, config), current: s.sid === session.sid, lastSeen: new Date(s.lastSeen).toISOString(), fingerprint: s.fingerprint })),
+          sessions: sessions.map(s => ({ ...publicSession(s, config), id: publicSessionId(s.sid, config), current: s.sid === session.sid, lastSeen: new Date(s.lastSeen).toISOString(), fingerprint: s.fingerprint })),
           events: events.filter(e => e.actorSub === session.sub).slice(0, 20),
         }, undefined, {}, config)
       }
       if (pathname === '/account/security/sessions' && method === 'GET') {
         const session = await requireSession(req, res); if (!session) return
         const sessions = await listUserSessions(store, config, session.sub)
-        return send(res, 200, { sessions: sessions.map(s => ({ ...publicSession(s, config), current: s.sid === session.sid, lastSeen: new Date(s.lastSeen).toISOString(), fingerprint: s.fingerprint })) }, undefined, {}, config)
+        return send(res, 200, { sessions: sessions.map(s => ({ ...publicSession(s, config), id: publicSessionId(s.sid, config), current: s.sid === session.sid, lastSeen: new Date(s.lastSeen).toISOString(), fingerprint: s.fingerprint })) }, undefined, {}, config)
       }
       if (pathname.match(/^\/account\/security\/sessions\/[^/]+\/revoke$/) && method === 'POST') {
         const session = await requireSession(req, res); if (!session) return
         if (!requireCsrf(req, res, session)) return
-        const sid = decodeURIComponent(pathname.split('/')[4])
-        const target = await getSession(store, sid)
+        const publicId = decodeURIComponent(pathname.split('/')[4])
+        const target = (await listUserSessions(store, config, session.sub))
+          .find(candidate => publicSessionId(candidate.sid, config) === publicId)
         if (!target || target.sub !== session.sub) return send(res, 404, { error: 'not_found' }, undefined, {}, config)
-        await deleteSession(store, sid)
-        await event(req, session, SECURITY_EVENTS.SESSION_REVOKED, 'warning', { sid })
+        await deleteSession(store, target.sid)
+        await event(req, session, SECURITY_EVENTS.SESSION_REVOKED, 'warning', { session: publicId })
         return send(res, 200, { revoked: true }, undefined, {}, config)
       }
       if (pathname === '/account/security/events' && method === 'GET') {
