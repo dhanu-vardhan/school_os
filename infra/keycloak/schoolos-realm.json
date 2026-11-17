@@ -7,50 +7,140 @@
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
-  "bruteForceProtected": true,
   "organizationsEnabled": true,
+  "sslRequired": "external",
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "minimumQuickLoginWaitSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "maxDeltaTimeSeconds": 43200,
+  "accessTokenLifespan": 300,
+  "accessTokenLifespanForImplicitFlow": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 43200,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "passwordPolicy": "length(14) and digits(1) and lowerCase(1) and upperCase(1) and specialChars(1) and notUsername and notEmail and passwordHistory(5)",
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "otpPolicyLookAheadWindow": 1,
+  "webAuthnPolicyRpEntityName": "SchoolOS",
+  "webAuthnPolicySignatureAlgorithms": ["ES256", "RS256"],
+  "webAuthnPolicyRpId": "localhost",
+  "webAuthnPolicyAttestationConveyancePreference": "none",
+  "webAuthnPolicyRequireResidentKey": "not specified",
+  "webAuthnPolicyUserVerificationRequirement": "preferred",
+  "webAuthnPolicyCreateTimeout": 0,
+  "webAuthnPolicyAvoidSameAuthenticatorRegister": false,
   "clients": [
     {
       "clientId": "schoolos-bff",
+      "name": "SchoolOS BFF",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
       "secret": "schoolos-bff-secret",
       "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "redirectUris": ["http://localhost:3000/*"],
-      "webOrigins": ["http://localhost:3000"],
-      "attributes": { "pkce.code.challenge.method": "S256" }
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "redirectUris": [
+        "http://localhost:3000/auth/callback",
+        "http://127.0.0.1:3000/auth/callback"
+      ],
+      "webOrigins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "true",
+        "backchannel.logout.url": "http://bff:8080/auth/backchannel-logout"
+      },
+      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "acr", "basic", "schoolos-api-audience"],
+      "optionalClientScopes": []
     },
     {
       "clientId": "schoolos-desktop",
+      "name": "SchoolOS Desktop (Tauri)",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
       "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "redirectUris": ["http://127.0.0.1/*", "schoolos://callback"],
-      "webOrigins": ["*"],
-      "attributes": { "pkce.code.challenge.method": "S256" }
+      "webOrigins": ["http://127.0.0.1"],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "acr", "basic", "schoolos-api-audience"],
+      "optionalClientScopes": []
     },
     {
       "clientId": "schoolos-api",
+      "name": "SchoolOS API",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
       "bearerOnly": true
     }
   ],
+  "clientScopes": [
+    {
+      "name": "schoolos-api-audience",
+      "description": "Adds the API audience to access tokens so the resource server can reject tokens minted for another client.",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "schoolos-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.custom.audience": "schoolos-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultDefaultClientScopes": ["profile", "email", "roles", "web-origins", "acr", "basic", "schoolos-api-audience"],
+  "defaultOptionalClientScopes": [],
   "roles": {
     "realm": [
-      { "name": "director" },
-      { "name": "admin" },
-      { "name": "teacher" },
-      { "name": "assistant" },
-      { "name": "accountant" },
-      { "name": "parent" },
-      { "name": "student" },
-      { "name": "therapist" }
+      { "name": "PLATFORM_ADMIN", "description": "Platform operator console" },
+      { "name": "GROUP_ADMIN", "description": "Multi-school group administrator" },
+      { "name": "DIRECTOR", "description": "Head of school" },
+      { "name": "ADMIN", "description": "School administrator" },
+      { "name": "DEPUTY", "description": "Deputy head / vie scolaire" },
+      { "name": "TEACHER", "description": "Teacher" },
+      { "name": "ASSISTANT", "description": "Teaching assistant" },
+      { "name": "SAFEGUARDING", "description": "Safeguarding lead" },
+      { "name": "NURSE", "description": "School nurse" },
+      { "name": "FINANCE", "description": "Finance lead" },
+      { "name": "ACCOUNTANT", "description": "Accountant" },
+      { "name": "HR", "description": "Human resources" },
+      { "name": "IT_ADMIN", "description": "School IT administrator" },
+      { "name": "LIBRARIAN", "description": "Librarian" },
+      { "name": "RECEPTION", "description": "Reception / visitor desk" },
+      { "name": "AUDITOR", "description": "Read-only auditor" },
+      { "name": "GUARDIAN", "description": "Parent or legal guardian" },
+      { "name": "STUDENT", "description": "Pupil" },
+      { "name": "ADMISSIONS", "description": "Admissions officer" },
+      { "name": "INSTRUCTOR", "description": "External instructor" },
+      { "name": "PROVIDER", "description": "External service provider" },
+      { "name": "THERAPIST", "description": "Therapist" },
+      { "name": "OPERATOR", "description": "Platform operator" },
+      { "name": "OWNER", "description": "Legacy owner role" }
     ]
   }
 }

@@ -32,6 +32,17 @@ services:
       timeout: 5s
       retries: 30
 
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   # MinIO remains the documented local S3 target; it is opt-in because some CI/ARM
   # registries do not serve the image. `storage` below is the default S3 fallback.
   minio:
@@ -92,9 +103,11 @@ services:
       dockerfile: services/api/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: demo
+      SCHOOLOS_ENV: local
+      DEMO_MODE: "true"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/schoolos
       SPRING_FLYWAY_URL: jdbc:postgresql://postgres:5432/schoolos
-      SCHOOLOS_DEMO_JWT_SECRET: schoolos-local-demo-jwt-secret-change-me
+      SCHOOLOS_DEMO_JWT_SECRET: ${SCHOOLOS_DEMO_JWT_SECRET:-schoolos-local-demo-jwt-secret-change-me}
       SCHOOLOS_STORAGE_ENDPOINT: http://storage:4566
     ports:
       - "8080:8080"
@@ -112,14 +125,26 @@ services:
       WEB_DIST: /app/web-dist
       API_BASE_URL: http://api:8080
       SCHOOLOS_PROFILE: demo
-      SCHOOLOS_DEMO_JWT_SECRET: schoolos-local-demo-jwt-secret-change-me
+      SCHOOLOS_ENV: local
+      DEMO_MODE: "true"
+      COOKIE_SECURE: "false"
+      ALLOWED_ORIGINS: http://localhost:3000
+      SESSION_SECRET: ${SESSION_SECRET:-schoolos-local-session-secret-change-me}
+      SCHOOLOS_DEMO_JWT_SECRET: ${SCHOOLOS_DEMO_JWT_SECRET:-schoolos-local-demo-jwt-secret-change-me}
+      REDIS_URL: redis://redis:6379
+      DEMO_CREDENTIALS_FILE: /app/.demo/credentials.json
+    volumes:
+      - demo-credentials:/app/.demo
     ports:
       - "3000:8080"
     depends_on:
       api:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 volumes:
   pgdata:
   miniodata:
   storage-data:
+  demo-credentials:
