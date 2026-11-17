@@ -16,3 +16,4 @@ Multi-tenant school management SaaS for small private schools in Paris/Ile-de-Fr
 
 ## Tests
 cd services/api && ./gradlew test
+# school_os
