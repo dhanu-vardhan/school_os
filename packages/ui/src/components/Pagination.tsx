@@ -22,7 +22,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: {
           if (n > pages) return null
           return (
             <button key={n} type="button" onClick={() => onPageChange(n)} aria-current={n === page ? 'page' : undefined}
-              className={cn('focus-ring h-8 min-w-8 rounded-md px-2 text-xs', n === page ? 'bg-brand-600 text-white' : 'border border-line bg-surface hover:bg-surface-2')}>
+              className={cn('focus-ring h-8 min-w-8 rounded-md px-2 text-xs', n === page ? 'bg-brand-600 text-neutral-0' : 'border border-line bg-surface hover:bg-surface-2')}>
               {n}
             </button>
           )

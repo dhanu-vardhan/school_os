@@ -160,6 +160,9 @@
   --action-danger-bg: var(--danger-600);
   --action-danger-bg-hover: var(--danger-700);
   --action-danger-fg: var(--neutral-0);
+  --action-success-bg: var(--accent-700);
+  --action-success-bg-hover: var(--accent-800);
+  --action-success-fg: var(--neutral-0);
   --action-ai-bg: var(--brand-50);
   --action-ai-fg: var(--brand-700);
   --action-ai-border: var(--brand-300);
@@ -171,10 +174,29 @@
 
   /* Component layer — status (colour is never the only signal: text + icon too) */
   --status-brand-fg: var(--brand-700);
+  --status-brand-bg: var(--brand-50);
+  --status-brand-border: var(--brand-200);
   --status-success-fg: var(--accent-700);
+  --status-success-bg: var(--accent-50);
+  --status-success-border: var(--accent-200);
   --status-warning-fg: var(--warning-700);
+  --status-warning-bg: var(--warning-50);
+  --status-warning-border: var(--warning-200);
   --status-danger-fg: var(--danger-700);
+  --status-danger-bg: var(--danger-50);
+  --status-danger-border: var(--danger-200);
   --status-info-fg: var(--info-700);
+  --status-info-bg: var(--info-50);
+  --status-info-border: var(--info-200);
+
+  /* Component layer — charts. Semantic aliases keep every view token-driven. */
+  --chart-fill: var(--brand-500);
+  --chart-line: var(--brand-600);
+  --chart-grid: var(--grid-line);
+  --chart-point: var(--surface);
+  --chart-label: var(--text-subtle);
+  --chart-bar-start: var(--brand-500);
+  --chart-bar-end: var(--accent-400);
 }
 
 .dark {
@@ -213,6 +235,9 @@
   --action-danger-bg: var(--danger-500);
   --action-danger-bg-hover: var(--danger-600);
   --action-danger-fg: var(--neutral-950);
+  --action-success-bg: var(--accent-500);
+  --action-success-bg-hover: var(--accent-600);
+  --action-success-fg: var(--neutral-950);
   --action-ai-bg: var(--brand-500);
   --action-ai-fg: var(--neutral-950);
   --action-ai-border: var(--brand-400);
@@ -220,10 +245,20 @@
   --state-layer-active: 241 245 249 / 0.2;
   --ripple-color: 15 23 42;
   --status-brand-fg: var(--brand-300);
+  --status-brand-bg: var(--brand-950);
+  --status-brand-border: var(--brand-800);
   --status-success-fg: var(--accent-300);
+  --status-success-bg: var(--accent-950);
+  --status-success-border: var(--accent-800);
   --status-warning-fg: var(--warning-300);
+  --status-warning-bg: var(--warning-950);
+  --status-warning-border: var(--warning-800);
   --status-danger-fg: var(--danger-300);
+  --status-danger-bg: var(--danger-950);
+  --status-danger-border: var(--danger-800);
   --status-info-fg: var(--info-300);
+  --status-info-bg: var(--info-950);
+  --status-info-border: var(--info-800);
 }
 
 * { border-color: rgb(var(--border)); }
@@ -304,10 +339,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font
 .ui-scale-in { animation: ui-scale-in var(--duration-fast) var(--ease-out) both; }
 
 /* Accessible scrollbars */
-.ui-scroll { scrollbar-width: thin; scrollbar-color: rgb(var(--border-strong)) transparent; }
+.ui-scroll { scrollbar-width: thin; scrollbar-color: rgb(var(--border-strong)) rgb(var(--neutral-0) / 0); }
 .ui-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-.ui-scroll::-webkit-scrollbar-thumb { background: rgb(var(--border-strong)); border-radius: 9999px; }
-.ui-scroll::-webkit-scrollbar-track { background: transparent; }
+.ui-scroll::-webkit-scrollbar-thumb { background: rgb(var(--border-strong)); border-radius: var(--radius-full); }
+.ui-scroll::-webkit-scrollbar-track { background: rgb(var(--neutral-0) / 0); }
 
 /* Sticky table header helper */
 .ui-sticky-head { position: sticky; top: 0; z-index: 2; background: rgb(var(--surface-2)); }

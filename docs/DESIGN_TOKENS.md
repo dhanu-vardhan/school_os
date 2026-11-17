@@ -85,7 +85,7 @@ Rules:
 
 - more than one `variant="primary"` (or bare `<Button>` default-primary) is found in the same JSX section without a `data-section` boundary,
 - an action label matches `^(OK|Submit|Yes|Cancel|Confirm)$` in either locale,
-- a raw hex/rgb/hsl colour appears outside `styles.css` or a token file.
+- a raw hex/rgb/hsl/oklch or named `white`/`black`/`transparent` colour appears outside `styles.css` or a token file.
 
 The lint is intentionally simple (regex + JSX section scan); complex cases are documented in review rather than suppressed.
 
@@ -96,9 +96,9 @@ The lint is intentionally simple (regex + JSX section scan); complex cases are d
 | Component | Semantic tokens used |
 |---|---|
 | Button (all variants) | `--action-*`, `--state-layer-*`, `--focus-ring`, `--btn-radius`, `--ripple-color` |
-| Badge / StatusPill | `--status-{brand,success,warning,danger,info}-*` |
+| Badge / StatusPill | `--status-{brand,success,warning,danger,info}-{fg,bg,border}` |
 | Card / surfaces | `--surface`, `--border`, `--shadow-*` |
-| Inputs | `--surface`, `--border-strong`, `--text`, `--focus-ring` |
-| Charts | `--brand-*`, `--accent-*`, `--border`, `--grid-line`, `--text-subtle` |
+| Inputs | `--surface`, `--control-border` (≥3:1), `--text`, `--focus-ring` |
+| Charts | `--chart-{fill,line,grid,point,label,bar-start,bar-end}` |
 
 Colour-blind safety: every status is encoded by **text + shape/icon + colour**, never colour alone. `/ui-kit/colors` renders the full matrix in light, dark and high-contrast modes with computed contrast ratios.

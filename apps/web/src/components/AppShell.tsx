@@ -83,7 +83,7 @@ function NotificationBell() {
       <IconButton variant="ghost" size="icon-sm" label={`${t('common.notifications')}${unread ? ` (${unread})` : ''}`} onClick={() => navigate('/app/notifications')}>
         <span className="relative">
           <Bell className="h-4 w-4" />
-          {!isLoading && unread > 0 && <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger-600 px-1 text-[10px] font-bold text-white">{unread > 9 ? '9+' : unread}</span>}
+          {!isLoading && unread > 0 && <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger-600 px-1 text-[10px] font-bold text-neutral-0">{unread > 9 ? '9+' : unread}</span>}
         </span>
       </IconButton>
     </Tooltip>
@@ -117,11 +117,11 @@ export function AppShell() {
     <div className="min-h-screen bg-app text-content">
       <a href="#main-content" className="ui-skip focus-ring">{t('common.skipToContent')}</a>
 
-      {sidebarOpen && <button className="fixed inset-0 z-30 bg-black/40 lg:hidden" aria-label={t('common.close')} onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && <button className="fixed inset-0 z-30 bg-overlay lg:hidden" aria-label={t('common.close')} onClick={() => setSidebarOpen(false)} />}
 
       <aside className={`ui-scroll fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-line bg-surface transition-transform duration-base lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex h-16 items-center gap-3 border-b border-line px-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white shadow-sm"><SchoolIcon className="h-5 w-5" /></span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-neutral-0 shadow-sm"><SchoolIcon className="h-5 w-5" /></span>
           <div className="min-w-0">
             <p className="font-display text-base font-bold leading-tight text-content">SchoolOS</p>
             <p className="truncate text-[11px] text-content-subtle">{t('app.tagline')}</p>

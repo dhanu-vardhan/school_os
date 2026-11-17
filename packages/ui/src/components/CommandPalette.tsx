@@ -13,7 +13,7 @@ export function CommandPalette({ open, onOpenChange, items }: {
       <div className="flex items-center gap-2 border-b border-line px-4">
         <Search className="h-4 w-4 text-content-subtle" />
         <Command.Input autoFocus placeholder="Search pages and actions…"
-          className="h-12 w-full bg-transparent text-sm text-content outline-none placeholder:text-content-subtle" />
+          className="h-12 w-full bg-surface/0 text-sm text-content outline-none placeholder:text-content-subtle" />
         <kbd className="rounded border border-line bg-surface-2 px-1.5 py-0.5 text-[10px] text-content-subtle">ESC</kbd>
       </div>
       <Command.List className="ui-scroll max-h-80 overflow-y-auto p-2">

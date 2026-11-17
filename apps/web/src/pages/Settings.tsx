@@ -62,7 +62,7 @@ export function SettingsPage() {
               <div className="max-w-xl space-y-4">
                 <p className="text-sm text-content-muted">{t('auth.sessionExpiredBody')}</p>
                 <Badge tone="brand">{config.authMode}</Badge>
-                <div><button type="button" className="focus-ring rounded-md bg-danger-600 px-4 py-2 text-sm font-medium text-white" onClick={() => void logout().then(() => window.location.assign('/login'))}>{t('common.logout')}</button></div>
+                <div><button type="button" className="focus-ring rounded-md bg-danger-600 px-4 py-2 text-sm font-medium text-neutral-0" onClick={() => void logout().then(() => window.location.assign('/login'))}>{t('common.logout')}</button></div>
               </div>
             ) },
           ]} />

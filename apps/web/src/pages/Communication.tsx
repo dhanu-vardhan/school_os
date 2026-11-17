@@ -106,7 +106,7 @@ export function MessagesPage() {
             <CardBody className="space-y-2 p-2">
               {messages.data!.data.map(m => (
                 <button key={m.id} type="button" onClick={() => setSelected(m)}
-                  className={`w-full rounded-lg border p-3 text-left transition-colors ${selected?.id === m.id ? 'border-brand-300 bg-brand-50 dark:bg-brand-500/10' : 'border-transparent hover:bg-surface-2'} ${!m.read ? 'font-medium' : ''}`}>
+                  className={`w-full rounded-lg border p-3 text-left transition-colors ${selected?.id === m.id ? 'border-brand-300 bg-brand-50 dark:bg-brand-500/10' : 'border-line/0 hover:bg-surface-2'} ${!m.read ? 'font-medium' : ''}`}>
                   <div className="flex items-center justify-between gap-2"><p className="truncate text-sm text-content">{m.subject}</p>{!m.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />}</div>
                   <p className="truncate text-xs text-content-muted">{m.from}</p>
                   <p className="mt-1 text-[11px] text-content-subtle">{formatDate(m.at)}</p>

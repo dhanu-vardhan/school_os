@@ -44,7 +44,7 @@ export function CalendarGrid({ days, startHour = 8, endHour = 18, events, onEven
           ))}
           <div className="pointer-events-none absolute inset-0" style={{ left: 64, gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))`, display: 'grid' }}>
             {days.map((_, dayIndex) => (
-              <div key={dayIndex} className="relative border-l border-transparent">
+              <div key={dayIndex} className="relative border-l border-line/0">
                 {events.filter(e => e.day === dayIndex).map(e => {
                   const top = (e.start - startHour) * 64
                   const height = Math.max(28, (e.end - e.start) * 64 - 4)

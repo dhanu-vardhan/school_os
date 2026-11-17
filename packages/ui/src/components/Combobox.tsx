@@ -22,7 +22,7 @@ export function Combobox({ value, onValueChange, options, placeholder = 'Searchâ
       <Popover.Portal>
         <Popover.Content align="start" sideOffset={4} className="z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-line bg-surface p-1 shadow-lg">
           <Command className="ui-scroll max-h-64 overflow-auto" loop>
-            <Command.Input placeholder={placeholder} className="focus-ring mb-1 w-full border-b border-line bg-transparent px-2 py-2 text-sm outline-none" />
+            <Command.Input placeholder={placeholder} className="focus-ring mb-1 w-full border-b border-line bg-surface/0 px-2 py-2 text-sm outline-none" />
             <Command.List>
               <Command.Empty className="px-3 py-6 text-center text-sm text-content-muted">No results</Command.Empty>
               {options.map(o => (

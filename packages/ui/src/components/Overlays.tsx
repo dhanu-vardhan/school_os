@@ -13,7 +13,7 @@ export function Tooltip({ content, children, side = 'top' }: {
       <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Content side={side} sideOffset={6}
-          className="ui-scale-in z-50 max-w-xs rounded-md bg-neutral-900 px-2.5 py-1.5 text-xs text-white shadow-lg dark:bg-neutral-100 dark:text-neutral-900">
+          className="ui-scale-in z-50 max-w-xs rounded-md bg-neutral-900 px-2.5 py-1.5 text-xs text-neutral-0 shadow-lg dark:bg-neutral-100 dark:text-neutral-900">
           {content}
           <TooltipPrimitive.Arrow className="fill-neutral-900 dark:fill-neutral-100" />
         </TooltipPrimitive.Content>

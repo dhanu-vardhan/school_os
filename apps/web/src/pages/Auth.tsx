@@ -41,7 +41,7 @@ export function LoginPage() {
     <div className="min-h-screen bg-app px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md"><GraduationCap className="h-6 w-6" /></span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-neutral-0 shadow-md"><GraduationCap className="h-6 w-6" /></span>
           <div>
             <h1 className="font-display text-xl font-bold text-content">SchoolOS</h1>
             <p className="text-xs text-content-muted">{t('app.tagline')}</p>

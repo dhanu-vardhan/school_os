@@ -1118,3 +1118,21 @@ features:
     status: stubbed
     prompt_ref: P2-colors
     reason: "Dev-only UI kit route; covered by Playwright smoke"
+  - id: UI-P3-TOKEN-MIGRATION
+    module: ui
+    name: "Part 2 component and screen token migration"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-tokens
+    reason: "All feature screens and shared components use semantic/component tokens"
+  - id: UI-P3-STATUS-CHARTS
+    module: ui
+    name: "Part 2 status chips and charts use component tokens"
+    roles: [system]
+    platform: [web]
+    checks: [ui]
+    status: stubbed
+    prompt_ref: P2-tokens
+    reason: "Status and chart colour layers added; no raw colour outside token file"

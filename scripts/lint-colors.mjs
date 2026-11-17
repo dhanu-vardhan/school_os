@@ -19,6 +19,7 @@ const patterns = [
   { name: 'rgb/rgba literal', re: /rgba?\(\s*(?!var\()\d/g },
   { name: 'hsl/hsla literal', re: /hsla?\(\s*(?!var\()\d/g },
   { name: 'oklch literal', re: /oklch\(\s*(?!var\()\d/g },
+  { name: 'named colour', re: /\b(?:white|black|transparent)\b/g },
 ]
 
 function filesIn(directory) {

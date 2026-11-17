@@ -75,6 +75,7 @@ const pairs = [
   ['primary action', '--action-primary-fg', '--action-primary-bg', 4.5],
   ['secondary action', '--action-secondary-fg', '--action-secondary-bg', 4.5],
   ['danger action', '--action-danger-fg', '--action-danger-bg', 4.5],
+  ['success action', '--action-success-fg', '--action-success-bg', 4.5],
   ['ai action', '--action-ai-fg', '--action-ai-bg', 4.5],
   ['status brand', '--status-brand-fg', '--surface', 4.5],
   ['status success', '--status-success-fg', '--surface', 4.5],

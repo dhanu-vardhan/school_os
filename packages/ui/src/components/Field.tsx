@@ -49,7 +49,7 @@ export function Checkbox({ label, description, className, ...props }: {
   return (
     <label className={cn('flex cursor-pointer items-start gap-2.5', className)}>
       <CheckboxPrimitive.Root className="focus-ring mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border border-line-strong bg-surface data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-600 disabled:opacity-50" {...props}>
-        <CheckboxPrimitive.Indicator><Check className="h-3 w-3 text-white" strokeWidth={3} /></CheckboxPrimitive.Indicator>
+        <CheckboxPrimitive.Indicator><Check className="h-3 w-3 text-neutral-0" strokeWidth={3} /></CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
       {(label || description) && (
         <span className="min-w-0 text-sm">
@@ -95,7 +95,7 @@ export function Switch({ checked, onCheckedChange, label, description, disabled 
       )}
       <SwitchPrimitive.Root checked={checked} onCheckedChange={onCheckedChange} disabled={disabled}
         className="focus-ring relative h-6 w-11 shrink-0 rounded-full bg-neutral-300 transition-colors data-[state=checked]:bg-brand-600 dark:bg-neutral-700 disabled:opacity-50">
-        <SwitchPrimitive.Thumb className="block h-5 w-5 translate-x-0.5 rounded-full bg-white shadow-sm transition-transform data-[state=checked]:translate-x-[22px]" />
+        <SwitchPrimitive.Thumb className="block h-5 w-5 translate-x-0.5 rounded-full bg-neutral-0 shadow-sm transition-transform data-[state=checked]:translate-x-[22px]" />
       </SwitchPrimitive.Root>
     </label>
   )

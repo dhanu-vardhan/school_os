@@ -14,9 +14,10 @@ const SEMANTIC_TOKENS = [
 
 const COMPONENT_TOKENS = [
   '--action-primary-bg', '--action-primary-fg', '--action-secondary-bg', '--action-secondary-fg',
-  '--action-danger-bg', '--action-danger-fg', '--action-ai-bg', '--action-ai-fg',
-  '--status-brand-fg', '--status-success-fg', '--status-warning-fg', '--status-danger-fg',
-  '--status-info-fg', '--focus-color',
+  '--action-danger-bg', '--action-danger-fg', '--action-success-bg', '--action-success-fg',
+  '--action-ai-bg', '--action-ai-fg', '--status-brand-bg', '--status-success-bg',
+  '--status-warning-bg', '--status-danger-bg', '--status-info-bg', '--chart-line',
+  '--chart-grid', '--focus-color',
 ] as const
 
 const PAIRS: { label: string; fg: string; bg: string; min: number }[] = [

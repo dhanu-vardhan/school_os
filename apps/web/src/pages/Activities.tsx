@@ -23,7 +23,7 @@ function ActivityCard({ activity, offeringId, onOpen }: { activity: Activity; of
   return (
     <button type="button" onClick={onOpen} className="ui-card ui-card-hover overflow-hidden text-left">
       <div className={`flex h-28 items-center justify-center bg-gradient-to-br ${toneMap[activity.imageTone ?? 'brand']}`}>
-        <Icon className="h-10 w-10 text-white/90" />
+        <Icon className="h-10 w-10 text-neutral-0/90" />
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2"><h3 className="font-display text-base font-semibold text-content">{activity.name}</h3><Badge tone="neutral">{activity.category}</Badge></div>
@@ -68,7 +68,7 @@ export function ActivitiesPage() {
               const o = offeringByActivity.get(a.id)
               return (
                 <button key={a.id} type="button" onClick={() => navigate(`/app/activities/${a.id}`)} className="ui-card flex w-full flex-wrap items-center gap-4 p-4 text-left hover:border-brand-300">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${toneMap[a.imageTone ?? 'brand']}`}>{(() => { const Icon = iconMap[a.icon ?? 'art'] ?? Palette; return <Icon className="h-5 w-5 text-white" /> })()}</div>
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${toneMap[a.imageTone ?? 'brand']}`}>{(() => { const Icon = iconMap[a.icon ?? 'art'] ?? Palette; return <Icon className="h-5 w-5 text-neutral-0" /> })()}</div>
                   <div className="min-w-0 flex-1"><p className="font-medium text-content">{a.name}</p><p className="truncate text-xs text-content-subtle">{a.description}</p></div>
                   <span className="text-xs text-content-muted">{a.day}</span>
                   {o && <Badge tone={o.booked >= o.capacity ? 'warning' : 'success'}>{o.booked}/{o.capacity}</Badge>}

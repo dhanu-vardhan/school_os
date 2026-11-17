@@ -14,7 +14,7 @@ export function Stepper({ steps, current, onStepClick }: {
             <button type="button" disabled={!onStepClick} onClick={() => onStepClick?.(i)}
               aria-current={active ? 'step' : undefined}
               className={cn('focus-ring flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
-                done ? 'border-accent-500 bg-accent-500 text-white' : active ? 'border-brand-600 bg-brand-600 text-white' : 'border-line-strong bg-surface text-content-subtle')}>
+                done ? 'border-action-success bg-action-success text-action-success-fg' : active ? 'border-action-primary bg-action-primary text-action-primary-fg' : 'border-line-control bg-surface text-content-subtle')}>
               {done ? <Check className="h-4 w-4" /> : i + 1}
             </button>
             <div className="min-w-0 pt-1">

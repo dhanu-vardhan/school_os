@@ -83,3 +83,12 @@
 | P2-4 | `scripts/check-contrast.mjs` parses `styles.css` and checks 13 foreground/background pairs in light, dark, high contrast and dark high contrast; `scripts/lint-colors.mjs` rejects raw colour literals outside the token file. | CI-detectable regressions without a browser or new dependency. |
 | P2-5 | `/ui-kit/colors` is a dev-only review page with token scales, live computed ratios and a monochrome status check. It never displays student or case data. | Supports the colour-blind review requirement while preserving the safeguarding rule. |
 | P2-6 | Root `package.json` gains `test`, `test:e2e`, `lint`, `lint:colors`, `lint:actions` and `lint:contrast` scripts so every quality gate has one command from the repo root. | Prior root had no `test` or `lint`, so gates were easy to skip. |
+
+## 2026-11-17: Part 2 Phase 3 — component token migration
+
+| # | Decision | Reason |
+|---|---|---|
+| P3-1 | Replace every named `white`/`black`/`transparent` utility with a token class (`text-neutral-0`, `bg-overlay`, `bg-surface/0`, `border-line/0`) and extend the raw-colour lint to fail on named colours too. | The brief requires zero raw colours outside token files; named keywords were the remaining loophole. |
+| P3-2 | Add `--chart-*` component tokens and migrate both charts to them. | Charts were token-based but referenced primitives directly; the component layer keeps future palette changes in one place. |
+| P3-3 | Add `--status-*-{bg,border}` tokens and use them in `Badge`/`StatusPill`; dark mode overrides the component layer rather than sprinkling `dark:` colour classes in each variant. | Colour remains the secondary signal (text/icon still carries meaning), and status chips stay consistent across modules. |
+| P3-4 | Use `--control-border` for outlined controls and stepper markers, leaving decorative dividers on `--border`. | Satisfies WCAG 1.4.11 without making the UI visually loud. |
