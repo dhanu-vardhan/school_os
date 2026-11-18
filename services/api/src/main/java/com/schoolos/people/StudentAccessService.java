@@ -35,7 +35,7 @@ public class StudentAccessService {
     @Transactional(readOnly = true)
     public Set<UUID> visibleStudentIds() {
         if (currentUser.hasRole("GUARDIAN")) {
-            return guardianChildren.findByGuardianSubject(currentUser.subject()).stream()
+            return guardianChildren.findActiveByGuardianSubject(currentUser.subject(), java.time.LocalDate.now()).stream()
                     .map(GuardianChild::getStudentId)
                     .collect(Collectors.toUnmodifiableSet());
         }

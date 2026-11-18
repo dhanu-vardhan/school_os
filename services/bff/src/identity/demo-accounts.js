@@ -55,10 +55,10 @@ export const DEMO_ACCOUNTS = [
   account('teacher-parttime', 'Thomas Roux', ROLES.TEACHER, [B], {
     title: 'Enseignant à temps partiel — 2 classes', scope: SCHOOL_B_NAME,
   }),
-  account('parent', 'Alex Moreau', ROLES.GUARDIAN, [
+  account('parent', 'Camille Martin', ROLES.GUARDIAN, [
     { ...A, childIds: ['stu-1', 'stu-2'] },
     { ...B, childIds: ['stu-b1'] },
-  ], { title: 'Parent — 2 enfants dans 2 établissements', scope: `${SCHOOL_A_NAME} + ${SCHOOL_B_NAME}` }),
+  ], { title: 'Parent — Léa et Tom', scope: `${SCHOOL_A_NAME} + ${SCHOOL_B_NAME}` }),
   account('parent-2', 'Sarah Cohen', ROLES.GUARDIAN, [{ ...A, childIds: ['stu-3'] }], {
     title: 'Parent — 1 enfant', scope: SCHOOL_A_NAME,
   }),
@@ -98,8 +98,8 @@ export const DEMO_ACCOUNTS = [
   // Legacy demo keys kept so existing screens/tests keep working.
   account('assistant', 'Yanis Petit', ROLES.ASSISTANT, [A], { title: 'Assistant pédagogique', scope: SCHOOL_A_NAME, legacy: true }),
   account('admissions', 'Nora Benali', ROLES.ADMISSIONS, [A], { title: 'Admissions', scope: SCHOOL_A_NAME, legacy: true }),
-  account('guardian', 'Alex Moreau', ROLES.GUARDIAN, [{ ...A, childIds: ['stu-1', 'stu-2'] }], { title: 'Parent', scope: SCHOOL_A_NAME, legacy: true }),
-  account('guardian2', 'Sarah Cohen', ROLES.GUARDIAN, [{ ...A, childIds: ['stu-3'] }], { title: 'Second parent', scope: SCHOOL_A_NAME, legacy: true }),
+  account('guardian', 'Famille Martin', ROLES.GUARDIAN, [{ ...A, childIds: ['stu-1', 'stu-2'] }], { title: 'Parent — Léa et Tom', scope: SCHOOL_A_NAME, legacy: true }),
+  account('guardian2', 'Alex Moreau', ROLES.GUARDIAN, [{ ...A, childIds: ['stu-2'] }], { title: 'Second parent — foyer séparé', scope: SCHOOL_A_NAME, legacy: true }),
   account('instructor', 'Mina Diallo', ROLES.INSTRUCTOR, [A], { title: 'Intervenant', scope: SCHOOL_A_NAME, legacy: true }),
   account('provider', 'Club Échecs Paris', ROLES.PROVIDER, [A], { title: 'Prestataire', scope: SCHOOL_A_NAME, legacy: true }),
   account('operator', 'Sophie Laurent', ROLES.OPERATOR, [A], { title: 'Opérateur plateforme', scope: 'Plateforme SchoolOS', legacy: true }),

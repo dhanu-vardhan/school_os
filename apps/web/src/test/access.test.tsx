@@ -79,7 +79,7 @@ describe('safe redirects and landing resolution', () => {
 
   it('resolves multi-role landings without merging permissions', () => {
     expect(landingRouteFor(['teacher', 'parent'])).toBe('/teacher')
-    expect(landingRouteFor(['teacher', 'parent'], 'parent')).toBe('/parent')
+    expect(landingRouteFor(['teacher', 'parent'], 'parent')).toBe('/family')
     expect(landingRouteFor([])).toBe('/app/dashboard')
   })
 

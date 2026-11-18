@@ -82,8 +82,9 @@ export function RadioGroup({ options, value, onValueChange, name, className }: {
   )
 }
 
-export function Switch({ checked, onCheckedChange, label, description, disabled }: {
+export function Switch({ checked, onCheckedChange, label, description, disabled, ariaLabel }: {
   checked?: boolean; onCheckedChange?: (v: boolean) => void; label?: string; description?: string; disabled?: boolean
+  ariaLabel?: string
 }) {
   return (
     <label className="flex items-center justify-between gap-4">
@@ -93,7 +94,7 @@ export function Switch({ checked, onCheckedChange, label, description, disabled 
           {description && <span className="block text-xs text-content-muted">{description}</span>}
         </span>
       )}
-      <SwitchPrimitive.Root checked={checked} onCheckedChange={onCheckedChange} disabled={disabled}
+      <SwitchPrimitive.Root checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} aria-label={ariaLabel}
         className="focus-ring relative h-6 w-11 shrink-0 rounded-full bg-neutral-300 transition-colors data-[state=checked]:bg-brand-600 dark:bg-neutral-700 disabled:opacity-50">
         <SwitchPrimitive.Thumb className="block h-5 w-5 translate-x-0.5 rounded-full bg-neutral-0 shadow-sm transition-transform data-[state=checked]:translate-x-[22px]" />
       </SwitchPrimitive.Root>

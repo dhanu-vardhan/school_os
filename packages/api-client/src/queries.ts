@@ -3,6 +3,7 @@ import {
   type QueryKey, type UseQueryOptions,
 } from '@tanstack/react-query'
 import * as api from './client'
+import * as familyApi from './family'
 import type { ApiResponse } from './http'
 import type { Notification, SafeguardingConcern, AiSuggestion, Invoice } from '@schoolos/shared'
 import type { AnalyticsQuery, Intervention, ScenarioInput, Target } from './client'
@@ -51,6 +52,32 @@ export const queryKeys = {
   accountSecurity: () => [...queryKeys.all, 'accountSecurity'] as const,
   securityOverview: () => [...queryKeys.all, 'securityOverview'] as const,
   securityEvents: () => [...queryKeys.all, 'securityEvents'] as const,
+  family: () => [...queryKeys.all, 'family'] as const,
+  familyOverview: () => [...queryKeys.family(), 'overview'] as const,
+  familyDashboard: () => [...queryKeys.family(), 'dashboard'] as const,
+  familyChildren: () => [...queryKeys.family(), 'children'] as const,
+  familyChild: (id: string) => [...queryKeys.familyChildren(), id] as const,
+  familyAttendance: (childId?: string) => [...queryKeys.family(), 'attendance', childId ?? 'all'] as const,
+  familyTimetable: (childId?: string) => [...queryKeys.family(), 'timetable', childId ?? 'all'] as const,
+  familyHomework: (childId?: string) => [...queryKeys.family(), 'homework', childId ?? 'all'] as const,
+  familyGrades: (childId?: string) => [...queryKeys.family(), 'grades', childId ?? 'all'] as const,
+  familyThreads: () => [...queryKeys.family(), 'threads'] as const,
+  familyAnnouncements: () => [...queryKeys.family(), 'announcements'] as const,
+  familyCalendar: () => [...queryKeys.family(), 'calendar'] as const,
+  familyForms: (childId?: string) => [...queryKeys.family(), 'forms', childId ?? 'all'] as const,
+  familyCollectors: (childId?: string) => [...queryKeys.family(), 'collectors', childId ?? 'all'] as const,
+  familyAppointments: (childId?: string) => [...queryKeys.family(), 'appointments', childId ?? 'all'] as const,
+  familyActivities: (childId?: string) => [...queryKeys.family(), 'activities', childId ?? 'all'] as const,
+  familyCanteen: (childId?: string) => [...queryKeys.family(), 'canteen', childId ?? 'all'] as const,
+  familyBilling: () => [...queryKeys.family(), 'billing'] as const,
+  familyDocuments: (childId?: string) => [...queryKeys.family(), 'documents', childId ?? 'all'] as const,
+  familyDownloads: () => [...queryKeys.family(), 'downloads'] as const,
+  familyPreferences: () => [...queryKeys.family(), 'preferences'] as const,
+  familyDevices: () => [...queryKeys.family(), 'devices'] as const,
+  familyDataRequests: () => [...queryKeys.family(), 'dataRequests'] as const,
+  familyConsents: () => [...queryKeys.family(), 'consents'] as const,
+  familyInvitations: () => [...queryKeys.family(), 'invitations'] as const,
+  familyPolicy: () => [...queryKeys.family(), 'policy'] as const,
 }
 
 export function useApiQuery<T>(
@@ -313,4 +340,63 @@ export function useCreateDataRequest() {
 export function useInviteMember() {
   const qc = useQueryClient()
   return useMutation({ mutationFn: api.inviteMember, onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.members() }) })
+}
+
+
+// ---------------------------------------------------------------------- guardian portal
+
+export const useFamilyOverview = () => useApiQuery(queryKeys.familyOverview(), familyApi.getFamilyOverview)
+export const useFamilyDashboard = () => useApiQuery(queryKeys.familyDashboard(), familyApi.getFamilyDashboard)
+export const useFamilyChildren = () => useApiQuery(queryKeys.familyChildren(), familyApi.listFamilyChildren)
+export const useFamilyChild = (id: string, enabled = true) =>
+  useApiQuery(queryKeys.familyChild(id), () => familyApi.getFamilyChild(id), { enabled })
+export const useFamilyAttendance = (childId?: string) =>
+  useApiQuery(queryKeys.familyAttendance(childId), () => familyApi.listFamilyAttendance(childId))
+export const useFamilyTimetable = (childId?: string) =>
+  useApiQuery(queryKeys.familyTimetable(childId), () => familyApi.listFamilyTimetable(childId))
+export const useFamilyHomework = (childId?: string) =>
+  useApiQuery(queryKeys.familyHomework(childId), () => familyApi.listFamilyHomework(childId))
+export const useFamilyGrades = (childId?: string) =>
+  useApiQuery(queryKeys.familyGrades(childId), () => familyApi.listFamilyGrades(childId))
+export const useFamilyThreads = () => useApiQuery(queryKeys.familyThreads(), familyApi.listFamilyThreads)
+export const useFamilyAnnouncements = () => useApiQuery(queryKeys.familyAnnouncements(), familyApi.listFamilyAnnouncements)
+export const useSchoolCalendar = () => useApiQuery(queryKeys.familyCalendar(), familyApi.listSchoolCalendar)
+export const useFamilyForms = (childId?: string) =>
+  useApiQuery(queryKeys.familyForms(childId), () => familyApi.listFamilyForms(childId))
+export const useFamilyCollectors = (childId?: string) =>
+  useApiQuery(queryKeys.familyCollectors(childId), () => familyApi.listAuthorizedPersons(childId))
+export const useFamilyAppointments = (childId?: string) =>
+  useApiQuery(queryKeys.familyAppointments(childId), () => familyApi.listAppointments(childId))
+export const useFamilyActivities = (childId?: string) =>
+  useApiQuery(queryKeys.familyActivities(childId), () => familyApi.listFamilyActivities(childId))
+export const useFamilyCanteen = (childId?: string) =>
+  useApiQuery(queryKeys.familyCanteen(childId), () => familyApi.listFamilyCanteen(childId))
+export const useFamilyBillingQuery = () => useApiQuery(queryKeys.familyBilling(), familyApi.getFamilyBilling)
+export const useFamilyDocuments = (childId?: string) =>
+  useApiQuery(queryKeys.familyDocuments(childId), () => familyApi.listFamilyDocuments(childId))
+export const useFamilyDownloads = () => useApiQuery(queryKeys.familyDownloads(), familyApi.listDocumentDownloads)
+export const useFamilyPreferences = () => useApiQuery(queryKeys.familyPreferences(), familyApi.getFamilyPreferences)
+export const useFamilyDevices = () => useApiQuery(queryKeys.familyDevices(), familyApi.listFamilyDevices)
+export const useFamilyDataRequests = () => useApiQuery(queryKeys.familyDataRequests(), familyApi.listFamilyDataRequests)
+export const useFamilyConsents = () => useApiQuery(queryKeys.familyConsents(), familyApi.listFamilyConsents)
+export const useFamilyPolicy = () => useApiQuery(queryKeys.familyPolicy(), familyApi.getFamilyPolicy)
+export const useFamilyIcsFeed = (childId?: string) =>
+  useQuery({
+    queryKey: [...queryKeys.family(), 'ics', childId ?? 'all'],
+    queryFn: () => familyApi.getIcsFeed(childId),
+    retry: false,
+  })
+export const useFamilyInvitations = () => useApiQuery(queryKeys.familyInvitations(), familyApi.listFamilyInvitations)
+export const useOtherGuardianContact = (childId: string, enabled = true) =>
+  useApiQuery([...queryKeys.family(), 'guardian-contact', childId], () => familyApi.getOtherGuardianContact(childId), { enabled })
+
+/** Family mutations always invalidate the whole family namespace: both parents must see one truth. */
+export function useFamilyMutation<TInput, TResult>(
+  fn: (input: TInput) => Promise<{ data: TResult; mock?: boolean }>,
+) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: queryKeys.family() }) },
+  })
 }

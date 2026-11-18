@@ -96,6 +96,8 @@ password. Names and titles are fictional.
 | `teacher-parttime` | Teacher | Thomas Roux | Les Tilleuls | no |
 | `parent` | Parent/guardian | Alex Moreau | both schools | no |
 | `parent-2` | Parent/guardian | Sarah Cohen | Jean-Moulin | no |
+| `guardian` | Parent/guardian (family portal, legacy key) | Camille Martin — *Famille Martin* | Jean-Moulin (demo) | no |
+| `guardian2` | Parent/guardian (family portal, legacy key) | Alex Moreau — *foyer séparé* | Jean-Moulin (demo) | no |
 | `student-college` | Student | Léa Martin | Jean-Moulin | no |
 | `student-lycee` | Student | Tom Durand | Jean-Moulin | no |
 | `safeguarding` | Safeguarding lead | Dr Paul Girard | Jean-Moulin | yes |
@@ -111,6 +113,20 @@ password. Names and titles are fictional.
 Legacy keys (`assistant`, `admissions`, `guardian`, `guardian2`, `instructor`, `provider`,
 `operator`) remain in the closed allow-list so older links keep working, but they are hidden
 from the picker (`?legacy=1` is not exposed; use the API directly only in local demos).
+
+### PROMPT 005 family portal demo scenarios (web/mock)
+
+The guardian portal (`/family`, G1–G20) uses explicit demo guardian identities and scoped fixtures:
+
+| Demo login key | Display family | Linked children | Notes |
+|---|---|---|---|
+| `guardian` | **Famille Martin** (Camille Martin, `demo-guardian`) | **Léa** (MS A, stu-1) and **Tom** (CP A, stu-2) | Canonical two-child household for dashboard, attendance, homework, grades, forms, billing, etc. |
+| `guardian2` | **Alex Moreau** (`demo-guardian-2`) | **Tom** (CP A, stu-2) | Separated household / second parent; explicit court-order restrictions in demo data (`collect_child`, `media`) while school information remains visible where not restricted. |
+| `demo-guardian-petit` | **Famille Petit** (no picker card) | stu-5, stu-9 (different classes) | Used in tests for IDOR/scoping; not exposed in the demo picker. |
+
+- `demoLogin('guardian')` lands on `/family`; `demoLogin('guardian2')` lands on `/family` with Tom-only scope.
+- In mock mode, guardian scope and restrictions are derived from the session (never from request body/query), and demo step-up refreshes `stepUpUntil` on the current session.
+- The picker visibility and BFF credential generation still follow the safety rules above; use the family keys in local/demo and automated tests only.
 
 ### Tenant switching
 

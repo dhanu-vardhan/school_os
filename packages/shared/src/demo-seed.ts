@@ -4,6 +4,7 @@ import type {
   School, Student, Activity, ActivityOffering, TimetableEvent, AttendanceRecord,
 } from './types'
 import type { DisplayRole } from './roles'
+import { makeFamilyData, type FamilyData } from './family/seed'
 
 // Local alias so this file can be authored before index.ts is regenerated.
 type Role = DisplayRole
@@ -38,6 +39,8 @@ export interface DemoData {
   timetable: TimetableEvent[]
   attendance: AttendanceRecord[]
   dataRequests: DataExportRequest[]
+  /** PROMPT 005 guardian portal state (see packages/shared/src/family). */
+  family: FamilyData
 }
 
 export const SCHOOL_A = '11111111-1111-4111-8111-111111111111'
@@ -202,6 +205,7 @@ export function makeDemoData(): DemoData {
       { id: 't-7', day: 4, start: 9, end: 10, title: 'Conseil de classe', subtitle: 'Salle des professeurs', tone: 'info' },
     ],
     attendance,
+    family: makeFamilyData(),
     dataRequests: [
       { id: 'dr-1', type: 'export', subject: 'Famille Martin', requestedAt: '2026-11-12', status: 'in_progress', dueAt: '2026-12-12' },
       { id: 'dr-2', type: 'erasure', subject: 'Ancien élève — anonymisation', requestedAt: '2026-11-05', status: 'pending', dueAt: '2026-12-05' },

@@ -18,6 +18,17 @@
 ## Subscription billing
 - Schools are merchant of record for parent payments; platform must not hold or transfer parents' money. TODO(legal-review) before launch.
 
+## Guardian / family portal (PROMPT 005, 2026-11-18)
+
+- **Tenant & subject scoping:** guardian portal data is tenant-scoped (RLS/`app.current_school` on V7 tables) and guardian-scoped by explicit `guardian_child` links derived server-side from the authenticated subject/JWT. No `school_id` or guardian/child scope is accepted from request body/query/header.
+- **Relationship & restrictions:** access is based on explicit link flags (authority, information rights, payer, collection, emergency, validity/revocation) and explicit court-order restrictions by type/scope only; custody is never inferred. Restrictions must take immediate effect and block only the relevant data class where implemented; enforcement requires continued end-to-end hardening/tests.
+- **Signatures, consents, receipts, audit:** V7 defines append-only/immutable intent for form signatures, payment receipts and family audit events (and immutability triggers). Signature/consent/withdrawal proof and watermarked download records are modeled in mock/service; legal validity of wording/e-signature remains `TODO(legal-review)`.
+- **Communications & notifications:** no parent↔parent relay; staff-recipient allow-list enforced by policy. Push/email content must remain content-free (category/generic text only) in production channels; demo/mock implements safe text helpers but full delivery governance is pending.
+- **Payments & documents:** split billing/payer visibility and step-up-gated payment action (`family.pay`) are implemented in service intent; PSP/SEPA/document storage/AV/signed short-lived URLs are demo-safe or pending integration. Downloads must be audited and watermarked.
+- **ICS & devices:** ICS feeds are tokenized/revocable in model/service; device/session revocation and preference management are surfaced in UI/mock/service with further hardening needed.
+- **18-year / majority policy:** handled by configurable school policy (`require_student_consent` default in demo) — `TODO(legal-review)` for legal basis and transitions.
+- **Human/legal items still open:** `TODO(legal-review)` for signatory rules/forms/notices/consents/règlement/18-year policy and mandatory-notice/office-hours content; DPIA addendum; accessibility audit; FR/EN translation review. Do not treat this section as production approval.
+
 ## Safeguarding
 - Safeguarding concern workflow roles and escalation editable templates. TODO(legal-review).
 

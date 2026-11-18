@@ -63,6 +63,11 @@ public class PolicyService {
     public static final String ANALYTICS_STUDENT = "analytics.student";
     public static final String ANALYTICS_CONFIGURE = "analytics.configure";
     public static final String ANALYTICS_EXPORT = "analytics.export";
+    /** Guardian/family portal (PROMPT 005). Server derives guardian scope from the JWT; never from the request. */
+    public static final String FAMILY_READ = "family.read";
+    public static final String FAMILY_WRITE = "family.write";
+    /** Finance action from the family portal: requires fresh MFA step-up. */
+    public static final String FAMILY_PAY = "family.pay";
 
     private static final Set<String> SCHOOL_READER = Set.of(
             SCHOOL_READ, STUDENT_READ, DASHBOARD_READ, ATTENDANCE_READ, MESSAGE_READ,
@@ -71,7 +76,7 @@ public class PolicyService {
     private static final Set<String> SENSITIVE = Set.of(
             SAFEGUARDING_READ, SAFEGUARDING_WRITE, HEALTH_READ, HEALTH_WRITE,
             BILLING_MANAGE, EXPORT, ERASURE, ROLE_MANAGE, MFA_MANAGE, IMPERSONATE,
-            ANALYTICS_EXPORT);
+            ANALYTICS_EXPORT, FAMILY_PAY);
 
     private static final Set<String> ALL = Set.of(
             SCHOOL_READ, SCHOOL_SETTINGS, MEMBERS_MANAGE, ROLE_MANAGE, CLASS_READ,
@@ -83,7 +88,8 @@ public class PolicyService {
             LIBRARY_READ, LIBRARY_WRITE, RECEPTION_READ, RECEPTION_WRITE, AUDIT_READ,
             SECURITY_READ, EXPORT, ERASURE, MFA_MANAGE, IMPERSONATE, OPERATOR_ACCESS,
             PLATFORM_ADMIN, LESSON_READ, LESSON_WRITE,
-            ANALYTICS_READ, ANALYTICS_STUDENT, ANALYTICS_CONFIGURE, ANALYTICS_EXPORT);
+            ANALYTICS_READ, ANALYTICS_STUDENT, ANALYTICS_CONFIGURE, ANALYTICS_EXPORT,
+            FAMILY_READ, FAMILY_WRITE, FAMILY_PAY);
 
     private static final Map<String, Set<String>> ROLE_PERMISSIONS = Map.ofEntries(
             Map.entry("PLATFORM_ADMIN", ALL),
@@ -138,7 +144,7 @@ public class PolicyService {
                     SECURITY_READ, EXPORT, ANALYTICS_READ, ANALYTICS_EXPORT)),
             Map.entry("GUARDIAN", Set.of(DASHBOARD_READ, STUDENT_READ, ATTENDANCE_READ,
                     ABSENCE_CREATE, MESSAGE_READ, MESSAGE_WRITE, ACTIVITY_READ, BILLING_READ,
-                    ANALYTICS_READ, ANALYTICS_STUDENT)),
+                    ANALYTICS_READ, ANALYTICS_STUDENT, FAMILY_READ, FAMILY_WRITE, FAMILY_PAY)),
             Map.entry("STUDENT", Set.of(DASHBOARD_READ, STUDENT_READ, ATTENDANCE_READ,
                     MESSAGE_READ, ACTIVITY_READ, ANALYTICS_READ, ANALYTICS_STUDENT)),
             Map.entry("ADMISSIONS", Set.of(DASHBOARD_READ, SCHOOL_READ, STUDENT_READ, STUDENT_WRITE,

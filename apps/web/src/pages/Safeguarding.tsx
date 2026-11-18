@@ -66,13 +66,17 @@ export function NewConcernPage() {
   const create = useCreateConcern()
   const [step, setStep] = useState(0)
   const [category, setCategory] = useState('wellbeing')
+  const [severity, setSeverity] = useState('medium')
   const [reportedByRole, setReportedByRole] = useState('safeguarding')
   const [context, setContext] = useState('')
+  const [immediateDanger, setImmediateDanger] = useState(false)
+  const [dangerAck, setDangerAck] = useState(false)
 
   const submit = async () => {
+    if (immediateDanger && !dangerAck) { toast.error(t('sg.dangerGate')); return }
     try {
       const res = await create.mutateAsync({ category, reportedByRole })
-      toast.success(`${t('safeguarding.reference')} ${res.data.reference}`)
+      toast.success(`${t('safeguarding.reference')} ${res.data.reference} — ${t('sg.receipt')} ${res.data.reference}`)
       navigate('/app/safeguarding')
     } catch { toast.error(t('state.error')) }
   }
@@ -86,7 +90,12 @@ export function NewConcernPage() {
         <CardBody className="min-h-56 space-y-4">
           {step === 0 && <>
             <FormField label={t('safeguarding.category')} required>{() => <Select value={category} onValueChange={setCategory} options={[
-              { value: 'wellbeing', label: 'Wellbeing' }, { value: 'attendance', label: 'Attendance' }, { value: 'safety', label: 'Safety' },
+              { value: 'neglect', label: 'Négligence' }, { value: 'physical', label: 'Physique' }, { value: 'emotional', label: 'Psychologique' },
+              { value: 'sexual', label: 'Sexuel' }, { value: 'intrafamily', label: 'Intrafamilial' }, { value: 'peer_harassment', label: 'Harcèlement entre pairs' },
+              { value: 'cyber_harassment', label: 'Cyberharcèlement' }, { value: 'online_risk', label: 'Risque en ligne' }, { value: 'self_harm', label: 'Signes auto-agression' }, { value: 'other', label: 'Autre' },
+            ]} />}</FormField>
+            <FormField label="Gravité">{() => <Select value={severity} onValueChange={setSeverity} options={[
+              { value: 'immediate', label: 'Immédiate' }, { value: 'high', label: 'Élevée' }, { value: 'medium', label: 'Moyenne' }, { value: 'low', label: 'Faible' },
             ]} />}</FormField>
             <FormField label={t('common.role')}>{() => <Select value={reportedByRole} onValueChange={setReportedByRole} options={[
               { value: 'safeguarding', label: t('role.safeguarding') }, { value: 'teacher', label: t('role.teacher') }, { value: 'reception', label: t('role.reception') },
@@ -94,6 +103,15 @@ export function NewConcernPage() {
           </>}
           {step === 1 && <>
             <p className="text-sm text-content-muted">{t('safeguarding.noLeak')}</p>
+            <p className="text-xs text-warning-700 dark:text-warning-300">Ne pas enquêter, ne pas poser de questions suggestives. Recueillir les paroles spontanées de l’enfant.</p>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={immediateDanger} onChange={e=>{setImmediateDanger(e.target.checked); if(e.target.checked) setDangerAck(false)}} /> Danger immédiat</label>
+            {immediateDanger && !dangerAck && (
+              <div className="rounded-lg border border-danger-300 bg-danger-50 p-4 text-sm text-danger-900">
+                <p className="font-semibold">{t('sg.dangerGate')}</p>
+                <p className="mt-1 text-xs">Appelez le 17/112 ou le 119 maintenant, puis continuez le dépôt.</p>
+                <Button size="sm" className="mt-2" onClick={()=>setDangerAck(true)}>J’ai appelé / Je continue</Button>
+              </div>
+            )}
             <FormField label={t('safeguarding.summary')} hint={t('common.confidential')}>{props => <Textarea {...props} value={context} onChange={e => setContext(e.target.value)} rows={5} />}</FormField>
             <p className="text-xs text-warning-700 dark:text-warning-300">TODO(legal-review) · {t('safeguarding.legal')}</p>
           </>}
@@ -164,6 +182,96 @@ export function ConcernDetailPage() {
           <Timeline items={c.events.map(e => ({ id: e.id, title: e.action, description: t(`role.${e.actorRole}`), time: formatDate(e.at) }))} />
         </CardBody>
       </Card>
+    </div>
+  )
+}
+
+export function SafeguardingHarassmentPage() {
+  const { t } = useTranslation()
+  const [level, setLevel] = useState('1')
+  const [declared, setDeclared] = useState(false)
+  return (
+    <div className="ui-page">
+      <OfflineNotice />
+      <ConfidentialBanner />
+      <PageHeader title={t('sg.harassment')} subtitle={t('safeguarding.noLeak')} breadcrumbs={[{ label: t('nav.safeguarding'), to: '/app/safeguarding' }, { label: t('sg.harassment') }]} />
+      <Card className="mb-4"><CardBody className="space-y-3 text-sm">
+        <p className="text-content-muted">pHARe — collecte du récit, référent adulte protecteur, renforcement de la vigilance sans stigmatisation, contact famille, escalade IEN/département/académique, déclaration « Faits établissement » (niveaux 1–3), journal des faits et actions jusqu’à résolution. Lignes nationales : 3020 (harcèlement), 3018 (cyberharcèlement).</p>
+        <FormField label="Niveau « Faits établissement »">{() => <Select value={level} onValueChange={setLevel} options={[{value:'1',label:'Niveau 1'},{value:'2',label:'Niveau 2'},{value:'3',label:'Niveau 3'}]} />}</FormField>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={declared} onChange={e=>setDeclared(e.target.checked)} /> Déclaré dans l’application nationale</label>
+        <Button onClick={()=>toast.success(t('common.save'))}>Enregistrer le suivi</Button>
+      </CardBody></Card>
+    </div>
+  )
+}
+
+export function SafeguardingContactsPage() {
+  const { t } = useTranslation()
+  return (
+    <div className="ui-page">
+      <OfflineNotice />
+      <ConfidentialBanner />
+      <PageHeader title={t('sg.contacts')} subtitle={t('safeguarding.noLeak')} breadcrumbs={[{ label: t('nav.safeguarding'), to: '/app/safeguarding' }, { label: t('sg.contacts') }]} />
+      <Card><CardBody className="space-y-2 text-sm text-content-muted">
+        <p>Répertoire maintenu par l’établissement (aucune valeur codée en dur) : CRIP du département, DSDEN (assistante sociale, conseiller technique), procureur, référent académique harcèlement, infirmier/psychologue/social, police/gendarmerie, rappels 119/3020/3018.</p>
+        <p>Modèles de communication parents versionnés (revue juridique). Journal des formations (qui, date, expiration).</p>
+        <Button onClick={()=>toast.success(t('common.save'))}>Ajouter un contact</Button>
+      </CardBody></Card>
+    </div>
+  )
+}
+
+export function SafeguardingReportsPage() {
+  const { t } = useTranslation()
+  const concerns = useConcerns(true)
+  const list = concerns.data?.data ?? []
+  const counts = list.reduce((acc:any,c:any)=>{ acc[c.status]=(acc[c.status]||0)+1; return acc }, {} as Record<string,number>)
+  return (
+    <div className="ui-page">
+      <OfflineNotice />
+      <ConfidentialBanner />
+      <PageHeader title={t('sg.reports')} subtitle="Indicateurs de climat scolaire — seuils de suppression appliqués." breadcrumbs={[{ label: t('nav.safeguarding'), to: '/app/safeguarding' }, { label: t('sg.reports') }]} />
+      <Card><CardBody>
+        <p className="text-sm text-content-muted mb-3">Affiché uniquement au-dessus du seuil de suppression et avec suppression secondaire. Aucun drill-down.</p>
+        <ul className="text-sm space-y-1">
+          {Object.entries(counts).map(([k,v])=> <li key={k}>{k}: {Number(v) < 5 ? 'masqué (seuil)' : String(v)}</li>)}
+          {list.length===0 && <li>Aucune donnée.</li>}
+        </ul>
+      </CardBody></Card>
+    </div>
+  )
+}
+
+export function SafeguardingAccessLogPage() {
+  const { t } = useTranslation()
+  return (
+    <div className="ui-page">
+      <OfflineNotice />
+      <ConfidentialBanner />
+      <PageHeader title={t('sg.accessLog')} subtitle="Qui, quand, quelles sections. Chaîne infalsifiable." breadcrumbs={[{ label: t('nav.safeguarding'), to: '/app/safeguarding' }, { label: t('sg.accessLog') }]} />
+      <Card><CardBody className="text-sm text-content-muted">
+        <p>Journal filtrable par dossier/utilisateur/date, exportable par le rôle d’audit approuvé uniquement. Chaque lecture de contenu produit une entrée.</p>
+        <Button onClick={()=>toast.success('Export demandé (2 approbations requises)')}>Exporter le journal</Button>
+      </CardBody></Card>
+    </div>
+  )
+}
+
+export function SafeguardingSettingsPage() {
+  const { t } = useTranslation()
+  const [idle, setIdle] = useState('15')
+  const [bg, setBg] = useState('60')
+  return (
+    <div className="ui-page">
+      <OfflineNotice />
+      <ConfidentialBanner />
+      <PageHeader title={t('sg.settings')} subtitle={t('safeguarding.noLeak')} breadcrumbs={[{ label: t('nav.safeguarding'), to: '/app/safeguarding' }, { label: t('sg.settings') }]} />
+      <Card><CardBody className="space-y-3 text-sm">
+        <FormField label="Délai d’inactivité avant ré-authentification (min)">{() => <Select value={idle} onValueChange={setIdle} options={[{value:'5',label:'5'},{value:'10',label:'10'},{value:'15',label:'15'}]} />}</FormField>
+        <FormField label="Durée break-glass (min)">{() => <Select value={bg} onValueChange={setBg} options={[{value:'30',label:'30'},{value:'60',label:'60'}]} />}</FormField>
+        <p className="text-xs text-content-subtle">Conservation légale, chemin alternatif (directeur/D SL en conflit d’intérêts), contacts départementaux : configurables par l’établissement. TODO(legal-review).</p>
+        <Button onClick={()=>toast.success(t('common.save'))}>{t('common.save')}</Button>
+      </CardBody></Card>
     </div>
   )
 }

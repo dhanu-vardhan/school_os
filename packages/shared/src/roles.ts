@@ -33,6 +33,10 @@ export type Permission =
   | 'library.loans' | 'library.catalogue'
   | 'group.aggregate.read' | 'group.schools.read'
   | 'impersonation.request' | 'featureflags.write'
+  // Guardian portal (PROMPT 005). Granted to family roles only — never to staff.
+  | 'family.read' | 'family.absence.write' | 'family.forms.sign'
+  | 'family.collector.write' | 'family.billing.pay' | 'family.data.request'
+  | 'family.concern.write' | 'family.messages.write'
 
 /** Accepts either the dotted canonical form or a colon-shaped alias. */
 export type PermissionInput = Permission | (string & {})
@@ -54,6 +58,13 @@ const all = new Set<Permission>([
   'library.loans', 'library.catalogue',
 ])
 
+/** Family portal capabilities. Rights are scoped server-side to linked children. */
+const familyPermissions: Permission[] = [
+  'family.read', 'family.absence.write', 'family.forms.sign', 'family.collector.write',
+  'family.billing.pay', 'family.data.request', 'family.concern.write', 'family.messages.write',
+  'activities.read', 'activities.enrol', 'messages.read', 'billing.read', 'finance.invoice.read',
+]
+
 const teaching: Permission[] = [
   'students.read', 'activities.read', 'activities.manage', 'ai.use', 'messages.read', 'messages.write',
   'attendance.record', 'attendance.board', 'grades.publish', 'grades.read',
@@ -73,9 +84,9 @@ const rolePermissions: Record<DisplayRole, Permission[]> = {
   hr: ['students.read', 'members.manage', 'hr.contracts.read', 'hr.leave.review', 'reports.read', 'compliance.read', 'messages.read', 'analytics.read'],
   admissions: ['students.read', 'students.write', 'messages.read', 'messages.write'],
   reception: ['students.read', 'messages.read', 'messages.write', 'activities.read', 'visitors.manage', 'pickups.approve', 'attendance.board', 'analytics.read'],
-  guardian: ['activities.read', 'activities.enrol', 'messages.read', 'messages.write', 'billing.read', 'finance.invoice.read', 'analytics.read'],
-  guardian2: ['activities.read', 'activities.enrol', 'messages.read', 'messages.write', 'billing.read', 'finance.invoice.read', 'analytics.read'],
-  parent: ['activities.read', 'activities.enrol', 'messages.read', 'messages.write', 'billing.read', 'finance.invoice.read', 'analytics.read'],
+  guardian: [...familyPermissions],
+  guardian2: [...familyPermissions],
+  parent: [...familyPermissions],
   student: ['activities.read', 'activities.enrol', 'messages.read', 'messages.write', 'analytics.read'],
   provider: ['activities.read', 'activities.manage', 'messages.read'],
   safeguarding: ['students.read', 'safeguarding.read', 'safeguarding.write', 'compliance.read', 'messages.read', 'security.read', 'security.audit.read', 'analytics.read'],
