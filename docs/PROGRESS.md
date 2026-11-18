@@ -55,8 +55,33 @@
 - Final observed checks: Gradle `--rerun-tasks` BUILD SUCCESSFUL (94 tests, 0 failures/errors/skipped; 55 analytics tests in 9 classes); `pnpm typecheck && pnpm lint && pnpm test && pnpm build` exit 0 (89 Vitest tests, 29 analytics-core + 5 invariants + 10 analytics UI); Playwright analytics 7 passed/1 intentional skip; 7 screenshots in `docs/screenshots/analytics/`.
 - Honest phase report: `docs/PHASE_REPORTS/analytics.md`. Not measured: p95<400 ms at 5,000×5 years, full axe audit. Not implemented: real upstream fact source, XLSX/PDF/object-storage downloads, per-export salt, per-user insight prefs, UI consumption of saved-view API, AI narratives (no pinned model).
 
+## PROMPT 000 — Platform foundations (P0 audit + defect fixes), 2026-11-18 (in progress, uncommitted at audit time → committed as P0)
+
+### Done (this session)
+- **P0 audit:** produced `docs/PART12_PLATFORM_FOUNDATIONS.md` with evidence-based status for **F-1..F-16**, **§4 cross-role defects**, cross-cutting gaps, prioritized P0→P3 plan, sequencing (002→005→006→003→004→008→007→010→011→012→009→013), and residual risks.
+- **Defect #1 (dashboards):** replaced director-clone fallthrough with role-specific, scoped dashboards for all canonical roles in `apps/web/src/pages/Dashboards.tsx` (principal, school-admin, deputy, teacher, parent, student, safeguarding-lead, nurse, finance, HR, IT admin, librarian, receptionist, auditor, analyst, group admin, platform/super-admin). `DashboardSwitch` now resolves via `displayToCanonical` and renders a per-role `data-testid="dashboard-…"`. Leadership-only KPIs (concerns/AI/whole-school overview) are no longer shown to restricted/non-leadership roles.
+- **Defect #2 (nav keys):** reconciled in-flight nav translations and added `apps/web/src/test/nav-i18n.test.tsx` asserting no rendered `nav.*` labels for every canonical role.
+- **Defect #3 (feeds/i18n):** localized remaining English demo-seed strings (safeguarding concern summaries/actions, custody note, AI weekly brief) to French; prior uncommitted finance/feed locale updates retained.
+- **Defect #4 (chart):** not re-verified visually this session; enrolment-by-level bar remains in leadership dashboards and existing robustness intent preserved (needs Playwright/screenshot confirmation).
+- **Defect #5 (brand):** login copy moved to i18n/SchoolOS brand keys (FR-primary), removing hard-coded English marketing/demo labels in key areas; `app.name` remains SchoolOS.
+- **Defect #6 (demo exposure):** login demo picker/banner gated by `config.demoEnabled && config.authMode === 'demo'` (defense-in-depth with server config), demo account query disabled outside demo mode, and dead "Try the demo" affordance removed.
+- **Defect #7 (groupe scolaire):** demo seed already reflects "Groupe scolaire Saint-Denis" (site primaire MS–CM2 + site collège 6e–5e) with distributed pupils/classes; full model/contract completion remains for later prompts/phases.
+- **Tests added:** `apps/web/src/test/role-dashboards.test.tsx` asserts each canonical role landing is reachable, representative forbidden routes are denied, and each role renders its own dashboard (no principal/director clone).
+
+### Verified (this session)
+- `pnpm --filter @schoolos/web typecheck` — **pass**.
+- `pnpm --filter @schoolos/web test` — **pass** (12 files, 125 tests; includes `nav-i18n.test.tsx`, `role-dashboards.test.tsx`, existing access/analytics/screens tests).
+- Not run this session: `pnpm -w` lint/test/typecheck (full workspace), Playwright e2e/screenshots, `cd services/api && JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew test`, `scripts/verify-all.sh`, direct BFF/API access-enforcement proofs for PROMPT 004 P0. Backend untouched by these UI/doc changes but full regression not re-executed.
+
+### In-flight reconciled (kept)
+- Uncommitted P004/P9 foundation items retained: `docs/PART11_FINANCE_AUDIT.md`, `docs/FINANCE_POLICY_FR.md`, finance-scoped `FinanceDashboard` in `apps/web/src/pages/Dashboards.tsx`, locale additions in `packages/i18n/src/locales/{fr,en}.ts`, `docs/DECISIONS.md` P11 entries. Pre-existing unrelated local modifications intentionally untouched: `apps/web/src/main.tsx`, `services/api/src/main/java/com/schoolos/pedagogy/LessonPlan.java`, `apps/web/src/dashboard/`, `docs/DASHBOARD_DESIGN.md`.
+
+### Remaining for PROMPT 000
+- **P0 close-out:** run broader verification as available (workspace/Gradle/Playwright/verify-all) and gather PROMPT 004 route/API access evidence; commit P0 with honest status.
+- **P1:** implement/harden F-1..F-16 (single permission source of truth + `docs/ROLE_MATRIX.md` + CI stale-fail, global role×endpoint expected-outcome matrix, scope resolver/IDOR coverage, unified audit/sensitive reads, policy engine + `docs/POLICY_REGISTER_FR.md`, approvals/delegation, consent/files/import/jobs/calendar/search/flags/i18n/observability, prod-safe demo guards).
+- **P2:** role-agnostic hardening (broader untranslated-key DOM guard, global audit coverage, cross-role defect regressions, PWA/offline-sensitive-data hygiene).
+- **P3:** full verify + docs (`PRODUCTION_READINESS.md`, `ROLE_RESPONSIBILITIES_FR.md`, `TRACEABILITY.md`, `SCREEN_INVENTORY.md`, `ROLE_UI_MAP.md`, `DEMO_SCRIPT.md`, `DEMO_ACCOUNTS.md`, etc.) and production gate (`DemoStartupGuard`/BFF refuse insecure prod states). Then continue prompt registry in order (002→005→006→003→004→008→007→010→011→012→009→013).
+
 ### Resume here
-- Part 8 landed in commit `72f22d4` (`promt8`) on branch `EC2`; the working tree is clean. Do not commit/push without an explicit request.
-- Re-verified 2026-11-17: `pnpm typecheck && pnpm lint && pnpm test && pnpm build` pass (89 tests); Gradle `test` BUILD SUCCESSFUL; Playwright analytics 7 passed / 1 intentional skip.
-- If resuming: first re-read `docs/PHASE_REPORTS/analytics.md` and `docs/GAP_REPORT.md` §“Part 8 analytics addendum”; then re-run `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, `cd services/api && JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew test --console=plain` and `cd apps/web && pnpm exec playwright test e2e/analytics.spec.ts --reporter=line`.
-- Highest-value next work: close A1 by wiring a real `AnalyticsFactSource`; close A3 by consuming `/api/analytics/views` in the UI; add a registered `verify/runner.py` check before promoting any P8 feature from `stubbed`; measure p95 and run a full axe audit.
+- Read `docs/PART12_PLATFORM_FOUNDATIONS.md` and this section first. Re-run `pnpm --filter @schoolos/web typecheck && pnpm --filter @schoolos/web test`; then run broader checks (`pnpm -r typecheck`, `cd services/api && JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew test`, Playwright, `scripts/verify-all.sh`) as environment allows.
+- Do **not** weaken security/RLS tests. Commit P0 before starting P1; never proceed with red tests. Keep pre-existing unrelated local modifications untouched.
