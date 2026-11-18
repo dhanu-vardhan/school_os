@@ -164,6 +164,16 @@ export interface Student {
   version?: number
 }
 
+/** Minimal, non-sensitive child reference used by the family context switcher. */
+export interface LinkedChild {
+  id: ID
+  firstName: string
+  lastName: string
+  classId?: ID
+  className?: string
+  schoolId: ID
+}
+
 export interface Guardian {
   id: ID
   studentIds: ID[]

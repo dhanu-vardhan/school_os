@@ -74,9 +74,27 @@ features:
     roles: [safeguarding,director]
     platform: [web]
     checks: [api,ui,permission]
-    status: stubbed
-    reason: Entity only, no workflow/UI
-    prompt_ref: P3-8
+    status: expected-working
+    reason: Restricted store, intake, triage, case file, decision, transmission, harassment, sharing, break-glass, reports, contacts, access log, settings (web/mock + migration)
+    prompt_ref: P007
+  - id: P3-9-reception
+    module: reception
+    name: Reception front office
+    roles: [receptionist,director]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: expected-working
+    reason: Dashboard, visitors, movements, absences, requests, enrolment, appointments, mail/lost-found, emergency, directory, handover (web + migration)
+    prompt_ref: P008
+  - id: P3-10-operator
+    module: platform
+    name: Platform operator console
+    roles: [super-admin]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: expected-working
+    reason: Tenant lifecycle, health, flags, support, security, compliance, billing, releases, templates, imports, backups, staff, audit, announcements (web + migration)
+    prompt_ref: P009
   - id: SCR-DIR-CLASSES
     module: ui
     name: Director Classes screen
@@ -1369,3 +1387,115 @@ features:
     status: stubbed
     reason: "docs/DEMO_SCRIPT.md documents P1-P6 from packages/shared/src/analytics-demo.ts; every demo response is flagged meta.mock=true; no verify/runner.py check registered"
     prompt_ref: P8-demo
+
+  # PROMPT 005 — Guardian / parent portal (G1–G20)
+  - id: P005-FAMILY-01
+    module: family
+    name: Guardian landing /family dashboard and child scope
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, permission]
+    status: expected-working
+    prompt_ref: P005-G1
+    reason: "Web/shared/mock implemented; guardian Playwright + web unit tests pass. Java API implemented, DB-backed e2e pending."
+  - id: P005-FAMILY-02
+    module: family
+    name: Children overview and restricted/contact visibility
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, permission, tenant]
+    status: expected-working
+    prompt_ref: P005-G2
+  - id: P005-FAMILY-03
+    module: family
+    name: Attendance view and absence declaration (scoped)
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission, tenant]
+    status: partial
+    prompt_ref: P005-G3
+    reason: "Mock/UI flows covered; Java endpoint implemented but not verified against migrated DB."
+  - id: P005-FAMILY-04
+    module: family
+    name: Timetable, homework and read-state tracking
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api]
+    status: partial
+    prompt_ref: P005-G4-G5
+  - id: P005-FAMILY-05
+    module: family
+    name: Grades, bulletins and acknowledgements (no ranking by default)
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission]
+    status: partial
+    prompt_ref: P005-G6
+  - id: P005-FAMILY-06
+    module: family
+    name: Messaging with staff only (no parent↔parent relay)
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission]
+    status: expected-working
+    prompt_ref: P005-G7
+    reason: "Recipient policy enforced in shared/mock/service; abuse/rate-limit governance pending."
+  - id: P005-FAMILY-07
+    module: family
+    name: Announcements and read receipts
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api]
+    status: partial
+    prompt_ref: P005-G8
+  - id: P005-FAMILY-08
+    module: family
+    name: Forms/signatures with signatory rules and withdrawal
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission]
+    status: partial
+    prompt_ref: P005-G9
+    reason: "one/both/legal-representative rules modeled and tested in shared/mock; Java path needs DB-backed parity/security tests."
+  - id: P005-FAMILY-09
+    module: family
+    name: Appointments, activities, canteen and collectors
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission]
+    status: partial
+    prompt_ref: P005-G10-G13
+  - id: P005-FAMILY-10
+    module: family
+    name: Billing with payer-only visibility and step-up payment
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission]
+    status: partial
+    prompt_ref: P005-G14
+    reason: "Split billing and FAMILY_PAY step-up enforced in mock/service; PSP/SEPA production integration pending."
+  - id: P005-FAMILY-11
+    module: family
+    name: Documents with request/download, watermark and audit intent
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission, tenant]
+    status: partial
+    prompt_ref: P005-G15
+  - id: P005-FAMILY-12
+    module: family
+    name: Preferences, devices, consents, data requests and help/concerns
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission]
+    status: partial
+    prompt_ref: P005-G16-G19
+  - id: P005-FAMILY-13
+    module: family
+    name: Invitations, restrictions, 18-year policy and revocable ICS feeds
+    roles: [guardian]
+    platform: [web]
+    checks: [ui, api, permission, tenant]
+    status: partial
+    prompt_ref: P005-G20
+    reason: "Cross-cutting flows implemented in web/mock and started in Java; DB-backed IDOR/revocation/expiry/invitation tests pending. Legal/DPIA open."

@@ -4,6 +4,8 @@ import com.schoolos.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -29,6 +31,7 @@ public class LessonPlan extends BaseEntity {
     private LocalDate plannedDate;
 
     /** Stable slot key used until a timetable aggregate exists (ISO day-of-week, 1–7). */
+    @JdbcTypeCode(SqlTypes.SMALLINT)
     @Column(name = "day_of_week")
     private Integer dayOfWeek;
 

@@ -1,6 +1,8 @@
 import { API_ROLE, makeDemoData } from '@schoolos/shared'
 import { bodyOf, getDb, matchId, mutateDb } from './db'
+import { sessionStore } from '../session-store'
 import { analyticsRequest } from './analytics'
+import { familyRoutes } from './family'
 import type { Method, RequestSpec } from '../http'
 import type { ApiResponse } from '../client'
 
@@ -68,6 +70,7 @@ function mockActiveSession(user: NonNullable<ReturnType<typeof demoUser>>, schoo
 type Handler = (path: string, method: Method, body: any) => ApiResponse<any> | null
 
 const routes: Array<[RegExp, Method[], Handler]> = [
+  ...familyRoutes(),
   [/^\/config$/, ['GET'], () => ok({
     appName: 'SchoolOS', version: '0.0.1', defaultLocale: 'fr', locales: ['fr', 'en'],
     authMode: 'demo', demoEnabled: true, apiBasePath: '/api', timezone: 'Europe/Paris',
@@ -116,7 +119,12 @@ const routes: Array<[RegExp, Method[], Handler]> = [
     const user = getDb().users.find(u => u.schoolId === body?.schoolId) ?? getDb().users[0]
     return ok(mockSession(user, body?.schoolId))
   }],
-  [/^\/auth\/mfa\/step-up$/, ['POST'], () => ok(mockSession(getDb().users[0]))],
+  [/^\/auth\/mfa\/step-up$/, ['POST'], () => {
+    // Step-up re-authenticates the *current* account; it must never swap the session identity.
+    const current = sessionStore.get()
+    if (!current.user) return ok(mockSession(getDb().users[0]))
+    return ok({ ...current, user: { ...current.user, mfa: true, stepUpUntil: Date.now() + 10 * 60_000 } })
+  }],
   [/^\/auth\/mfa\/enroll\/start$/, ['POST'], () => ok({
     secret: 'JBSWY3DPEHPK3PXP', otpauthUrl: 'otpauth://totp/SchoolOS:demo?secret=JBSWY3DPEHPK3PXP&issuer=SchoolOS',
     backupCodes: ['1111-2222', '3333-4444', '5555-6666'],
@@ -319,8 +327,10 @@ const notFound = () => { throw Object.assign(new Error('NOT_FOUND'), { status: 4
 
 export function mockRequest<T = any>(spec: RequestSpec): ApiResponse<T> {
   const { path, method, body } = spec
+  // Query strings carry filters only; handlers still receive the full path to read them.
+  const pathname = path.split('?')[0]
   for (const [pattern, methods, handler] of routes) {
-    if (!pattern.test(path) || !methods.includes(method)) continue
+    if (!pattern.test(pathname) || !methods.includes(method)) continue
     const result = handler(path, method, body)
     if (result) return result as ApiResponse<T>
   }

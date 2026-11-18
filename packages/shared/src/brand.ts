@@ -1,8 +1,8 @@
 import type { BrandConfig } from './types'
 
 export const DEFAULT_BRAND: BrandConfig = {
-  name: 'Acadia',
-  tagline: 'School Management Platform',
+  name: 'SchoolOS',
+  tagline: 'Plateforme de gestion scolaire',
   logoMark: 'graduation-cap-bars',
 }
 

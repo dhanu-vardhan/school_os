@@ -9,10 +9,12 @@ import {
 import {
   Avatar, Badge, Button, CommandPalette, DropdownMenu, IconButton, Modal, Tooltip, toast,
 } from '@schoolos/ui'
-import { SHOW_UI_KIT, useNotifications } from '@schoolos/api-client'
+import { SHOW_COMING_SOON, SHOW_UI_KIT, useNotifications } from '@schoolos/api-client'
+import { CANONICAL_ROLE_LABEL_KEY, availableContexts, displayToCanonical, landingRouteFor, navGroupsForRole } from '@schoolos/shared'
 import { useSession } from '../app/session'
 import { usePreferences, type Theme } from '../app/preferences'
-import { ALL_NAV_ITEMS, visibleNavGroups } from '../app/nav'
+import { useUiContext } from '../app/context'
+import { navIcon } from '../app/nav-icons'
 import { useOnline } from '../app/hooks'
 import { prefetchNavigation } from '../app/prefetch'
 import { useGlobalShortcuts } from '../app/shortcuts'
@@ -20,6 +22,7 @@ import { navigateWithTransition } from '../app/view-transitions'
 import { getNavigationGuard, subscribeNavigationGuard } from '../app/navigation-guard'
 import { QuickAddDialog, ShortcutsHelpDialog } from './ShortcutDialogs'
 import { MockNotice } from './Screen'
+import { RouteGuard } from '../access'
 
 function SchoolSwitcher() {
   const { t } = useTranslation()
@@ -49,6 +52,57 @@ function SchoolSwitcher() {
         },
       }))}
     />
+  )
+}
+
+function RoleSwitcher() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { roles, role } = useSession()
+  const { viewingRole, setViewingRole } = useUiContext()
+  const contexts = availableContexts(roles)
+  if (contexts.length < 2) return null
+  const active = viewingRole ?? role
+  return (
+    <DropdownMenu
+      trigger={
+        <Button variant="outline" size="sm" className="hidden max-w-44 gap-2 md:inline-flex">
+          <span className="truncate">{t('common.viewingAs', { role: t(CANONICAL_ROLE_LABEL_KEY[contexts.find(c => c.role === displayToCanonical(active))?.role ?? contexts[0].role]) })}</span>
+          <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+        </Button>
+      }
+      items={contexts.map(context => ({
+        label: t(CANONICAL_ROLE_LABEL_KEY[context.role]),
+        onSelect: () => {
+          if (displayToCanonical(active) === context.role) return
+          setViewingRole(context.role)
+          navigate(landingRouteFor(context.role))
+        },
+      })).concat([{ label: t('role.switchReset'), onSelect: () => { setViewingRole(undefined); navigate('/') } }])}
+    />
+  )
+}
+
+function ContextBanners() {
+  const { t } = useTranslation()
+  const { role } = useSession()
+  const { impersonation, endImpersonation } = useUiContext()
+  const canonical = displayToCanonical(role)
+  const confidential = canonical === 'safeguarding-lead' || canonical === 'nurse'
+  const readOnly = canonical === 'auditor'
+  if (!confidential && !readOnly && !impersonation) return null
+  const seconds = impersonation ? Math.max(0, Math.round((impersonation.endsAt - Date.now()) / 1000)) : 0
+  return (
+    <div className="space-y-2" role="status">
+      {confidential && <div className="rounded-lg bg-slate-800 px-4 py-2 text-center text-sm font-medium text-neutral-0">{t('access.confidential')}</div>}
+      {readOnly && <div className="rounded-lg bg-surface-2 px-4 py-2 text-center text-sm font-medium text-content-muted">{t('access.readOnly')}</div>}
+      {impersonation && (
+        <div className="flex flex-wrap items-center justify-center gap-3 rounded-lg bg-warning-50 px-4 py-2 text-sm text-warning-800 dark:bg-warning-500/15 dark:text-warning-200">
+          <span>{t('access.impersonating', { name: impersonation.label, time: `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` })}</span>
+          <Button size="sm" variant="outline" onClick={endImpersonation}>{t('access.endSession')}</Button>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -99,7 +153,8 @@ export function AppShell() {
   const location = useLocation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { session, role, logout } = useSession()
+  const { session, role, roles, schoolId, stepUpActive, logout } = useSession()
+  const { impersonation } = useUiContext()
   const online = useOnline()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
@@ -107,7 +162,15 @@ export function AppShell() {
   const [helpOpen, setHelpOpen] = useState(false)
   const [pendingPath, setPendingPath] = useState<string | null>(null)
   const [, forceGuardRender] = useState(0)
-  const groups = useMemo(() => visibleNavGroups(role, SHOW_UI_KIT), [role])
+  const canonical = displayToCanonical(role)
+  const groups = useMemo(
+    () => navGroupsForRole(canonical, {
+      role, roles, schoolId, stepUpActive,
+      featureFlags: { SHOW_UI_KIT, SHOW_COMING_SOON },
+      impersonating: !!impersonation,
+    }, { includeSoon: SHOW_COMING_SOON }),
+    [canonical, role, roles, schoolId, stepUpActive, impersonation],
+  )
 
   useEffect(() => { setSidebarOpen(false) }, [location.pathname])
 
@@ -145,9 +208,16 @@ export function AppShell() {
     onEscape: closeSidebar,
   })
 
-  const commandItems = ALL_NAV_ITEMS
-    .filter(item => (!item.devOnly || SHOW_UI_KIT) && (!item.permission || groups.some(g => g.items.includes(item))))
-    .map(item => ({ id: item.to, label: t(item.labelKey), group: t('common.actions'), icon: <item.icon className="h-4 w-4" />, onSelect: () => goTo(item.to) }))
+  const commandItems = groups.flatMap(group => group.items.map(item => {
+    const Icon = navIcon(item.icon)
+    return {
+      id: item.path,
+      label: t(item.labelKey),
+      group: t(group.labelKey),
+      icon: <Icon className="h-4 w-4" />,
+      onSelect: () => goTo(item.path),
+    }
+  }))
 
   return (
     <div className="min-h-screen bg-app text-content"
@@ -184,15 +254,18 @@ export function AppShell() {
             <div key={group.labelKey}>
               <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-sidebar-text/50">{t(group.labelKey)}</p>
               <div className="space-y-0.5">
-                {group.items.map(item => (
-                  <NavLink key={item.to} to={item.to}
-                    onMouseEnter={() => warm(item.to)}
-                    onFocus={() => warm(item.to)}
-                    className={({ isActive }) => `focus-ring flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${isActive ? 'bg-brand-600 font-semibold text-neutral-0' : 'text-sidebar-text/80 hover:bg-sidebar-text/10 hover:text-neutral-0'}`}>
-                    <item.icon className="h-4 w-4 shrink-0" aria-hidden />
-                    <span className="truncate">{t(item.labelKey)}</span>
-                  </NavLink>
-                ))}
+                {group.items.map(item => {
+                  const Icon = navIcon(item.icon)
+                  return (
+                    <NavLink key={item.path} to={item.path}
+                      onMouseEnter={() => warm(item.path)}
+                      onFocus={() => warm(item.path)}
+                      className={({ isActive }) => `focus-ring flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${isActive ? 'bg-brand-600 font-semibold text-neutral-0' : 'text-sidebar-text/80 hover:bg-sidebar-text/10 hover:text-neutral-0'}`}>
+                      <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                      <span className="truncate">{t(item.labelKey)}</span>
+                    </NavLink>
+                  )
+                })}
               </div>
             </div>
           ))}
@@ -221,6 +294,7 @@ export function AppShell() {
             {!online && <Badge tone="warning" dot>{t('common.offline')}</Badge>}
             <MockNotice mock compact />
             <div className="hidden sm:block"><SchoolSwitcher /></div>
+            <RoleSwitcher />
             <NotificationBell />
             <LanguageThemeControls />
             <Tooltip content={t('shortcuts.help')}>
@@ -237,20 +311,24 @@ export function AppShell() {
           </div>
         </header>
 
+        <ContextBanners />
         <main key={location.pathname} id="main-content" className="ui-route-in mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <Outlet />
+          <RouteGuard><Outlet /></RouteGuard>
         </main>
       </div>
 
       <nav aria-label={t('nav.more')} className="ui-safe-bottom ui-glass fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-line px-2 py-1.5 lg:hidden">
-        {groups.flatMap(g => g.items).slice(0, 5).map(item => (
-          <NavLink key={item.to} to={item.to}
-          onMouseEnter={() => warm(item.to)}
-          onFocus={() => warm(item.to)}
-          className={({ isActive }) => `focus-ring flex min-w-14 flex-col items-center gap-0.5 rounded-md px-2 py-1 text-[10px] ${isActive ? 'text-brand-600 dark:text-brand-300' : 'text-content-subtle'}`}>
-            <item.icon className="h-5 w-5" /><span className="max-w-16 truncate">{t(item.labelKey)}</span>
-          </NavLink>
-        ))}
+        {groups.flatMap(g => g.items).slice(0, 5).map(item => {
+          const Icon = navIcon(item.icon)
+          return (
+            <NavLink key={item.path} to={item.path}
+            onMouseEnter={() => warm(item.path)}
+            onFocus={() => warm(item.path)}
+            className={({ isActive }) => `focus-ring flex min-w-14 flex-col items-center gap-0.5 rounded-md px-2 py-1 text-[10px] ${isActive ? 'text-brand-600 dark:text-brand-300' : 'text-content-subtle'}`}>
+              <Icon className="h-5 w-5" /><span className="max-w-16 truncate">{t(item.labelKey)}</span>
+            </NavLink>
+          )
+        })}
       </nav>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} items={commandItems} />

@@ -13,7 +13,7 @@ import {
   acceptInvitation, authSignIn, currentDemoTotp, demoSignIn, forgotPassword, resetPassword,
   sessionStore, useDemoAccounts, verifyMfa,
 } from '@schoolos/api-client'
-import { ROLE_ACCENT, ROLE_FAMILY, toDisplayRole } from '@schoolos/shared'
+import { ROLE_ACCENT, ROLE_FAMILY, landingRouteFor, postLoginRoute, toDisplayRole } from '@schoolos/shared'
 import type { DemoAccount, MfaChallenge } from '@schoolos/shared'
 import { useSession } from '../app/session'
 import { PageHeader } from '../components/Screen'
@@ -43,6 +43,7 @@ export function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const [params] = useSearchParams()
   const { config, refresh } = useSession()
   const [schoolId, setSchoolId] = useState<string | undefined>()
   const [identifier, setIdentifier] = useState('')
@@ -53,7 +54,8 @@ export function LoginPage() {
   const [challenge, setChallenge] = useState<Challenge>()
   const [code, setCode] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const accountsQuery = useDemoAccounts(config.demoEnabled)
+  const demoAllowed = !!config.demoEnabled && config.authMode === 'demo'
+  const accountsQuery = useDemoAccounts(demoAllowed)
 
   const schools = useMemo(() => {
     const map = new Map<string, string>()
@@ -66,8 +68,11 @@ export function LoginPage() {
     await qc.invalidateQueries()
     await refresh()
     const stored = sessionStore.get()
-    const target = (stored.user?.memberships?.length ?? 0) > 1 && !schoolId ? '/schools/select' : '/app/dashboard'
-    navigate(target, { replace: true })
+    if ((stored.user?.memberships?.length ?? 0) > 1 && !schoolId) {
+      navigate('/schools/select', { replace: true })
+      return
+    }
+    navigate(postLoginRoute(params.get('returnTo'), stored.user?.roles), { replace: true })
   }
 
   async function handleResult(result: Awaited<ReturnType<typeof authSignIn>>['data'] | Awaited<ReturnType<typeof demoSignIn>>['data']) {
@@ -178,10 +183,10 @@ export function LoginPage() {
   }
 
   const benefits = [
-    { icon: Sparkles, label: 'Smarter School Management' },
-    { icon: Mail, label: 'Real-Time Communication' },
-    { icon: GraduationCap, label: 'Academic Performance Tracking' },
-    { icon: Building2, label: 'Connected School Community' },
+    { icon: Sparkles, label: t('auth.benefit1') },
+    { icon: Mail, label: t('auth.benefit2') },
+    { icon: GraduationCap, label: t('auth.benefit3') },
+    { icon: Building2, label: t('auth.benefit4') },
   ]
 
   return (
@@ -213,10 +218,10 @@ export function LoginPage() {
         <div className="relative z-10 space-y-8">
           <BrandLockup />
           <h1 className="max-w-[22rem] text-balance text-4xl font-bold leading-tight lg:text-[56px]">
-            One Platform. Every School Connection.
+            {t('auth.brandHeadline')}
           </h1>
           <p className="max-w-[34rem] text-lg text-brand-100 lg:text-xl">
-            Bringing parents, teachers, students and school administrators together through one intelligent platform.
+            {t('auth.brandSubheadline')}
           </p>
           <ul className="space-y-3">
             {benefits.map(b => (
@@ -239,12 +244,12 @@ export function LoginPage() {
             <p className="mt-1 text-sm text-content-muted">{t('auth.subtitle')}</p>
           </div>
           {error && <Banner tone="danger" title={t('state.error')}>{error}</Banner>}
-          {config.demoEnabled && <Banner tone="info" title={t('auth.demoOnly')} />}
+          {demoAllowed && <Banner tone="info" title={t('auth.demoOnly')} />}
           <form onSubmit={submitPassword} className="mt-4 space-y-4">
-            <FormField label="School ID / School Code" required>
+            <FormField label={t('auth.schoolCode')} required>
               {field => (
                 <Input {...field} value={schoolId ?? ''} onChange={e => setSchoolId(e.target.value || undefined)}
-                  placeholder="Ask your school for your code" autoComplete="organization" />
+                  placeholder={t('auth.schoolCodePlaceholder')} autoComplete="organization" />
               )}
             </FormField>
             <FormField label={t('auth.email')} required>
@@ -260,7 +265,7 @@ export function LoginPage() {
                     onChange={e => setPassword(e.target.value)} className="pr-20" />
                   <Button type="button" variant="bare" size="sm" onClick={() => setShowPassword(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-brand-700 hover:underline dark:text-brand-300">
-                    {showPassword ? 'Hide' : 'Show'}
+                    {showPassword ? t('auth.hide') : t('auth.show')}
                   </Button>
                 </div>
               )}
@@ -276,22 +281,19 @@ export function LoginPage() {
             </Button>
             {config.passkeyEnabled && (
               <Button type="button" variant="outline" className="h-12 w-full rounded-full">
-                Sign in with a passkey
+                {t('auth.passkey')}
               </Button>
             )}
             <div className="text-center">
               <Link to="/support" className="text-sm font-medium text-brand-700 hover:underline dark:text-brand-300">
-                Help &amp; Support
+                {t('auth.helpSupport')}
               </Link>
             </div>
-            {config.demoEnabled && (
-              <div className="space-y-2 border-t border-line pt-4">
-                <Button type="button" variant="outline" className="w-full" onClick={() => { /* demo picker below */ }}>
-                  Try the demo
-                </Button>
+            {demoAllowed && (
+              <div className="space-y-3 border-t border-line pt-4">
+                <p className="text-center text-xs font-semibold uppercase tracking-wide text-content-subtle">{t('auth.tryDemo')}</p>
                 <div className="grid max-h-[40vh] gap-2 overflow-y-auto">
                   {accountsQuery.data?.data?.accounts?.filter(a => !a.legacy && (!schoolId || a.schools.some(s => s.id === schoolId))).map(account => {
-                    const role = toDisplayRole(account.role) ?? account.role.toLowerCase()
                     return (
                       <Button key={account.key} variant="bare" onClick={() => void pickDemo(account)}
                         disabled={busy !== undefined}
@@ -310,14 +312,14 @@ export function LoginPage() {
             )}
           </form>
           <p className="mt-4 flex items-center justify-center gap-2 text-xs text-content-subtle">
-            <ShieldCheck className="h-3.5 w-3.5" /> Protected sign-in
+            <ShieldCheck className="h-3.5 w-3.5" /> {t('auth.protectedSignIn')}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-content-subtle">
             <span>FR / EN</span>
             <span>·</span>
-            <span>Terms</span>
+            <span>{t('auth.terms')}</span>
             <span>·</span>
-            <span>Privacy Policy</span>
+            <span>{t('auth.privacy')}</span>
             <span>·</span>
             <span>v0.0.1</span>
           </div>
@@ -343,7 +345,7 @@ export function SchoolSelectPage() {
     try {
       await switchSchool(id)
       toast.success(t('common.school'))
-      navigate('/app/dashboard', { replace: true })
+      navigate(landingRouteFor(sessionStore.get().user?.roles), { replace: true })
     } catch {
       toast.error(t('state.error'))
     } finally { setBusy(false) }
@@ -528,7 +530,7 @@ export function ForbiddenPage() {
         <h1 className="mt-4 font-display text-2xl font-bold text-content">{t('auth.forbidden')}</h1>
         <p className="mt-2 text-sm text-content-muted">{t('auth.forbiddenBody')}</p>
         <div className="mt-6 flex flex-col gap-2">
-          <Button asChild><Link to="/app/dashboard">Go to my dashboard</Link></Button>
+          <Button asChild><Link to="/">Go to my dashboard</Link></Button>
           <Button asChild variant="outline"><Link to="/app/platform/support">Request access</Link></Button>
         </div>
       </Card>
@@ -544,7 +546,7 @@ export function NotFoundPage() {
       <p className="mt-4 font-display text-6xl font-bold text-brand-500">404</p>
       <h1 className="mt-2 font-display text-2xl font-bold text-content">{t('auth.notFound')}</h1>
       <p className="mt-2 text-sm text-content-muted">{t('auth.notFoundBody')}</p>
-      <Button asChild className="mt-6"><Link to="/app/dashboard">{t('auth.goHome')}</Link></Button>
+      <Button asChild className="mt-6"><Link to="/">{t('auth.goHome')}</Link></Button>
     </div>
   )
 }

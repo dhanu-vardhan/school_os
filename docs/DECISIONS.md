@@ -172,3 +172,82 @@
 | A8-7 | Frontend display role `analyst` maps to API `DATA_ANALYST`/`ANALYST`; mock display roles `admin`→`school_admin` and `operator`→`group_admin`. | Legacy demo labels and modern API roles must coexist without weakening server-side scope checks. |
 | A8-8 | Frontend permissions are `analytics.read`, `analytics.student`, `analytics.configure`, `analytics.export`; mock and types are imported type-only by the production client. | Deny-by-default parity between UI gating (UX only) and the authoritative backend policy. |
 | A8-9 | URL is the single source of truth for analytics filters; saved views are in-memory only until a governed server store exists; no `localStorage`/`sessionStorage` writes for analytics filters. | Shareable, deterministic views without persisting sensitive filter state in browser storage (AGENTS.md rule 5). |
+
+## 2026-11-18: Part 9 — direction operations (P0 audit/foundations, in progress)
+
+| # | Decision | Reason |
+|---|---|---|
+| P9-1 | Unify product branding to **SchoolOS** in shared brand config and i18n `app.name`/taglines; keep historical references in dated docs/reports unchanged. | Removes "Acadia" vs "SchoolOS" inconsistency (defect #6) without rewriting project history. |
+| P9-2 | Fix raw sidebar keys by adding `nav.settings` and `nav.auditLog` translations (FR/EN) and keep existing aliases (`nav.schoolSettings`, `nav.audit`) for compatibility. | Restores readable direction navigation labels with minimal risk to other consumers. |
+| P9-3 | Remove blanket "Données partielles" partial-module banner from implemented director dashboard views while retaining mock indicators and keeping `state.partial` for genuinely unimplemented/placeholder states. | Defect #7: avoid misleading users once modules are present; mock data is still disclosed separately. |
+| P9-4 | Localize demo notification/feed content in the shared mock seed to French primary copy. | Defect #2: director activity feed must match the FR-first experience. |
+| P9-5 | Scope teacher dashboard KPIs/lists to the signed-in teacher by matching `session.user.name` to class ownership and filtering timetable/students accordingly (with safe fallback to avoid empty UI when linkage is missing). | Defect #4: prevents cross-teacher visibility in the UI; backend/object-scope enforcement remains required for authoritative isolation. |
+| P9-6 | Make enrolment-by-level bar rendering robust with explicit column height and minimum visible bar height for non-zero values. | Defect #3: ensures "Effectif par niveau" renders reliably across layouts. |
+| P9-7 | Model the demo as a **groupe scolaire** with two sites/cycles under one direction context: **Site Primaire Saint-Denis** (maternelle/élémentaire, MS–CM2) and **Site Collège Les Lilas** (collège, 6e–5e+), with pupils distributed across both sites/cycles (≥16) and direction scenarios (coverage, validations, delegations, compliance) attached to the appropriate site/cycle. | Defect #8 and D/E requirements: reflects French multi-cycle school operations and enables scoped direction/deputy/teacher workflows. Detailed implementation is phased into seed, types, mock/API contracts, and migrations as direction operations land. |
+| P9-8 | Permission vocabulary parity between UI (dotted) and API (string constants) must be handled via an explicit mapping layer during P1; no implicit allow on unknown/unnamed permissions. | Safer default under AGENTS.md non-negotiable authorization rules while shared/BFF/API foundations converge. |
+
+## 2026-11-18: Part 11 — Finance role (PROMPT 004, P0 scope & policy decisions)
+
+| # | Decision | Reason |
+|---|---|---|
+| P11-1 | Target **private schools first** (sous contrat d’association via OGEC-type association, or hors contrat) for the finance operations module: contribution des familles, cantine, garderie/étude, activities, trips, deposits, scholarships/discounts, SEPA collection, dunning, and accounting export. Support **périscolaire/services run by the school** (garderie, cantine, clubs). Implement **EPLE-style separation of duties** (ordonnateur / gestionnaire / agent comptable pattern: preparer / approver / treasurer) only as a **configurable pattern and export hooks**, without claiming to replace public-sector accounting (M9.6/GFC) or implementing public-sector budget law. | Matches French organizational reality cited in PROMPT 004 and keeps legal/operational scope honest. |
+| P11-2 | Keep the demo/seed as **"École Primaire Saint-Denis" (private school group, groupe scolaire)** for finance scenarios. Add a **public/private school setting** that toggles which finance modules/capabilities appear; private is the default for the finance demo. | Provides a coherent demo target while allowing future configuration without hard-coding public-sector behavior. |
+| P11-3 | Implement cited French/regulatory rules as **configurable policy with code comments `// verify with expert-comptable / current legislation`** (and documented defaults/sources in `docs/FINANCE_POLICY_FR.md`), never as hard legal assertions. Thresholds, calendars, and legal wording are parameterized and marked for human/legal/accounting review. | The agent is not the legal authority and thresholds/rules change; production safety requires explicit verification points. |
+| P11-4 | Use **integer minor units (cents) + ISO currency** everywhere for money (DB/Java/TS/shared), no floating point; deterministic allocation/rounding helpers with tests. Financial records are **append-only/immutable by correction** (credit notes/reversing entries), with **gap-free serialized numbering** per series/fiscal year and a **double-entry balanced ledger** invariant. | Money-grade correctness and auditability for family funds and school accounting. |
+| P11-5 | Treat finance as a **high-sensitivity domain**: deny-by-default permissions, server-side four-eyes/preparer!=approver, step-up/MFA for sensitive actions, field-level encryption + masked/audited reveal for IBAN/income docs, no PII/IBAN/amount-per-family in logs/traces/errors/URLs/analytics/AI/notifications, strict tenant isolation (RLS on every finance table) and guardian IDOR controls. **Never weaken existing security tests.** | Handles family bank data and school funds with least privilege and evidence-backed controls. |
+| P11-6 | Integrate external/payment/accounting capabilities via **ports/adapters** (`PaymentProvider`, `BankStatementParser`, `SepaFileGenerator`, `EInvoiceReceiver`, `AccountingExporter`) with **deterministic fakes** for demo/tests and documented production slots. No direct card data handling (PSP hosted fields/redirect, 3-DS/SCA, verified+idempotent webhooks); EU-hosted/PSP/PDP choices are human/vendor decisions recorded in `docs/DECISIONS.md` when made. | Enables safe, testable integration boundaries and avoids PCI/operational overreach in code. |
+| P11-7 | P0 finance defect remediation priorities: remove all cross-domain leaks from finance landing/nav/API (safeguarding counts/details, attendance, school messages/announcements, pupil creation, director actions, "Open reports" count), enforce finance vs restricted routes/APIs (UI + BFF + API, verified by Playwright and direct API calls), fix `nav.settings` globally with untranslated-key DOM test for every role, and localize activity/feed content via app i18n (not browser translation). | Establishes a safe baseline before implementing finance operations features. |
+
+## 2026-11-18: PROMPT 005 — Guardian/parent portal (P1–P4, in progress)
+
+| # | Decision | Reason |
+|---|---|---|
+| G5-1 | Use a dedicated family domain in shared (`packages/shared/src/family/*`) and stateful mock/API client as the G1–G20 contract source, with canonical landing `/family`, `/family/*` routes, and `family.read/write/pay` permissions granted only to guardian roles. | Keeps guardian scope/UX explicit, testable, and separated from legacy `/parent` behavior while enabling incremental backend parity. |
+| G5-2 | Derive guardian identity and accessible children from session/JWT and active `guardian_child` links server-side (and session in mock); never accept `school_id` or guardian/child scope from client input. V7 enforces tenant RLS + explicit guardian link checks. | Enforces AGENTS.md rule 1 and prevents IDOR/cross-tenant leakage by construction. |
+| G5-3 | Model restrictions, authority, signatories, invitations, consents, and 18-year access as explicit flags/policy (no custody inference). Mirror pure policy rules in TypeScript and Java with independent tests. | Legal/safety correctness must not depend on heuristics; parity tests reduce silent weakening across layers. |
+| G5-4 | Treat `FAMILY_PAY` as sensitive (`stepUpRequired`) and require an active step-up for invoice payment in the Java service, in addition to permission checks. | Payment actions are high-risk and must not proceed on a stale session. |
+| G5-5 | Implement initial Java backend with `FamilyService`/`FamilyController` over JDBC (direct SQL) and V7 schema, recording audit/signature/receipt events for covered actions; `FamilyRepository` scaffolding removed as unused/broken to unblock compilation. | Delivers a compiling, scoped API surface quickly while keeping RLS/append-only tables as the durable foundation; full parity and DB-backed security tests remain required. |
+| G5-6 | Keep legal notices, mandatory-notice/office-hours policy, DPIA, a11y, and FR/EN legal/copy review explicitly open as human/TODO items; do not mark production-complete. | Compliance and legal validity require DPO/legal/human review beyond implementation. |
+
+## 2026-11-18: PROMPT 000 — Platform foundations P0 (defect fixes)
+
+| # | Decision | Reason |
+|---|---|---|
+| P000-1 | Map dashboards by canonical role (`displayToCanonical`) and render a dedicated, scoped landing per canonical role; non-leadership/restricted roles must not receive director/principal overview KPIs (safeguarding counts, AI pending, whole-school aggregates) unless explicitly permitted and appropriate to their scope. | Fixes cross-role dashboard leakage (PROMPT 000 §4 defect 1) while preserving deny-by-default, role-appropriate UX. |
+| P000-2 | Gate demo UI in the web app on **both** `config.demoEnabled` and `config.authMode === 'demo'` (server-authoritative), disable demo account fetch outside demo mode, and remove inert demo affordances. | Defense-in-depth so "Try the demo" role list is not shown in production/OIDC deployments even under misconfiguration, complementing BFF/API startup guards. |
+| P000-3 | Add automated guards for P0 defects: `apps/web/src/test/nav-i18n.test.tsx` (no rendered `nav.*` labels for all canonical roles) and `apps/web/src/test/role-dashboards.test.tsx` (landing reachability, representative forbidden routes, and non-clone dashboard per role). | Prevents regression of nav i18n, landing/forbidden-route correctness, and director-dashboard leakage. |
+
+## PROMPT 007 — Safeguarding & harassment referent
+
+- Restricted store is a separate PostgreSQL schema `sg` with forced RLS and school_id, not the public `safeguarding_concern` table (legacy retained for compatibility). Content never reaches dashboards, search, notifications, analytics, AI, logs, or exports.
+- Nobody gets content access by role alone: authorization is the case access list (`sg_access_grant`); director requires explicit grant + step-up.
+- Break-glass defaults to 60 minutes, reason mandatory, alert to case owner and director without content, post-hoc review task.
+- Export requires two-person approval, watermark (user, timestamp, case id, hash), expiring signed link; disabled for demo accounts.
+- Legal hold blocks deletion; deletion irreversible and audited; no hard delete by operators.
+- SchoolOS never files with authorities; it prepares copy-ready records and tracks human transmission (to, when, by whom, reference, acknowledgement).
+- Family is informed of IP transmission unless contrary to the child's interest; rationale documented in `sg_decision`.
+- Immediate-danger gate blocks submission until caller acknowledges calling 17/112/119.
+- Conflict-of-interest routing excludes conflicted persons and routes to configured alternates; no reporting step may be blocked by approval (art. 40 CPP individual duty).
+- Safeguarding content is never cached offline; UI shows clear offline message.
+- Categories wording, templates, retention schedule, départemental contacts remain TODO(legal-review).
+
+## PROMPT 008 — Reception / front office
+
+- Role key confirmed: display `receptionist` (BFF `reception`); landing `/reception` (legacy `/front-office` retained).
+- Pupil data at desk is minimal by design: name, class, present/absent today; guardian/collector details revealed only when needed and audited.
+- Restrictions shown as action cues ("refuser l'accès — voir direction"), not legal details.
+- Visitor data retention default ≤ 1 year, configurable, decided with DPO.
+- Unknown collector → block and call guardian from emergency contacts; director exception required.
+- Reception cannot approve sensitive changes (court orders, payer, authority flags) — creates approval for director.
+- Emergency roll includes pupils present, staff on site, visitors/providers on site, guardian emergency numbers; offline encrypted packet with TTL, cleared on logout; daily PDF for paper storage.
+- Alert triggers support exercise mode; post-event report for safety register.
+- Kiosk mode: large-touch, auto-lock, privacy screen when idle.
+- Certificates numbered, issued per policy; above-policy requests go to director.
+
+## PROMPT 009 — Platform operator
+
+- Platform plane (operator) and tenant plane (school) are distinct permission namespaces (platform.* vs school permissions); operator tokens rejected by tenant data endpoints except via approved support session.
+- No standing access to pupil PII; support session is read-only, masked by default, time-boxed, with school director approval and platform four-eyes for high-risk scopes.
+- Four-eyes for destructive/high-impact actions; WebAuthn-only for platform admins; no shared accounts.
+- Tenant-visible audit: schools see every platform-side access to their tenant.
+- Operator acts as RGPD processor (sous-traitant); DPA per school.

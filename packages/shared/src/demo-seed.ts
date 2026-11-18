@@ -4,6 +4,7 @@ import type {
   School, Student, Activity, ActivityOffering, TimetableEvent, AttendanceRecord,
 } from './types'
 import type { DisplayRole } from './roles'
+import { makeFamilyData, type FamilyData } from './family/seed'
 
 // Local alias so this file can be authored before index.ts is regenerated.
 type Role = DisplayRole
@@ -38,6 +39,8 @@ export interface DemoData {
   timetable: TimetableEvent[]
   attendance: AttendanceRecord[]
   dataRequests: DataExportRequest[]
+  /** PROMPT 005 guardian portal state (see packages/shared/src/family). */
+  family: FamilyData
 }
 
 export const SCHOOL_A = '11111111-1111-4111-8111-111111111111'
@@ -51,14 +54,16 @@ const names = [
 ] as const
 
 const classes: ClassGroup[] = [
-  { id: 'c-ms', name: 'Moyenne Section A', level: 'MS', teacher: 'Amélie Roux', room: 'Salle 04', headcount: 22, capacity: 24, attendanceToday: 21 },
-  { id: 'c-cp', name: 'CP A', level: 'CP', teacher: 'Élise Martin', room: 'Salle 08', headcount: 23, capacity: 25, attendanceToday: 22 },
-  { id: 'c-ce1', name: 'CE1 B', level: 'CE1', teacher: 'Inès Diallo', room: 'Salle 10', headcount: 24, capacity: 26, attendanceToday: 24 },
-  { id: 'c-ce2', name: 'CE2 A', level: 'CE2', teacher: 'Laura Perrin', room: 'Salle 11', headcount: 21, capacity: 26, attendanceToday: 20 },
-  { id: 'c-cm1', name: 'CM1 A', level: 'CM1', teacher: 'Julien Petit', room: 'Salle 12', headcount: 25, capacity: 28, attendanceToday: 25 },
-  { id: 'c-cm2', name: 'CM2 B', level: 'CM2', teacher: 'Nora Benali', room: 'Salle 14', headcount: 26, capacity: 28, attendanceToday: 24 },
-  { id: 'c-6e', name: '6e Rentrée', level: '6e', teacher: 'Paul Girard', room: 'Bât. B – 02', headcount: 27, capacity: 30, attendanceToday: 26 },
-  { id: 'c-5e', name: '5e Descartes', level: '5e', teacher: 'Sarah Cohen', room: 'Bât. B – 06', headcount: 25, capacity: 30, attendanceToday: 24 },
+  // Site primaire (maternelle / élémentaire)
+  { id: 'c-ms', name: 'Moyenne Section A', level: 'MS', teacher: 'Amélie Roux', room: 'Site primaire – Salle 04', headcount: 22, capacity: 24, attendanceToday: 21 },
+  { id: 'c-cp', name: 'CP A', level: 'CP', teacher: 'Élise Martin', room: 'Site primaire – Salle 08', headcount: 23, capacity: 25, attendanceToday: 22 },
+  { id: 'c-ce1', name: 'CE1 B', level: 'CE1', teacher: 'Inès Diallo', room: 'Site primaire – Salle 10', headcount: 24, capacity: 26, attendanceToday: 24 },
+  { id: 'c-ce2', name: 'CE2 A', level: 'CE2', teacher: 'Laura Perrin', room: 'Site primaire – Salle 11', headcount: 21, capacity: 26, attendanceToday: 20 },
+  { id: 'c-cm1', name: 'CM1 A', level: 'CM1', teacher: 'Julien Petit', room: 'Site primaire – Salle 12', headcount: 25, capacity: 28, attendanceToday: 25 },
+  { id: 'c-cm2', name: 'CM2 B', level: 'CM2', teacher: 'Nora Benali', room: 'Site primaire – Salle 14', headcount: 26, capacity: 28, attendanceToday: 24 },
+  // Site collège
+  { id: 'c-6e', name: '6e Rentrée', level: '6e', teacher: 'Paul Girard', room: 'Site collège – Bât. B 02', headcount: 27, capacity: 30, attendanceToday: 26 },
+  { id: 'c-5e', name: '5e Descartes', level: '5e', teacher: 'Sarah Cohen', room: 'Site collège – Bât. B 06', headcount: 25, capacity: 30, attendanceToday: 24 },
 ]
 
 const classIds = classes.map(c => c.id)
@@ -88,33 +93,33 @@ export function makeDemoData(): DemoData {
 
   return {
     schools: [
-      { id: SCHOOL_A, name: 'École Primaire Saint-Denis', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '12 rue de la République, 93100 Saint-Denis', logoText: 'PSD' },
-      { id: SCHOOL_B, name: 'Collège Les Lilas', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '8 avenue du Général Leclerc, 93260 Les Lilas', logoText: 'LL' },
+      { id: SCHOOL_A, name: 'Groupe scolaire Saint-Denis – Site primaire', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '12 rue de la République, 93100 Saint-Denis', logoText: 'GSP' },
+      { id: SCHOOL_B, name: 'Groupe scolaire Saint-Denis – Site collège', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '8 avenue du Général Leclerc, 93260 Les Lilas', logoText: 'GSC' },
     ],
     users: [
-      { role: 'director', sub: 'demo-director', name: 'Camille Durand', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'direction@saint-denis.edu.fr' },
-      { role: 'deputy', sub: 'demo-deputy', name: 'Nora Benali', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'adjointe@saint-denis.edu.fr' },
-      { role: 'teacher', sub: 'demo-teacher', name: 'Élise Martin', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'e.martin@saint-denis.edu.fr' },
-      { role: 'assistant', sub: 'demo-assistant', name: 'Yanis Petit', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'y.petit@saint-denis.edu.fr' },
-      { role: 'finance', sub: 'demo-finance', name: 'Sarah Cohen', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'compta@saint-denis.edu.fr' },
-      { role: 'admissions', sub: 'demo-admissions', name: 'Lucie Bernard', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'admissions@saint-denis.edu.fr' },
-      { role: 'reception', sub: 'demo-reception', name: 'Hugo Leroy', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'accueil@saint-denis.edu.fr' },
-      { role: 'guardian', sub: 'demo-guardian', name: 'Famille Martin', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'famille.martin@example.fr' },
-      { role: 'guardian2', sub: 'demo-guardian-2', name: 'Alex Moreau', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'alex.moreau@example.fr' },
-      { role: 'student', sub: 'demo-student', name: 'Jade Petit', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'jade.petit@example.fr' },
-      { role: 'instructor', sub: 'demo-instructor', name: 'Mina Diallo', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'm.diallo@club-echecs.fr' },
-      { role: 'provider', sub: 'demo-provider', name: 'Club Échecs Paris', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'contact@club-echecs.fr' },
-      { role: 'safeguarding', sub: 'demo-safeguarding', name: 'Dr Paul Girard', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'protection@saint-denis.edu.fr' },
-      { role: 'therapist', sub: 'demo-therapist', name: 'Claire Aubry', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'c.aubry@saint-denis.edu.fr' },
-      { role: 'operator', sub: 'demo-operator', name: 'Opérateur Plateforme', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'ops@schoolos.app' },
-      { role: 'analyst', sub: 'demo-analyst', name: 'Analyste de données', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'analyste@saint-denis.edu.fr' },
+      { role: 'director', sub: 'demo-director', name: 'Camille Durand', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'direction@saint-denis.edu.fr' },
+      { role: 'deputy', sub: 'demo-deputy', name: 'Nora Benali', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'adjointe@saint-denis.edu.fr' },
+      { role: 'teacher', sub: 'demo-teacher', name: 'Élise Martin', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'e.martin@saint-denis.edu.fr' },
+      { role: 'assistant', sub: 'demo-assistant', name: 'Yanis Petit', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'y.petit@saint-denis.edu.fr' },
+      { role: 'finance', sub: 'demo-finance', name: 'Sarah Cohen', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'compta@saint-denis.edu.fr' },
+      { role: 'admissions', sub: 'demo-admissions', name: 'Lucie Bernard', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'admissions@saint-denis.edu.fr' },
+      { role: 'reception', sub: 'demo-reception', name: 'Hugo Leroy', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'accueil@saint-denis.edu.fr' },
+      { role: 'guardian', sub: 'demo-guardian', name: 'Famille Martin', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'famille.martin@example.fr' },
+      { role: 'guardian2', sub: 'demo-guardian-2', name: 'Alex Moreau', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'alex.moreau@example.fr' },
+      { role: 'student', sub: 'demo-student', name: 'Jade Petit', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'jade.petit@example.fr' },
+      { role: 'instructor', sub: 'demo-instructor', name: 'Mina Diallo', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'm.diallo@club-echecs.fr' },
+      { role: 'provider', sub: 'demo-provider', name: 'Club Échecs Paris', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'contact@club-echecs.fr' },
+      { role: 'safeguarding', sub: 'demo-safeguarding', name: 'Dr Paul Girard', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'protection@saint-denis.edu.fr' },
+      { role: 'therapist', sub: 'demo-therapist', name: 'Claire Aubry', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'c.aubry@saint-denis.edu.fr' },
+      { role: 'operator', sub: 'demo-operator', name: 'Opérateur Plateforme', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'ops@schoolos.app' },
+      { role: 'analyst', sub: 'demo-analyst', name: 'Analyste de données', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'analyste@saint-denis.edu.fr' },
     ],
     students,
     classes,
     guardians: [
       { id: 'g-1', studentIds: ['stu-1', 'stu-2'], name: 'Famille Martin', email: 'famille.martin@example.fr', phone: '06 12 34 56 78', relation: 'Parents', pickupAuthorised: true },
       { id: 'g-2', studentIds: ['stu-3'], name: 'Nadia Benali', email: 'n.benali@example.fr', phone: '06 98 76 54 32', relation: 'Mère', pickupAuthorised: true },
-      { id: 'g-3', studentIds: ['stu-4'], name: 'Karim Roux', email: 'k.roux@example.fr', phone: '07 55 20 10 05', relation: 'Père', pickupAuthorised: false, custodyNotes: 'Restricted pickup — verified ID required.' },
+      { id: 'g-3', studentIds: ['stu-4'], name: 'Karim Roux', email: 'k.roux@example.fr', phone: '07 55 20 10 05', relation: 'Père', pickupAuthorised: false, custodyNotes: 'Retrait restreint — pièce d’identité obligatoire.' },
       { id: 'g-4', studentIds: ['stu-5', 'stu-9'], name: 'Sophie Petit', email: 's.petit@example.fr', phone: '06 44 28 19 30', relation: 'Mère', pickupAuthorised: true },
     ],
     activities: [
@@ -134,21 +139,21 @@ export function makeDemoData(): DemoData {
       { id: 'off-6', activityId: 'act-6', term: 'Automne 2026', capacity: 12, booked: 9, waitlist: 2, minEnrolment: 6, priceCents: 9500, currency: 'EUR', status: 'open', location: 'Cuisine', sessions: [{ id: 's7', date: '2026-11-24', start: '17:30', end: '18:30' }] },
     ],
     concerns: [
-      { id: 'sc-1', reference: 'SC-2026-014', category: 'wellbeing', status: 'open', createdAt: '2026-11-14T09:20:00Z', updatedAt: '2026-11-14T09:20:00Z', reportedByRole: 'teacher', subjectInitials: 'L.M.', summary: 'Concern record — content restricted to authorised roles.', events: [{ id: 'e1', at: '2026-11-14T09:20:00Z', actorRole: 'teacher', action: 'Concern opened' }] },
-      { id: 'sc-2', reference: 'SC-2026-013', category: 'attendance', status: 'under_review', createdAt: '2026-11-10T13:05:00Z', updatedAt: '2026-11-12T10:30:00Z', reportedByRole: 'reception', subjectInitials: 'A.R.', summary: 'Concern record — content restricted to authorised roles.', assignee: 'Dr Paul Girard', events: [{ id: 'e2', at: '2026-11-10T13:05:00Z', actorRole: 'reception', action: 'Concern opened' }, { id: 'e3', at: '2026-11-12T10:30:00Z', actorRole: 'safeguarding', action: 'Status changed to under review' }] },
-      { id: 'sc-3', reference: 'SC-2026-009', category: 'safety', status: 'closed', createdAt: '2026-10-22T08:40:00Z', updatedAt: '2026-11-02T16:10:00Z', reportedByRole: 'assistant', subjectInitials: 'T.M.', summary: 'Concern record — content restricted to authorised roles.', events: [{ id: 'e4', at: '2026-10-22T08:40:00Z', actorRole: 'assistant', action: 'Concern opened' }, { id: 'e5', at: '2026-11-02T16:10:00Z', actorRole: 'safeguarding', action: 'Concern closed' }] },
+      { id: 'sc-1', reference: 'SC-2026-014', category: 'wellbeing', status: 'open', createdAt: '2026-11-14T09:20:00Z', updatedAt: '2026-11-14T09:20:00Z', reportedByRole: 'teacher', subjectInitials: 'L.M.', summary: 'Fiche de signalement — contenu réservé aux personnels habilités.', events: [{ id: 'e1', at: '2026-11-14T09:20:00Z', actorRole: 'teacher', action: 'Signalement ouvert' }] },
+      { id: 'sc-2', reference: 'SC-2026-013', category: 'attendance', status: 'under_review', createdAt: '2026-11-10T13:05:00Z', updatedAt: '2026-11-12T10:30:00Z', reportedByRole: 'reception', subjectInitials: 'A.R.', summary: 'Fiche de signalement — contenu réservé aux personnels habilités.', assignee: 'Dr Paul Girard', events: [{ id: 'e2', at: '2026-11-10T13:05:00Z', actorRole: 'reception', action: 'Signalement ouvert' }, { id: 'e3', at: '2026-11-12T10:30:00Z', actorRole: 'safeguarding', action: 'Statut modifié : en cours d’examen' }] },
+      { id: 'sc-3', reference: 'SC-2026-009', category: 'safety', status: 'closed', createdAt: '2026-10-22T08:40:00Z', updatedAt: '2026-11-02T16:10:00Z', reportedByRole: 'assistant', subjectInitials: 'T.M.', summary: 'Fiche de signalement — contenu réservé aux personnels habilités.', events: [{ id: 'e4', at: '2026-10-22T08:40:00Z', actorRole: 'assistant', action: 'Signalement ouvert' }, { id: 'e5', at: '2026-11-02T16:10:00Z', actorRole: 'safeguarding', action: 'Signalement clôturé' }] },
     ],
     suggestions: [
       { id: 'ai-1', feature: 'report-comment', title: 'Bulletin comment draft — Léa M.', body: 'Léa participe avec attention aux activités de lecture. Elle gagne en autonomie et aide volontiers ses camarades lors des ateliers.', modelId: 'local-draft-v1', status: 'proposed', confidence: 0.82, redacted: true, createdAt: '2026-11-16T10:12:00Z' },
       { id: 'ai-2', feature: 'message-tone', title: 'Parent message tone check', body: 'Bonjour, nous vous informons que la sortie au musée prévue mardi est maintenue. Merci de signer l’autorisation avant lundi.', modelId: 'local-draft-v1', status: 'proposed', confidence: 0.91, redacted: true, createdAt: '2026-11-16T11:40:00Z' },
-      { id: 'ai-3', feature: 'weekly-brief', title: 'Weekly director briefing', body: 'Attendance averaged 94% this week. Two classes are close to capacity. Three activity waitlists need review before Friday.', modelId: 'local-draft-v1', status: 'proposed', confidence: 0.76, redacted: true, createdAt: '2026-11-15T07:30:00Z' },
+      { id: 'ai-3', feature: 'weekly-brief', title: 'Point hebdomadaire — direction', body: 'La fréquentation moyenne a atteint 94 % cette semaine. Deux classes approchent de leur capacité. Trois listes d’attente d’activités doivent être examinées avant vendredi.', modelId: 'local-draft-v1', status: 'proposed', confidence: 0.76, redacted: true, createdAt: '2026-11-15T07:30:00Z' },
     ],
     notifications: [
-      { id: 'n-1', title: 'Attendance recorded', body: 'CP A — 22 present, 1 late.', at: '2026-11-17T08:35:00Z', read: false, tone: 'success', category: 'attendance' },
-      { id: 'n-2', title: 'New message', body: 'Élise Martin sent a message about the museum trip.', at: '2026-11-17T08:12:00Z', read: false, tone: 'info', category: 'message' },
-      { id: 'n-3', title: 'Activity waitlist', body: 'Football en herbe has 5 students waiting.', at: '2026-11-16T17:00:00Z', read: false, tone: 'warning', category: 'activity' },
-      { id: 'n-4', title: 'Invoice overdue', body: 'Garderie — November 2026 is overdue.', at: '2026-11-15T09:00:00Z', read: true, tone: 'danger', category: 'billing' },
-      { id: 'n-5', title: 'Maintenance window', body: 'Scheduled maintenance Sunday 02:00–04:00.', at: '2026-11-14T12:00:00Z', read: true, tone: 'info', category: 'system' },
+      { id: 'n-1', title: 'Appel enregistré', body: 'CP A — 22 présents, 1 retard.', at: '2026-11-17T08:35:00Z', read: false, tone: 'success', category: 'attendance' },
+      { id: 'n-2', title: 'Nouveau message', body: 'Élise Martin a envoyé un message au sujet de la sortie au musée.', at: '2026-11-17T08:12:00Z', read: false, tone: 'info', category: 'message' },
+      { id: 'n-3', title: 'Liste d’attente activité', body: 'Football en herbe compte 5 élèves en attente.', at: '2026-11-16T17:00:00Z', read: false, tone: 'warning', category: 'activity' },
+      { id: 'n-4', title: 'Facture en retard', body: 'Garderie — novembre 2026 est en retard.', at: '2026-11-15T09:00:00Z', read: true, tone: 'danger', category: 'billing' },
+      { id: 'n-5', title: 'Maintenance planifiée', body: 'Maintenance prévue dimanche de 02:00 à 04:00.', at: '2026-11-14T12:00:00Z', read: true, tone: 'info', category: 'system' },
     ],
     messages: [
       { id: 'msg-1', from: 'Élise Martin', to: 'Famille Martin', subject: 'Sortie musée — autorisation', body: 'Bonjour, pensez à signer l’autorisation pour la sortie de mardi au musée.', at: '2026-11-17T08:12:00Z', read: false, replies: [] },
@@ -200,6 +205,7 @@ export function makeDemoData(): DemoData {
       { id: 't-7', day: 4, start: 9, end: 10, title: 'Conseil de classe', subtitle: 'Salle des professeurs', tone: 'info' },
     ],
     attendance,
+    family: makeFamilyData(),
     dataRequests: [
       { id: 'dr-1', type: 'export', subject: 'Famille Martin', requestedAt: '2026-11-12', status: 'in_progress', dueAt: '2026-12-12' },
       { id: 'dr-2', type: 'erasure', subject: 'Ancien élève — anonymisation', requestedAt: '2026-11-05', status: 'pending', dueAt: '2026-12-05' },

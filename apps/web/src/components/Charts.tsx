@@ -48,10 +48,14 @@ export function BarChart({ data, height = 180 }: { data: Point[]; height?: numbe
   return (
     <div className="flex items-end gap-3" style={{ height }} role="img" aria-label="Bar chart">
       {data.map(d => (
-        <div key={d.label} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+        <div key={d.label} className="flex h-full min-w-0 flex-1 flex-col items-center gap-1.5">
           <span className="tnum text-[11px] font-semibold text-content-muted">{d.value}</span>
-          <div className="flex w-full flex-1 items-end">
-            <div className="w-full rounded-t-md bg-gradient-to-t from-chart-bar-start to-chart-bar-end transition-all duration-slow" style={{ height: `${(d.value / max) * 100}%` }} title={`${d.label}: ${d.value}`} />
+          <div className="flex w-full flex-1 items-end" style={{ minHeight: 0 }}>
+            <div
+              className="w-full rounded-t-md bg-gradient-to-t from-chart-bar-start to-chart-bar-end transition-all duration-slow"
+              style={{ height: `${Math.max((d.value / max) * 100, d.value > 0 ? 6 : 0)}%` }}
+              title={`${d.label}: ${d.value}`}
+            />
           </div>
           <span className="w-full truncate text-center text-[10px] text-content-subtle">{d.label}</span>
         </div>
