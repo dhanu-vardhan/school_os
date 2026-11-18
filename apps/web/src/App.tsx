@@ -76,6 +76,10 @@ const MyActivitiesPage = lazy(() => import('./pages/Activities').then(m => ({ de
 const SafeguardingPage = lazy(() => import('./pages/Safeguarding').then(m => ({ default: m.SafeguardingPage })))
 const ReceptionPage = lazy(() => import('./pages/Reception').then(m => ({ default: m.ReceptionPage })))
 const OperatorConsolePage = lazy(() => import('./pages/OperatorConsole').then(m => ({ default: m.OperatorConsolePage })))
+const InstructorPage = lazy(() => import('./pages/Instructor').then(m => ({ default: m.InstructorPage })))
+const ProviderPage = lazy(() => import('./pages/Provider').then(m => ({ default: m.ProviderPage })))
+const AnalystPage = lazy(() => import('./pages/Analyst').then(m => ({ default: m.AnalystPage })))
+const TherapistPage = lazy(() => import('./pages/Therapist').then(m => ({ default: m.TherapistPage })))
 const NewConcernPage = lazy(() => import('./pages/Safeguarding').then(m => ({ default: m.NewConcernPage })))
 const ConcernDetailPage = lazy(() => import('./pages/Safeguarding').then(m => ({ default: m.ConcernDetailPage })))
 const SafeguardingHarassmentPage = lazy(() => import('./pages/Safeguarding').then(m => ({ default: m.SafeguardingHarassmentPage })))
@@ -272,6 +276,8 @@ export default function App() {
           <Route path="/app/safeguarding/reports" element={<SafeguardingReportsPage />} />
           <Route path="/app/safeguarding/access-log" element={<SafeguardingAccessLogPage />} />
           <Route path="/app/safeguarding/settings" element={<SafeguardingSettingsPage />} />
+          <Route path="/app/instructor" element={<InstructorPage />} />
+          <Route path="/app/provider" element={<ProviderPage />} />
 
           <Route path="/app/ai/suggestions" element={<AiSuggestionsPage />} />
           <Route path="/app/ai/tools" element={<AiToolsPage />} />
@@ -287,6 +293,8 @@ export default function App() {
           <Route path="/app/reports" element={<ReportsPage />} />
           <Route path="/app/analytics" element={<AnalyticsDashboardPage />} />
           <Route path="/app/analytics/explore" element={<AnalyticsExplorePage />} />
+          <Route path="/app/analytics/analyst" element={<AnalystPage />} />
+          <Route path="/app/therapist" element={<TherapistPage />} />
           <Route path="/app/platform/status" element={<SystemStatusPage />} />
           <Route path="/app/platform/console" element={<OperatorConsolePage />} />
           <Route path="/app/platform/flags" element={<FeatureFlagsPage />} />

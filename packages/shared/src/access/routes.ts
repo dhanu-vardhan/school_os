@@ -401,6 +401,8 @@ const ROLE_NAV_TREES: Record<CanonicalRole, { key: string; items: NavTuple[] }[]
       ['nav.gradebook', soon('teacher', 'gradebook'), 'BookOpenText', 'grades.publish'],
       ['nav.homework', soon('teacher', 'homework'), 'ClipboardList'],
       ['nav.timetable', '/app/timetable', 'CalendarDays'],
+      ['nav.instructor', '/app/instructor', 'Trophy', 'activities.read'],
+      ['nav.provider', '/app/provider', 'Building2', 'activities.read'],
     ] },
     { key: 'nav.group.communication', items: [
       ['nav.messages', '/app/communication/messages', 'Mail', 'messages.read'],
@@ -492,6 +494,7 @@ const ROLE_NAV_TREES: Record<CanonicalRole, { key: string; items: NavTuple[] }[]
       ['sg.reports', '/app/safeguarding/reports', 'BarChart3', 'safeguarding.read'],
       ['sg.accessLog', '/app/safeguarding/access-log', 'ScrollText', 'safeguarding.read'],
       ['sg.settings', '/app/safeguarding/settings', 'Settings2', 'safeguarding.write'],
+      ['nav.therapist', '/app/therapist', 'HeartPulse', 'safeguarding.read'],
     ] },
     { key: 'nav.group.compliance', items: [
       ['nav.accessReports', '/app/compliance/audit', 'ScrollText', 'security.audit.read'],
@@ -583,9 +586,10 @@ const ROLE_NAV_TREES: Record<CanonicalRole, { key: string; items: NavTuple[] }[]
     { key: 'nav.group.insights', items: [
       ['nav.dashboard', CANONICAL_LANDINGS.analyst, 'LayoutDashboard'],
       ['analytics.explore', '/app/analytics/explore', 'ChartNoAxesCombined', 'analytics.student'],
-      ['nav.savedReports', soon('analyst', 'saved'), 'FileClock'],
-      ['nav.dictionary', soon('analyst', 'dictionary'), 'BookOpenText'],
-      ['nav.exports', soon('analyst', 'exports'), 'DatabaseBackup', 'analytics.export'],
+      ['nav.analystConsole', '/app/analytics/analyst', 'ChartNoAxesCombined', 'analytics.student'],
+      ['nav.savedReports', '/app/analytics/analyst', 'FileClock', 'analytics.student'],
+      ['nav.dictionary', '/app/analytics/analyst', 'BookOpenText', 'analytics.student'],
+      ['nav.exports', '/app/analytics/analyst', 'DatabaseBackup', 'analytics.export'],
     ] },
   ],
 }

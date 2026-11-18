@@ -251,3 +251,40 @@
 - Four-eyes for destructive/high-impact actions; WebAuthn-only for platform admins; no shared accounts.
 - Tenant-visible audit: schools see every platform-side access to their tenant.
 - Operator acts as RGPD processor (sous-traitant); DPA per school.
+
+## PROMPT 010 — Instructor
+
+- Instructor maps to display role `teacher` (no new canonical role); dedicated `/app/instructor` page scoped to assigned activities/sessions.
+- Eligibility gate blocks roster access when any required document (contract, honorability, qualifications, charter/training, insurance) is missing or expired; director and reception alerted.
+- Ratios are configurable policy per age band, not hard-coded.
+- Emergency contacts are session-window-scoped and audited; no bulk export.
+- Photos only when image rights = yes and school policy permits; EXIF stripping on upload; no social sharing features.
+- Honorability verification performed by humans/authorities outside the app; app stores document type, issuer, dates, status and gates access.
+
+## PROMPT 011 — External provider
+
+- Provider maps to display role `teacher`; dedicated `/app/provider` page with window-scoped, assignment-scoped roster.
+- Access gate requires contract active + org documents valid + intervenant documents valid + assignment + within session window; any failure blocks roster with reason and alerts director/reception.
+- Roster is view-only (no export/copy/print by default); watermark with user + timestamp; auto-hidden outside window.
+- Provider tokens cannot call guardian/student/finance/safeguarding/analytics endpoints (global matrix test).
+- Provider can file safeguarding concerns (write-only) via "Signaler une inquiétude"; must not contact family directly about it.
+- Invoices flow through finance supplier module; e-invoicing PDP decision is human.
+- Offboarding revokes access immediately and certifies deletion of pupil-derived data in provider notes.
+
+## PROMPT 012 — Analyst
+
+- Aggregate-only by construction: analyst endpoints return aggregate DTOs; DB role has no SELECT on base pupil tables (test).
+- Minimum cell size default 10, higher for sensitive classes (finance 15); safeguarding/harassment/discipline/health/hardship excluded or heavily suppressed.
+- Primary + secondary suppression across rows/columns/totals; differencing guard denies near-identical queries within a time window and audits + alerts director.
+- Network analyst requires per-school consent; consent revocation removes school from future roll-ups immediately; ranks/league tables off by default.
+- No free-form SQL; only governed metrics from the metric registry; metric dictionary synced with docs/METRIC_DICTIONARY.md via CI.
+- Analyst access list, quotas, and quarterly review; exports watermarked and audited.
+
+## PROMPT 013 — Therapist / external practitioner
+
+- Scope deliberately limited to logistics and coordination: NO diagnoses, clinical notes, assessments, treatment plans, or health documents stored in SchoolOS (HDS boundary). Free text restricted; attachments limited to administrative documents.
+- module.therapist ships OFF by default; may be enabled per tenant only after legal/DPO sign-off (see PART21).
+- Coordination uses an approved coded vocabulary maintained by direction; no free-text clinical content accepted.
+- Teachers see only "intervention programmée" and approved coded adaptations; practitioner identity hidden by default unless guardian consent permits.
+- Consent is versioned, revocable instantly, and blocks access immediately.
+- Analytics excludes this class entirely by default.

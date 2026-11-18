@@ -1199,4 +1199,8 @@ export const fr = {
   'nav.enrolment': 'Inscriptions',
   'nav.emergency': 'Alertes & urgence',
   'nav.console': 'Console plateforme',
+  'nav.instructor': 'Espace animateur',
+  'nav.provider': 'Espace prestataire',
+  'nav.analystConsole': 'Console analyste',
+  'nav.therapist': 'Praticien externe',
 }

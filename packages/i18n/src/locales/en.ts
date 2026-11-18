@@ -1199,4 +1199,8 @@ export const en: Record<keyof typeof import('./fr').fr, string> = {
   'nav.enrolment': 'Enrolment',
   'nav.emergency': 'Alerts & emergency',
   'nav.console': 'Platform console',
+  'nav.instructor': 'Instructor space',
+  'nav.provider': 'Provider space',
+  'nav.analystConsole': 'Analyst console',
+  'nav.therapist': 'External practitioner',
 }

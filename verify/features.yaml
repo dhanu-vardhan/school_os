@@ -95,6 +95,42 @@ features:
     status: expected-working
     reason: Tenant lifecycle, health, flags, support, security, compliance, billing, releases, templates, imports, backups, staff, audit, announcements (web + migration)
     prompt_ref: P009
+  - id: P3-11-instructor
+    module: activities
+    name: Instructor space
+    roles: [teacher]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: expected-working
+    reason: Dashboard, eligibility gate, activities, sessions, attendance, pickup, ratio, notes, incidents, messages, waitlist, trips, hours, help (web + migration)
+    prompt_ref: P010
+  - id: P3-12-provider
+    module: activities
+    name: External provider space
+    roles: [teacher]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: expected-working
+    reason: Onboarding, documents/gate, sessions, window-scoped roster, attendance, pickup, report, incident, messages, invoices, rules, feedback, offboarding (web + migration)
+    prompt_ref: P011
+  - id: P3-13-analyst
+    module: analytics
+    name: Analyst console
+    roles: [analyst]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: expected-working
+    reason: Overview, governed explore, suppression, saved views, scheduled reports, metric dictionary, data quality, exports, query log (web + migration)
+    prompt_ref: P012
+  - id: P3-14-therapist
+    module: therapist
+    name: External practitioner (flagged off)
+    roles: [safeguarding-lead]
+    platform: [web]
+    checks: [api,ui,permission]
+    status: expected-working
+    reason: Flag-gated module: onboarding, consent, assignment, sessions, coordination codes, documents, messages, reports, offboarding (web + migration); flag OFF by default
+    prompt_ref: P013
   - id: SCR-DIR-CLASSES
     module: ui
     name: Director Classes screen
