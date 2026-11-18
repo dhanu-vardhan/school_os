@@ -1,10 +1,10 @@
 import { expect, test, type Page } from '@playwright/test'
 
-async function signIn(page: Page, name = /Camille Durand/) {
+async function signIn(page: Page, name: RegExp | string = /Camille Durand/, landing: RegExp = /\/principal$/) {
   await page.goto('/login')
   await expect(page.getByRole('heading', { name: 'Bon retour !' })).toBeVisible()
   await page.getByRole('button', { name }).click()
-  await expect(page).toHaveURL(/\/app\/dashboard$/)
+  await expect(page).toHaveURL(landing)
   await expect(page.getByRole('heading', { name: /Bonjour,/ })).toBeVisible()
 }
 
@@ -107,7 +107,7 @@ test('director is denied platform admin while operator is allowed', async ({ pag
 
   await page.goto('/login')
   await page.getByRole('button', { name: /Opérateur Plateforme/ }).click()
-  await expect(page).toHaveURL(/\/app\/dashboard$/)
+  await expect(page).toHaveURL(/\/platform$/)
   await goTo(page, '/app/platform/flags')
   await expect(page.getByRole('heading', { name: /Fonctionnalités/ })).toBeVisible()
 })
@@ -136,7 +136,7 @@ test('security pages render and browser storage holds no tokens', async ({ page 
 test('teacher cannot open the security centre', async ({ page }) => {
   await page.goto('/login')
   await page.getByRole('button', { name: /Élise Martin/ }).click()
-  await expect(page).toHaveURL(/\/app\/dashboard$/)
+  await expect(page).toHaveURL(/\/teacher$/)
   await goTo(page, '/app/security')
   await expect(page.getByRole('heading', { name: 'Accès refusé' })).toBeVisible()
 })
