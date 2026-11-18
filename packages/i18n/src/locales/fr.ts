@@ -1,5 +1,5 @@
 export const fr = {
-  'app.name': 'Acadia',
+  'app.name': 'SchoolOS',
   'app.tagline': 'Plateforme de gestion scolaire',
   'common.search': 'Rechercher',
   'common.skipToContent': 'Aller au contenu principal',
@@ -70,6 +70,7 @@ export const fr = {
   'nav.staff': 'Personnel',
   'nav.roles': 'Rôles & droits',
   'nav.schoolSettings': 'Réglages de l’école',
+  'nav.settings': 'Paramètres',
   'nav.members': 'Membres',
   'nav.invitations': 'Invitations',
   'nav.activities': 'Activités',
@@ -80,6 +81,7 @@ export const fr = {
   'nav.retention': 'Rétention',
   'nav.compliance': 'Conformité RGPD',
   'nav.audit': 'Journal d’audit',
+  'nav.auditLog': 'Journal d’audit',
   'nav.reports': 'Rapports & analyses',
   'nav.status': 'État du système',
   'nav.flags': 'Fonctionnalités',

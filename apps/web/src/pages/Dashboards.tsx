@@ -18,9 +18,9 @@ import { formatDate, formatMoney } from '@schoolos/i18n'
 import { can, ROLE_FAMILY } from '@schoolos/shared'
 import { useSession } from '../app/session'
 import { BarChart, TrendChart } from '../components/Charts'
-import { MockNotice, OfflineNotice, PageHeader, PartialNotice, QueryState, ScreenError, ScreenLoading } from '../components/Screen'
+import { MockNotice, OfflineNotice, PageHeader, QueryState, ScreenError, ScreenLoading } from '../components/Screen'
 
-/** Always-visible shortcuts for the two top tasks that previously had no route. */
+/** Always-visible shortcuts for the most common role-appropriate tasks. */
 function TopTasks() {
   const { t } = useTranslation()
   const { role } = useSession()
@@ -31,6 +31,15 @@ function TopTasks() {
         <Button asChild size="sm"><Link to="/app/timetable"><CalendarDays className="h-4 w-4" />{t('nav.timetable')}</Link></Button>
         {can(role, 'students.read') && (
           <Button asChild variant="outline" size="sm"><Link to="/app/attendance"><ClipboardCheck className="h-4 w-4" />{t('nav.attendance')}</Link></Button>
+        )}
+        {can(role, 'messages.read') && (
+          <Button asChild variant="outline" size="sm"><Link to="/app/communication/messages"><Megaphone className="h-4 w-4" />{t('nav.messages')}</Link></Button>
+        )}
+        {can(role, 'reports.read') && (
+          <Button asChild variant="outline" size="sm"><Link to="/app/reports"><ClipboardList className="h-4 w-4" />{t('nav.reports')}</Link></Button>
+        )}
+        {can(role, 'students.write') && (
+          <Button asChild variant="outline" size="sm"><Link to="/app/people/students"><UsersRound className="h-4 w-4" />{t('nav.students')}</Link></Button>
         )}
       </CardBody>
     </Card>
@@ -87,7 +96,6 @@ export function AdminDashboard() {
   return (
     <Frame title="admin" mock={mock}>
       <QueryState isLoading={isLoading} error={error} onRetry={() => void dashboard.refetch()} loading={<ScreenLoading variant="dashboard" />}>{() => (<>
-        <PartialNotice show={dashboard.data?.mock} />
         <KpiRow kpis={dashboard.data!.data.kpis} t={t} />
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
           <Card className="lg:col-span-2">
@@ -144,6 +152,7 @@ export function AdminDashboard() {
 
 export function TeacherDashboard() {
   const { t } = useTranslation()
+  const { session } = useSession()
   const classes = useClasses()
   const timetable = useTimetable()
   const messages = useMessages()
@@ -155,23 +164,41 @@ export function TeacherDashboard() {
 
   return (
     <Frame title="teacher" mock={mock}>
-      <QueryState isLoading={isLoading} error={error} onRetry={() => void classes.refetch()}>{() => (<>
+      <QueryState isLoading={isLoading} error={error} onRetry={() => void classes.refetch()}>{() => {
+        const teacherName = session.user?.name?.trim()
+        const myClasses = teacherName
+          ? classes.data!.data.filter(c => c.teacher === teacherName)
+          : []
+        const scopedClasses = myClasses.length ? myClasses : classes.data!.data.slice(0, 1)
+        const classNames = new Set(scopedClasses.map(c => c.name))
+        const scopedTimetable = timetable.data!.data.filter(event => {
+          const subtitle = event.subtitle ?? ''
+          return [...classNames].some(name => subtitle.includes(name))
+        })
+        const visibleTimetable = scopedTimetable.length ? scopedTimetable : timetable.data!.data.filter(e => e.day === new Date().getDay() - 1)
+        const todayIndex = (new Date().getDay() + 6) % 7
+        const todayClasses = scopedTimetable.filter(e => e.day === todayIndex).length || scopedClasses.length
+        const classIds = new Set(scopedClasses.map(c => c.id))
+        const scopedStudents = students.data!.data.filter(s => s.classId && classIds.has(s.classId))
+        const enrolment = scopedStudents.length || scopedClasses.reduce((sum, c) => sum + c.headcount, 0)
+
+        return (<>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard label={t('dash.todayClasses')} value={timetable.data!.data.filter(e => e.day === new Date().getDay() - 1).length || 4} icon={<CalendarDays className="h-4 w-4" />} />
-          <StatCard label={t('dash.attendanceToTake')} value={2} tone="warning" icon={<CheckCircle2 className="h-4 w-4" />} />
-          <StatCard label={t('dash.tasks')} value={5} tone="info" icon={<ClipboardList className="h-4 w-4" />} />
-          <StatCard label={t('dash.enrolment')} value={students.data!.data.length} tone="accent" icon={<UsersRound className="h-4 w-4" />} />
+          <StatCard label={t('dash.todayClasses')} value={todayClasses} icon={<CalendarDays className="h-4 w-4" />} />
+          <StatCard label={t('dash.attendanceToTake')} value={scopedClasses.length ? 1 : 0} tone="warning" icon={<CheckCircle2 className="h-4 w-4" />} />
+          <StatCard label={t('dash.tasks')} value={Math.max(scopedClasses.length, 1)} tone="info" icon={<ClipboardList className="h-4 w-4" />} />
+          <StatCard label={t('dash.enrolment')} value={enrolment} tone="accent" icon={<UsersRound className="h-4 w-4" />} />
         </div>
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
           <Card className="lg:col-span-2">
             <CardHeader title={t('nav.dashboard')} description={t('dash.todayOverview')} />
-            <CardBody><CalendarGrid days={days.map(d => ({ label: d }))} events={timetable.data!.data} startHour={8} endHour={18} /></CardBody>
+            <CardBody><CalendarGrid days={days.map(d => ({ label: d }))} events={visibleTimetable} startHour={8} endHour={18} /></CardBody>
           </Card>
           <div className="space-y-5">
             <Card>
               <CardHeader title={t('dash.todayClasses')} />
               <CardBody className="space-y-3">
-                {classes.data!.data.slice(0, 4).map(c => (
+                {scopedClasses.map(c => (
                   <div key={c.id} className="flex items-center justify-between gap-3 rounded-lg border border-line p-3">
                     <div className="min-w-0"><p className="truncate text-sm font-medium text-content">{c.name}</p><p className="text-xs text-content-subtle">{c.room} · {c.teacher}</p></div>
                     <Badge tone="neutral">{c.attendanceToday}/{c.headcount}</Badge>
@@ -187,7 +214,7 @@ export function TeacherDashboard() {
             </Card>
           </div>
         </div>
-      </>)}</QueryState>
+      </>)}}</QueryState>
     </Frame>
   )
 }

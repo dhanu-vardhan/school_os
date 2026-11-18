@@ -51,14 +51,16 @@ const names = [
 ] as const
 
 const classes: ClassGroup[] = [
-  { id: 'c-ms', name: 'Moyenne Section A', level: 'MS', teacher: 'Amélie Roux', room: 'Salle 04', headcount: 22, capacity: 24, attendanceToday: 21 },
-  { id: 'c-cp', name: 'CP A', level: 'CP', teacher: 'Élise Martin', room: 'Salle 08', headcount: 23, capacity: 25, attendanceToday: 22 },
-  { id: 'c-ce1', name: 'CE1 B', level: 'CE1', teacher: 'Inès Diallo', room: 'Salle 10', headcount: 24, capacity: 26, attendanceToday: 24 },
-  { id: 'c-ce2', name: 'CE2 A', level: 'CE2', teacher: 'Laura Perrin', room: 'Salle 11', headcount: 21, capacity: 26, attendanceToday: 20 },
-  { id: 'c-cm1', name: 'CM1 A', level: 'CM1', teacher: 'Julien Petit', room: 'Salle 12', headcount: 25, capacity: 28, attendanceToday: 25 },
-  { id: 'c-cm2', name: 'CM2 B', level: 'CM2', teacher: 'Nora Benali', room: 'Salle 14', headcount: 26, capacity: 28, attendanceToday: 24 },
-  { id: 'c-6e', name: '6e Rentrée', level: '6e', teacher: 'Paul Girard', room: 'Bât. B – 02', headcount: 27, capacity: 30, attendanceToday: 26 },
-  { id: 'c-5e', name: '5e Descartes', level: '5e', teacher: 'Sarah Cohen', room: 'Bât. B – 06', headcount: 25, capacity: 30, attendanceToday: 24 },
+  // Site primaire (maternelle / élémentaire)
+  { id: 'c-ms', name: 'Moyenne Section A', level: 'MS', teacher: 'Amélie Roux', room: 'Site primaire – Salle 04', headcount: 22, capacity: 24, attendanceToday: 21 },
+  { id: 'c-cp', name: 'CP A', level: 'CP', teacher: 'Élise Martin', room: 'Site primaire – Salle 08', headcount: 23, capacity: 25, attendanceToday: 22 },
+  { id: 'c-ce1', name: 'CE1 B', level: 'CE1', teacher: 'Inès Diallo', room: 'Site primaire – Salle 10', headcount: 24, capacity: 26, attendanceToday: 24 },
+  { id: 'c-ce2', name: 'CE2 A', level: 'CE2', teacher: 'Laura Perrin', room: 'Site primaire – Salle 11', headcount: 21, capacity: 26, attendanceToday: 20 },
+  { id: 'c-cm1', name: 'CM1 A', level: 'CM1', teacher: 'Julien Petit', room: 'Site primaire – Salle 12', headcount: 25, capacity: 28, attendanceToday: 25 },
+  { id: 'c-cm2', name: 'CM2 B', level: 'CM2', teacher: 'Nora Benali', room: 'Site primaire – Salle 14', headcount: 26, capacity: 28, attendanceToday: 24 },
+  // Site collège
+  { id: 'c-6e', name: '6e Rentrée', level: '6e', teacher: 'Paul Girard', room: 'Site collège – Bât. B 02', headcount: 27, capacity: 30, attendanceToday: 26 },
+  { id: 'c-5e', name: '5e Descartes', level: '5e', teacher: 'Sarah Cohen', room: 'Site collège – Bât. B 06', headcount: 25, capacity: 30, attendanceToday: 24 },
 ]
 
 const classIds = classes.map(c => c.id)
@@ -88,26 +90,26 @@ export function makeDemoData(): DemoData {
 
   return {
     schools: [
-      { id: SCHOOL_A, name: 'École Primaire Saint-Denis', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '12 rue de la République, 93100 Saint-Denis', logoText: 'PSD' },
-      { id: SCHOOL_B, name: 'Collège Les Lilas', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '8 avenue du Général Leclerc, 93260 Les Lilas', logoText: 'LL' },
+      { id: SCHOOL_A, name: 'Groupe scolaire Saint-Denis – Site primaire', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '12 rue de la République, 93100 Saint-Denis', logoText: 'GSP' },
+      { id: SCHOOL_B, name: 'Groupe scolaire Saint-Denis – Site collège', timezone: 'Europe/Paris', locale: 'fr', academicYear: '2026-2027', address: '8 avenue du Général Leclerc, 93260 Les Lilas', logoText: 'GSC' },
     ],
     users: [
-      { role: 'director', sub: 'demo-director', name: 'Camille Durand', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'direction@saint-denis.edu.fr' },
-      { role: 'deputy', sub: 'demo-deputy', name: 'Nora Benali', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'adjointe@saint-denis.edu.fr' },
-      { role: 'teacher', sub: 'demo-teacher', name: 'Élise Martin', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'e.martin@saint-denis.edu.fr' },
-      { role: 'assistant', sub: 'demo-assistant', name: 'Yanis Petit', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'y.petit@saint-denis.edu.fr' },
-      { role: 'finance', sub: 'demo-finance', name: 'Sarah Cohen', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'compta@saint-denis.edu.fr' },
-      { role: 'admissions', sub: 'demo-admissions', name: 'Lucie Bernard', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'admissions@saint-denis.edu.fr' },
-      { role: 'reception', sub: 'demo-reception', name: 'Hugo Leroy', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'accueil@saint-denis.edu.fr' },
-      { role: 'guardian', sub: 'demo-guardian', name: 'Famille Martin', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'famille.martin@example.fr' },
-      { role: 'guardian2', sub: 'demo-guardian-2', name: 'Alex Moreau', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'alex.moreau@example.fr' },
-      { role: 'student', sub: 'demo-student', name: 'Jade Petit', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'jade.petit@example.fr' },
-      { role: 'instructor', sub: 'demo-instructor', name: 'Mina Diallo', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'm.diallo@club-echecs.fr' },
-      { role: 'provider', sub: 'demo-provider', name: 'Club Échecs Paris', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'contact@club-echecs.fr' },
-      { role: 'safeguarding', sub: 'demo-safeguarding', name: 'Dr Paul Girard', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'protection@saint-denis.edu.fr' },
-      { role: 'therapist', sub: 'demo-therapist', name: 'Claire Aubry', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'c.aubry@saint-denis.edu.fr' },
-      { role: 'operator', sub: 'demo-operator', name: 'Opérateur Plateforme', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'ops@schoolos.app' },
-      { role: 'analyst', sub: 'demo-analyst', name: 'Analyste de données', schoolId: SCHOOL_A, schoolName: 'École Primaire Saint-Denis', email: 'analyste@saint-denis.edu.fr' },
+      { role: 'director', sub: 'demo-director', name: 'Camille Durand', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'direction@saint-denis.edu.fr' },
+      { role: 'deputy', sub: 'demo-deputy', name: 'Nora Benali', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'adjointe@saint-denis.edu.fr' },
+      { role: 'teacher', sub: 'demo-teacher', name: 'Élise Martin', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'e.martin@saint-denis.edu.fr' },
+      { role: 'assistant', sub: 'demo-assistant', name: 'Yanis Petit', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'y.petit@saint-denis.edu.fr' },
+      { role: 'finance', sub: 'demo-finance', name: 'Sarah Cohen', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'compta@saint-denis.edu.fr' },
+      { role: 'admissions', sub: 'demo-admissions', name: 'Lucie Bernard', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'admissions@saint-denis.edu.fr' },
+      { role: 'reception', sub: 'demo-reception', name: 'Hugo Leroy', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'accueil@saint-denis.edu.fr' },
+      { role: 'guardian', sub: 'demo-guardian', name: 'Famille Martin', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'famille.martin@example.fr' },
+      { role: 'guardian2', sub: 'demo-guardian-2', name: 'Alex Moreau', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'alex.moreau@example.fr' },
+      { role: 'student', sub: 'demo-student', name: 'Jade Petit', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'jade.petit@example.fr' },
+      { role: 'instructor', sub: 'demo-instructor', name: 'Mina Diallo', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'm.diallo@club-echecs.fr' },
+      { role: 'provider', sub: 'demo-provider', name: 'Club Échecs Paris', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'contact@club-echecs.fr' },
+      { role: 'safeguarding', sub: 'demo-safeguarding', name: 'Dr Paul Girard', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'protection@saint-denis.edu.fr' },
+      { role: 'therapist', sub: 'demo-therapist', name: 'Claire Aubry', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'c.aubry@saint-denis.edu.fr' },
+      { role: 'operator', sub: 'demo-operator', name: 'Opérateur Plateforme', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'ops@schoolos.app' },
+      { role: 'analyst', sub: 'demo-analyst', name: 'Analyste de données', schoolId: SCHOOL_A, schoolName: 'Groupe scolaire Saint-Denis – Site primaire', email: 'analyste@saint-denis.edu.fr' },
     ],
     students,
     classes,
@@ -144,11 +146,11 @@ export function makeDemoData(): DemoData {
       { id: 'ai-3', feature: 'weekly-brief', title: 'Weekly director briefing', body: 'Attendance averaged 94% this week. Two classes are close to capacity. Three activity waitlists need review before Friday.', modelId: 'local-draft-v1', status: 'proposed', confidence: 0.76, redacted: true, createdAt: '2026-11-15T07:30:00Z' },
     ],
     notifications: [
-      { id: 'n-1', title: 'Attendance recorded', body: 'CP A — 22 present, 1 late.', at: '2026-11-17T08:35:00Z', read: false, tone: 'success', category: 'attendance' },
-      { id: 'n-2', title: 'New message', body: 'Élise Martin sent a message about the museum trip.', at: '2026-11-17T08:12:00Z', read: false, tone: 'info', category: 'message' },
-      { id: 'n-3', title: 'Activity waitlist', body: 'Football en herbe has 5 students waiting.', at: '2026-11-16T17:00:00Z', read: false, tone: 'warning', category: 'activity' },
-      { id: 'n-4', title: 'Invoice overdue', body: 'Garderie — November 2026 is overdue.', at: '2026-11-15T09:00:00Z', read: true, tone: 'danger', category: 'billing' },
-      { id: 'n-5', title: 'Maintenance window', body: 'Scheduled maintenance Sunday 02:00–04:00.', at: '2026-11-14T12:00:00Z', read: true, tone: 'info', category: 'system' },
+      { id: 'n-1', title: 'Appel enregistré', body: 'CP A — 22 présents, 1 retard.', at: '2026-11-17T08:35:00Z', read: false, tone: 'success', category: 'attendance' },
+      { id: 'n-2', title: 'Nouveau message', body: 'Élise Martin a envoyé un message au sujet de la sortie au musée.', at: '2026-11-17T08:12:00Z', read: false, tone: 'info', category: 'message' },
+      { id: 'n-3', title: 'Liste d’attente activité', body: 'Football en herbe compte 5 élèves en attente.', at: '2026-11-16T17:00:00Z', read: false, tone: 'warning', category: 'activity' },
+      { id: 'n-4', title: 'Facture en retard', body: 'Garderie — novembre 2026 est en retard.', at: '2026-11-15T09:00:00Z', read: true, tone: 'danger', category: 'billing' },
+      { id: 'n-5', title: 'Maintenance planifiée', body: 'Maintenance prévue dimanche de 02:00 à 04:00.', at: '2026-11-14T12:00:00Z', read: true, tone: 'info', category: 'system' },
     ],
     messages: [
       { id: 'msg-1', from: 'Élise Martin', to: 'Famille Martin', subject: 'Sortie musée — autorisation', body: 'Bonjour, pensez à signer l’autorisation pour la sortie de mardi au musée.', at: '2026-11-17T08:12:00Z', read: false, replies: [] },
